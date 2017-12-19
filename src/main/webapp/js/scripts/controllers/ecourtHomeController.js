@@ -1,0 +1,291 @@
+var EDMSApp = angular.module('EDMSApp', []);
+EDMSApp.directive('loading', ['$http', function ($http) {
+    return {
+        restrict: 'A',
+        link: function (scope, elm, attrs) {
+            scope.isLoading = function () {
+                return $http.pendingRequests.length > 0;
+            };
+            scope.$watch(scope.isLoading, function (v) {
+                if (v) {
+                    elm.show();
+                } else {
+                    elm.hide();
+                }
+            });
+        }
+    };
+}]);
+
+
+
+EDMSApp.controller('ScrutinyCtrl',['$scope','$http',function ($scope, $http) {
+
+
+	 
+	 
+	  var urlBase="/onlinecasefiling/"
+	  
+
+	  $scope.draftList=[];
+	 
+	 
+	  $scope.caseId= $('#caseId').val();
+	 
+	  getDraftDetails();
+	  
+	  
+	  function getDraftDetails(){
+		  	$http.get(urlBase+'ecourt/getDraftDetails').
+	      success(function (data) {
+	    	  
+	      	$scope.count=data.data;
+	      	$scope.draftList=data.modelList;
+	    	  
+	      }).
+	      error(function(data, status, headers, config) {
+	      	console.log("Error in getting tree data");
+	      });
+		}
+	  
+	  
+	  $scope.viewDetails=function(id){
+			window.open(urlBase+"ecourt_add_case/draftView/"+id,'_self');
+		  
+	  }
+
+
+	$scope.previewDetails=function(id){
+	window.open(urlBase+"ecourt/scrutinyView/"+id,"_blank");
+	}
+
+
+	function getRegisterCase(id){
+	$http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
+		params : {
+			'docId' : id
+		}
+	}).success(function(data, status, headers, config) {
+	            
+	          $scope.registerCase = data.modelData;
+	            var date=new Date(parseInt($scope.registerCase.rcd_date_of_section4));
+				$scope.registerCase.rcd_date_of_section4=("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' +  date.getFullYear();
+				
+
+	}).error(function(data, status, headers, config) {
+	});
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		function getPetitioner(id){
+	    $http.get(urlBase+ 'ecourt/getPetitioner', {
+			params : {
+				'docId' : id
+			}
+		}).success(function(data, status, headers, config) {
+	                
+	              $scope.petitionerDataList = data.modelList;
+	               
+	}).error(function(data, status, headers, config) {
+		});
+
+	}
+		
+		
+		function getRespondent(id){
+		    $http.get(urlBase+ 'ecourt/getRespondent', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.respondentDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+
+
+
+
+		function getActDetails(id){
+		    $http.get(urlBase+ 'ecourt/getActDetails', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.actDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+
+
+		
+		function getImpugnedOrder(id){
+		    $http.get(urlBase+ 'ecourt/getImpugnedOrder', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		              $scope.impugnedDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+
+	     
+		
+		function getTrialCourt(id){
+		    $http.get(urlBase+ 'ecourt/getTrialCourt', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		              $scope.trialDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+		
+		
+		
+		function getCourtFee(id){
+		    $http.get(urlBase+ 'ecourt/getCourtFee', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		              $scope.courtFeeList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+
+
+
+
+
+  
+
+	
+}]);
+
+EDMSApp.controller('TabsDemoCtrl',['$scope','$http',function ($scope, $http) {
+  $scope.tabs = [
+    {
+          id: 1,
+        title:'home',
+        content:'',
+          show:true,
+    },
+    {
+        id: 2,
+        title:'New Case',
+        content:'Dynamic content 2',
+        disabled: false
+    },
+    {
+        id: 3,
+        title:'Document',
+        content:'Dynamic content 3',
+    	disabled: false	
+    },
+    {
+        id: 4,
+        title:'Help',
+        content:'Dynamic content 4',
+        disabled: false	
+    },
+    {
+        id: 5,
+        title:'Back',
+        content:'Dynamic content 5',
+        disabled: false	
+    },
+    {
+        id: 6,
+        title:'Dynamic Title 6',
+        content:'Dynamic content 6'
+    },
+  ];
+
+ 
+  var urlBase="/onlinecasefiling/"
+  
+  
+ 
+  $scope.show=false;
+  $scope.selectTab = function(tabId) {
+	  if(tabId==1){
+		  $scope.show=true;
+	  }	  else{
+		  window.location.href=urlBase + "ecourt_add_case/addCaseDetail"
+		  $scope.show=false;
+	  }
+	  /*window.location.href="document/search"**/
+	  
+    console.log('Selected tab: ' + tabId);
+  };
+  
+
+ 
+ $scope.show=false;
+  
+
+  $scope.count='';
+ $scope.draftDataList=[];
+ 
+  getDraftDetails();
+  
+  
+  function getDraftDetails(){
+	  
+		$http.get(urlBase+'ecourt/getDashboard').
+    success(function (data) {
+  	  if(data.response=="TRUE"){
+  		  
+    	$scope.dashboardData=data.modelData;
+  	  }
+    }).
+    error(function(data, status, headers, config) {
+    	console.log("Error in getting tree data");
+    });
+	};
+  
+  
+  
+  
+  
+}]);

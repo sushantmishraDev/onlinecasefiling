@@ -1,0 +1,63 @@
+package com.dms.validation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.PoliceStation;
+import com.dms.service.PoliceStationService;
+
+@Component
+public class PoliceStationMstrValidator {
+
+	@Autowired
+	PoliceStationService policeStationService;
+
+	public ActionResponse doValidation(PoliceStation pl) {
+
+		ActionResponse response = new ActionResponse();
+		Validator validation = new Validator();
+
+		List<String> errorList = new ArrayList<String>();
+		Map<String, List> error = new HashMap<String, List>();
+		String status = "TRUE";
+
+		validation.isRequired("Police Station Name", pl.getPs_name());
+		validation.isRequiredDropDown("District Name", pl.getPs_location());
+
+		error = validation.getError();
+		
+		if(pl.getPs_name()!=null && pl.getPs_location()!=null)
+		{
+				PoliceStation result = new PoliceStation();
+				result=policeStationService.checkDuplicate(pl.getPs_name(), pl.getPs_location(),pl.getPs_id());
+					
+					if(result.getPs_id() !=null)
+					{
+						errorList = new ArrayList<String>();
+						
+						errorList.add("Police station already exist");
+						error.put("Police Station" ,errorList);
+					}
+			
+		}		
+		
+		
+
+
+		if (!error.isEmpty()) {
+			status = "FALSE";
+		}
+
+		response.setResponse(status);
+		response.setDataMapList(error);
+
+		return response;
+	}
+
+}

@@ -1,0 +1,390 @@
+package com.dms.controller;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.Advocate;
+import com.dms.model.LoginLog;
+import com.dms.model.Lookup;
+import com.dms.model.ObjectMaster;
+import com.dms.model.Register;
+import com.dms.model.User;
+import com.dms.model.UserRole;
+import com.dms.service.AdvocateService;
+import com.dms.service.LookupService;
+import com.dms.service.UserRoleService;
+import com.dms.service.UserService;
+import com.dms.utility.GlobalFunction;
+import com.dms.validation.RegisterValidation;
+import com.dms.validation.Validator;
+
+
+@Controller
+public class LoginController extends HttpServlet {
+
+	@Autowired 
+	private UserService userService;
+	
+	@Autowired 
+	private AdvocateService advocateService;
+	
+	@Autowired 
+	private UserRoleService urService;
+	
+	@Autowired 
+	private LookupService lookupService;
+	
+	@Autowired  
+	private MessageSource messageSource;
+	
+	@Autowired
+	private RegisterValidation registerValidation;
+	@Autowired
+	private UserRoleService userRoleService;
+	GlobalFunction cm;
+	private static final int DEFAULT_BUFFER_SIZE = 10240; // 10KB.
+    private String filePath;
+    public void init() throws ServletException {
+        this.filePath = "/pics/latest";
+    }
+	public LoginController()
+	{
+		userService = new UserService();
+		cm = new GlobalFunction();
+	}
+	
+	
+/*	@RequestMapping(value = "login")
+	public String ecourt() {	    	
+		
+		return "/ecourt/login";
+	}*/
+	
+	
+	
+	
+	@RequestMapping(value = "/dms/login")
+	public String login() {	    	
+		
+		return "/dms/login";
+	}
+
+	@RequestMapping(value = "/user/validateAdvocate", method = {RequestMethod.POST})
+	public @ResponseBody String validateAdvocate(@RequestBody Register register) {
+		String jsonData="";
+		ActionResponse<Advocate> response=new ActionResponse<Advocate>();
+			//check if aor already exist in advocates
+				// if false return advocate does not exist
+				// if true return details of advocate
+			Advocate adv=advocateService.getByRollNo(register);
+			User u=userService.getUserByUsername(register.getRollNo());
+			if(u.getUm_id()!=null){
+				Map<String, List> error = new HashMap<String, List>();
+				List<String> errorList = new ArrayList<String>();
+				Validator validation=new Validator();
+				error=validation.getError();
+				errorList.add("Record already exist");
+				error.put("advocate", errorList);
+				response.setDataMapLists(error);
+				response.setResponse("FALSE");
+				response.setData("Record already exist");
+			}else
+			{
+				if(adv.getAdv_id()==null)
+				{
+					Map<String, List> error = new HashMap<String, List>();
+					List<String> errorList = new ArrayList<String>();
+					Validator validation=new Validator();
+					error=validation.getError();
+					errorList.add("Record does not exist");
+					error.put("advocate", errorList);
+	
+					response.setDataMapLists(error);
+					response.setResponse("FALSE");
+					response.setData("Record does not exist");
+				}else{
+					response.setResponse("TRUE");
+					response.setModelData(adv);
+				}
+			}
+			jsonData=cm.convert_to_json(response);
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/user/register", method = {RequestMethod.POST})
+	public @ResponseBody String register(@RequestBody Register register,HttpServletRequest request) {	 
+		String jsonData="";
+		ActionResponse<Register> response=new ActionResponse<Register>();
+		response = registerValidation.doValidation(register);
+		 if(response.getResponse()=="TRUE"){
+			 User user=new User();
+			 user.setPassword(cm.md5encryption(register.getPassword()));
+			 user.setUm_fullname(register.getName());
+			 user.setUsername(register.getUsername());
+			 user.setUm_email(register.getEmail());
+			 user.setUm_mobile(register.getMobile());
+			 user.setUm_gender(register.getGender());
+			 user.setCr_by(1L);
+			 user.setCr_date(new Date());
+			 String ipaddress = request.getRemoteAddr();
+			 user.setUm_ipaddress(ipaddress);
+			 user = userService.save(user);
+			 if(user.getUm_id()!=null){
+				 String role="";
+				 if(register.getType().equals("aor"))
+					 role="Advocate";
+				 if(register.getType().equals("inperson"))
+					 role="InPerson";
+				 
+				 Lookup lkRole=lookupService.getAllByLongname(role);
+					 
+				UserRole ur = new UserRole();			
+				
+				ur.setUr_um_mid(user.getUm_id());
+				ur.setUr_role_id(lkRole.getLk_id());
+				ur.setUr_cr_date(new Date());
+				ur.setUr_rec_status(1);
+				
+				urService.save(ur);
+			 }
+			 response.setData("Your account has been created, please click on below link to Sign In.");
+		 }
+		// check type of user
+			// if true check in users table
+					//if true then return user already exist
+					//if false then return details of advocate
+		// if inperson check if same username exist in db
+		
+		jsonData=cm.convert_to_json(response);	
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/dms/logout", method = {RequestMethod.GET,RequestMethod.POST})
+	public String logout(HttpSession session) {	 
+		session.removeAttribute("USER");
+		return "redirect:/";
+	}
+	
+	@RequestMapping(value = "/dms/userlogin", method = RequestMethod.POST, consumes = { "application/json;charset=UTF-8" }, produces = { "application/json;charset=UTF-8" })
+	public @ResponseBody String userlogin(@RequestBody User user, HttpSession session,HttpServletRequest request) throws ParseException {
+		// System.out.println("call user login");
+		String result = " ";
+		
+		//UserRole ur=userRoleService.getByUserRole("Scrutiny");
+		//System.out.println("User Role"+ur.getUser().getUsername());
+		
+		user = userService.validateLogin(user.getUsername(), user.getPassword());
+		ActionResponse<User> response = new ActionResponse();
+		ActionResponse<ObjectMaster> response2 = new ActionResponse();
+	
+		if (user.getUm_id() != null)
+		{
+			
+				Date date1=new Date();
+				
+				String ipaddress = request.getRemoteAddr();
+				
+				//String date = cm.dateToString(date1,"dd-MM-yyyy");
+				LoginLog loginLog=new LoginLog();
+				 
+				loginLog.setLl_login_time(date1);
+				loginLog.setLl_user_mid(user.getUm_id());
+				loginLog.setLl_ip_address(ipaddress);
+				
+				userService.saveLog(loginLog);
+				
+				user = userService.getByuserid(user.getUm_id());
+
+				List<ObjectMaster> ob_list = userService.getUserObjects(user.getUm_id());
+
+				session.setAttribute("USER", user);
+				response.setResponse("TRUE");
+				response.setModelData(user);
+				response2.setModelList(ob_list);
+				session.setAttribute("ob_list", ob_list);
+			
+				response.setData("User logged in successfully");
+//				
+//				 logger.info("User logged in successfully"+user.getUm_fullname());
+//				 logger.error("This is an error log entry"+user.getUm_fullname());
+
+		}
+		else
+		{
+			response.setResponse("FALSE");
+			response.setData("Username or Password is invalid");
+		}
+
+		result = cm.convert_to_json(response);
+		// System.out.println(result);
+		return result;
+	}
+	
+	
+	@RequestMapping(value = "/views/landingPage")
+	public String index(Model model, HttpSession session) {
+		User user = new User();
+		return "/views/dashboard";
+	}
+	
+	@RequestMapping(value = "/views/securityQuestion")
+	public String index2(Model model, HttpSession session) {
+	//	User user = new User();
+
+		return "/views/securityQuestion";
+	}
+	@RequestMapping(value = "/dms/userFagPass", method = RequestMethod.POST, consumes = { "application/json;charset=UTF-8" }, produces = { "application/json;charset=UTF-8" })	
+	public @ResponseBody String userFagPass(@RequestBody User user,HttpSession session) {
+		//System.out.println("call user login");
+		String result = " ";
+
+		user = userService.validateUser(user.getUsername());	
+		ActionResponse <User> response = new ActionResponse();		
+		ActionResponse <ObjectMaster> response2 = new ActionResponse();
+		if(user.getUm_id() != null){	
+			user = userService.getByuserid(user.getUm_id());
+			
+		 List<ObjectMaster>	ob_list = userService.getUserObjects(user.getUm_id());
+			
+			session.setAttribute("USER", user);	
+			response.setResponse("TRUE");
+			response.setModelData(user);
+			response2.setModelList(ob_list);
+			session.setAttribute("ob_list", ob_list);
+			response.setData("User logged in successfully");
+		}else{
+			response.setResponse("FALSE");
+			response.setData("Please Enter correct Username");
+		}		
+		result = cm.convert_to_json(response);
+		//System.out.println(result);
+		return result;
+	}
+	
+	@RequestMapping(value = "/views/forgetPassword")
+	public String index3(Model model, HttpSession session) {
+	//	User user = new User();
+
+		return "/views/forgetPassword";
+	}
+	
+	
+	//ecourt
+	@RequestMapping(value="/ecourt/login")
+	public String ecourtlogin() {	    	
+		
+		return "/ecourt/login";
+	}
+
+	
+	@RequestMapping(value="/ecourt/createaccountinperson")
+	public String ecourtcreateinpersonaccount() {	    	
+		
+		return "/ecourt/createaccountinperson";
+	}
+	
+	@RequestMapping(value = "/genearteOTP", method = RequestMethod.POST)
+	@ResponseBody
+	public String genearteOTP(@RequestBody User user,HttpSession session) 
+	{
+		String result = " ";
+		user = userService.validateUser(user.getUsername());	
+		ActionResponse <User> response = new ActionResponse();		
+		if(user.getUm_id() != null)
+		{
+			 Integer otp=cm.generateOTP();
+			 user.setUm_otp(otp);
+			 user=userService.save(user);
+			 
+			 Lookup urlLookup=lookupService.getLookUpObject("SMS_URL");
+			 
+			 String sms_url=urlLookup.getLk_longname();
+			 String mob_no=user.getUm_mobile();
+			 String smstext="Your OTP is "+otp+" for eFiling password change. Don't disclose to anyone.";
+			 
+			 String otpresponse=cm.sendSMS(sms_url, mob_no, smstext);
+			 
+			 if(otpresponse.equals("1"))
+			 {
+				 response.setResponse("TRUE");
+				 user.setUm_otp(null);
+				 response.setModelData(user);
+				 response.setData("OTP sent successfully");
+			 }else{
+					response.setResponse("FALSE");
+					response.setData("Unable to send OTP, please try again");
+				}
+					
+		}else{
+			response.setResponse("FALSE");
+			response.setData("Please Enter correct Username");
+		}		
+		result = cm.convert_to_json(response);
+		//System.out.println(result);
+		return result;
+		
+	}
+	
+	@RequestMapping(value = "/validateOtp", method = RequestMethod.POST)
+	@ResponseBody
+	public String validateOtp(@RequestBody User u,HttpSession session) 
+	{
+		String result = " ";
+		User user = userService.validateUser(u.getUsername());	
+		ActionResponse <User> response = new ActionResponse();		
+		if(user.getUm_id() != null)
+		{
+			 if(u.getUm_otp().equals(user.getUm_otp()))
+			 {
+				 String pass=cm.generatePassword();
+				 Lookup urlLookup=lookupService.getLookUpObject("SMS_URL");
+				 
+				 String sms_url=urlLookup.getLk_longname();
+				 String mob_no=user.getUm_mobile();
+				 String smstext="Dear "+user.getUm_fullname()+" your new Password for eFiling is "+pass+" Please do not share this password with anybody.";
+				 
+				 String pwd = cm.md5encryption(pass);
+				 user.setPassword(pwd);
+				 user.setUm_otp(null);
+				 
+				 user=userService.save(user);
+				 
+				 cm.sendSMS(sms_url, mob_no, smstext);
+				 response.setResponse("TRUE");
+				 response.setData("Please login with password received on your mobile");
+			 }
+			 else
+			 {
+				response.setResponse("FALSE");
+				response.setData("Please Enter correct OTP");
+			 }		
+			
+		}else{
+			response.setResponse("FALSE");
+			response.setData("Error");
+		}		
+		result = cm.convert_to_json(response);
+		//System.out.println(result);
+		return result;
+		
+	}
+}

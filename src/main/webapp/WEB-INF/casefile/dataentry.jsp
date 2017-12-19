@@ -1,0 +1,401 @@
+<jsp:include page="../content/header.jsp"></jsp:include>
+<%@ page import="com.dms.model.User"%>	
+<%@page import="com.dms.model.UserRole"%>
+<%@ page import="java.util.List" %>
+<script src="${pageContext.request.contextPath}/js/angularJs/ngMask.js"></script>
+
+<style>
+.form-horizontal.form-bordered .form-group>.control-label {
+	padding: 10px 15px 15px;
+}
+
+.form-horizontal.form-bordered .form-group>div {
+	padding: 5px;
+}
+
+.form-control {
+	padding: 5px 8px;
+	height: 30px;
+}
+
+.add {
+	background-image: "/images/add.png";
+}
+
+.remove {
+	background-image: "/images/remove.png";
+}
+</style>
+<% 
+User user = null;
+if(session.getAttribute("USER")!=null)
+	 user = (User)session.getAttribute("USER");
+
+%>
+
+<% 
+		List<UserRole> userroles=user.getUserroles();
+		Boolean dataentryop=false;
+		Boolean isadmin=false;
+		for(UserRole userrole:userroles){
+			if(userrole.getLk().getLk_longname().equals("DMSMaker") || userrole.getLk().getLk_longname().equals("DMSChecker") || userrole.getLk().getLk_longname().equals("DMSVerifier")){
+				dataentryop=true;
+			}
+			if(userrole.getLk().getLk_longname().equals("DMSAdmin")){
+				isadmin=true;
+			}
+		}
+%>
+			
+				
+
+<div id="content" class="content" ng-controller="dataEntryCtrl"
+	style="margin-left: 0px;">
+	<!-- begin row -->
+	<div class="row">
+		<!-- begin col-10 -->
+		<div class="col-md-11" style="float: none; margin: auto;">
+			<!-- begin panel -->
+			<div class="panel panel-inverse">
+				<div class="panel-heading">
+					<div class="panel-heading-btn"></div>
+					<h4 class="panel-title">Data Entry</h4>
+				</div>
+				<div class="panel-body">
+				<form class="form-horizontal form-bordered" >
+				<div class="col-md-12">
+					<div class="form-group">
+							<label class="control-label col-md-2">Judgement File:</label>
+	<!-- 							<input type="text" ng-model="masterentity.dfd" value="test"> -->
+								<div class="col-md-4  col-sm-4">
+								<select ng-model="judgementfilename"
+									class="form-control" id="dfd_id" 
+									ng-change="JudmentlistChange()"
+									ng-options="bcd.jfd_document_name as bcd.jfd_document_name for bcd in masterentity.judgementList"
+									>
+								<option>Select File</option>
+								</select>
+							</div>
+					</div>
+				</div>
+				<div class="col-md-12">
+				<div class="form-group">
+							<label class="control-label col-md-2">Reopened Casefile:</label>
+							<div class="col-md-4  col-sm-4">
+							<select ng-model="masterentity.id" class="form-control" id="id" 
+							ng-change="reopencasefileChange()"
+									ng-options="reopencasefile.id as reopencasefile.document_name for reopencasefile in masterentity.reopencasefileList">
+								<option>Select File</option>
+							</select>
+							</div>
+					</div>
+				</div>
+				</form>
+					<div class="col-md-6">
+						<jsp:include page="viewer.jsp"></jsp:include>
+					</div>
+					<div class="col-md-6" style="border-left: 1px solid #eee;">
+						<form class="form-horizontal form-bordered" name="dataEntryForm"
+							novalidate>
+							<div ng-show="errorlist.AssignUserId"  class="alert alert-block alert-danger">
+								<ul>
+									<span ng-repeat="errors in errorlist"> 
+									<span ng-repeat="n in errors track by $index">
+											<li>{{(n)}}</li>
+									</span> 
+									</span>
+								</ul>
+							</div>
+							
+							<div ng-show="errorlist"  class="alert alert-block alert-danger">
+								<ul>
+									<span ng-repeat="errors in errorlist"> 
+									<span ng-repeat="n in errors track by $index">
+											<li>{{(n)}}</li>
+									</span> 
+									</span>
+								</ul>
+							</div>
+	
+							 <div ng-show="errorList.length>0" class="alert alert-block alert-danger">
+								<ul>
+									<span ng-repeat="errors in errorList">
+										<li>{{errors.msg}}</li>
+									</span>
+								</ul>
+							</div> 
+							<div style="max-height: 700px; overflow-y: scroll;">
+								<input type="hidden" class="form-control" value=${fd_id
+									} id="fd_id" name="fd_id"> 
+									<input type="hidden" class="form-control" value=${judgmentdocId} id="judgmentdocId" name="judgmentdocId">
+									<input type="hidden"
+									class="form-control" value=${fd_file_bar_code
+									} id="fd_file_bar_code" name="fd_file_bar_code">
+																	
+								
+								<div class="form-group" ng-repeat="data in metaDataList ">
+									<label class="control-label col-md-5 col-sm-5">{{data.metaField.mf_lable}}
+										<span ng-if="data.metaField.mf_required_status">*</span> :
+									</label>
+									<div class="col-md-6 col-sm-6"
+										ng-if="data.metaField.mf_type=='text'">
+										<input class="form-control" type="text"
+											placeholder="{{data.metaField.mf_lable}}"
+											ng-model="data.md_value">
+									</div>
+									<div class="col-md-6 col-sm-6"
+										ng-if="data.metaField.mf_type=='date'">
+										<input type='text' class="form-control"
+											ng-model='data.md_value' mask='39/19/9999' />
+									</div>
+									<div class="col-md-6 col-sm-6"
+										ng-if="data.metaField.mf_type=='dropdown' && data.metaField.mf_id!=17 && data.metaField.mf_id!=33">
+										<select
+											ng-options="item.id as item.name for item in data.metaField.dropDownList"
+											class="form-control" number-converter
+											ng-model="data.md_value" required>
+										</select>
+									</div>
+									<div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id==17">
+										<select
+											ng-options="item.id as item.name for item in data.metaField.dropDownList"
+											class="form-control" number-converter
+											ng-change="getPoliceStns(data)" ng-model="data.md_value"
+											required>
+										</select>
+									</div>
+									<div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id==33">
+										<select
+											ng-options="item.id as item.name for item in data.metaField.dropDownList"
+											class="form-control" number-converter
+											ng-change="getJudges(data)" ng-model="data.md_value" required>
+										</select>
+									</div>
+<!-- 									<div class="col-md-6 col-sm-6" -->
+<!-- 										ng-if="data.metaField.mf_id=='4'"> -->
+<!-- 										<select -->
+<!-- 											ng-options="year.lk_id as year.lk_longname for year in yearList" -->
+<!-- 											class="form-control" ng-model="data.md_value" required> -->
+<!-- 										</select> -->
+<!-- 									</div> -->
+									<img src="${pageContext.request.contextPath}/images/plus.png"
+										style="width: 25px;"
+										ng-click="addRow(data.metaField.mf_id,$index);"
+										ng-show="data.metaField.mf_add_multiple && data.metaField.mf_id==11 && data.flag==2" />
+									<img src="${pageContext.request.contextPath}/images/minus.png"
+										style="width: 25px;"
+										ng-click="removeRow(data.metaField.mf_id,$index);"
+										ng-show="data.metaField.mf_add_multiple && data.metaField.mf_id==11 && data.flag==3" />
+
+									<img src="${pageContext.request.contextPath}/images/plus.png"
+										style="width: 25px;"
+										ng-click="addRow(data.metaField.mf_id,$index);"
+										ng-show="data.metaField.mf_add_multiple && data.metaField.mf_id!=11 && data.flag==0" />
+									<img src="${pageContext.request.contextPath}/images/minus.png"
+										style="width: 25px;"
+										ng-click="removeRow(data.metaField.mf_id,$index);"
+										ng-show="data.metaField.mf_add_multiple && data.metaField.mf_id!=11 && data.flag==1" />
+								</div>
+								<div class="row">
+									<label class="control-label col-md-5 col-sm-5 ">Reject Remark:</label>
+									<div class="col-md-6 col-sm-6 ">
+										
+											<!-- <div class="col-md-6 col-sm-6">		 -->
+											<select
+												ng-options="data.lk_id as data.lk_longname for data in remarklist | orderBy: 'lk_id' "
+												class="form-control" id="remark" name="remark"
+												ng-model="remark">
+											</select> 
+										
+										
+									</div>
+								</div>
+								<%  if (dataentryop){ %>
+								<div class="form-group">
+									<label class="control-label col-md-6 col-sm-6"></label>
+									<div class="col-md-12 col-sm-12">
+										<button type="submit" class="btn btn-danger"
+											ng-click="reject(metaFieldList)">Reject</button>
+									<button type="submit" class="btn btn-danger"
+											data-loading-text="Saving...." ng-disabled="buttonDisabled"	ng-click="metaDataSave(metaFieldList)">Save</button>
+
+										<button type="submit" class="btn btn-danger"
+											ng-click="metaDataSubmit(metaFieldList)">Submit</button>
+									</div>
+								</div>
+								<% } %>
+								<%  if (isadmin){ %>
+								<div class="form-group">
+									<label class="control-label col-md-6 col-sm-6"></label>
+									<div class="col-md-12 col-sm-12">
+										<button type="submit" class="btn btn-danger"
+											ng-click="deletecasefile(metaFieldList)">Delete</button>
+
+										<button type="submit" class="btn btn-danger"
+											ng-click="metaDataSubmit(metaFieldList)">Submit</button>
+										
+									</div>
+								</div>
+								<% } %>
+						</form>
+					</div>
+				</div>
+			</div>
+			<!-- end panel -->
+		</div>
+		<!-- end col-10 -->
+	</div>
+	<!-- end row -->
+	<div class="modal fade" id="receipt_Modal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog ">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: black;">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<strong style="color: #FBFCFD;">Inward Receipt</strong>
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="panel-body">
+
+						<table id="data-table"
+							class="table table-striped table-bordered nowrap table-hover"
+							width="100%">
+							<thead>
+							</thead>
+							<tbody>
+
+								<tr>
+
+									<td>Inward No</td>
+									<td>{{masterentity.ib_inward_number}}</td>
+								</tr>
+
+								<tr>
+
+									<td>Bench Code</td>
+									<td>{{masterentity.ib_branch}}</td>
+								</tr>
+								<tr>
+
+									<td>Bundle Number</td>
+									<td>{{masterentity.ib_bundle_number}}</td>
+								</tr>
+								<tr>
+									<td>Case Type</td>
+									<td>{{masterentity.ib_case_type}}</td>
+								</tr>
+								<tr>
+
+									<td>Case File Count</td>
+									<td>{{masterentity.ib_case_file_count}}</td>
+								</tr>
+								<tr>
+
+									<td>AHC User</td>
+									<td>{{masterentity.ib_in_ahc_user}}</td>
+								</tr>
+								<tr>
+
+									<td>SCHIL User</td>
+									<td>${username}</td>
+								</tr>
+								<tr>
+
+									<td>Date</td>
+									<td>{{masterentity.ib_inward_date}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-4 col-sm-4"></label>
+						<div class="col-md-6 col-sm-6">
+							<a href="javascript:;"
+								class="btn btn-success
+									 data-dismiss="modal" >Print</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="ib_Modal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog ">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: black;">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<strong style="color: #FBFCFD;"> Bundle Creation </strong>
+					</h4>
+				</div>
+				<%@ include file="inward_bundle_form.jsp"%>
+			</div>
+		</div>
+	</div>
+
+ <div class="modal fade" id="judgementfile_Modal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true" style="z-index:10500;">
+		<div class="modal-dialog" style="width:50%;overflow: auto;right:298px;">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: black;">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<strong style="color: #FBFCFD;">Judgement File</strong>
+					</h4>
+				</div>
+				<div class="row">
+				<object type="application/pdf" data="{{judgementfileurl}}" width="100%" height="600">
+				</object>
+				
+				</div>
+				<div class="row judgementfile"></div>
+			</div>
+		</div>
+	</div>
+
+
+</div>
+
+
+
+<!-- begin scroll to top btn -->
+<a href="javascript:;"
+	class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+	data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+<!-- end scroll to top btn -->
+
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/scripts/controllers/dataEntryController.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>
+
+<script>
+	$(function() {
+		$(".btn").click(function() {
+			$(this).button('loading').delay(1000).queue(function() {
+				$(this).button('reset');
+				$(this).dequeue();
+			});
+		});
+	});
+
+	$(document).ready(function() {
+		App.init();
+
+	});
+</script>
+</body>
+</html>

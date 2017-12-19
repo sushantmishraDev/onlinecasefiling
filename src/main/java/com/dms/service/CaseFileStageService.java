@@ -1,0 +1,55 @@
+package com.dms.service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.ApplicationStage;
+import com.dms.model.CaseFileStage;
+import com.dms.model.CaveatFileStage;
+
+@Service
+public class CaseFileStageService {
+	
+	@PersistenceContext
+	private EntityManager em;
+	
+	@Transactional
+	public CaseFileStage save(CaseFileStage s) {
+
+		CaseFileStage master = null;
+		try {
+			master = em.merge(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	@Transactional
+	public CaveatFileStage saveCaveat(CaveatFileStage caseStage) {
+		// TODO Auto-generated method stub
+		CaveatFileStage master = null;
+		try {
+			master = em.merge(caseStage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	@Transactional
+	public ApplicationStage saveApplication(ApplicationStage cfs) {
+		// TODO Auto-generated method stub
+		ApplicationStage master = null;
+		try {
+			master = em.merge(cfs);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+
+} 

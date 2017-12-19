@@ -1,0 +1,57 @@
+package com.dms.validation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.Judge;
+import com.dms.service.JudgeService;
+
+@Component
+public class JudgeMstrValidator {
+	
+	@Autowired
+	JudgeService judgeService;
+	
+public ActionResponse doValidation(Judge ju){
+		
+		ActionResponse response = new ActionResponse();
+		Validator validation=new Validator();
+		
+
+		List<String> errorList = new ArrayList<String>();
+		Map<String, List> error = new HashMap<String, List>();
+		String status = "TRUE";
+		
+		validation.isRequired("Judge Name",ju.getJg_name());
+		//validation.isRequiredDropDown("Bench Code", ju.getJg_bench_code());
+
+		validation.isRequiredDropDown("Joining Year", ju.getJg_joining_year());
+		if(ju.getJg_retirement_year()!= null)
+		{
+			validation.isLessThan("Joining Year",ju.getJg_joining_year(),ju.getJg_retirement_year());
+		}	
+
+		
+		
+		error=validation.getError();
+		
+		if(!error.isEmpty())
+		{
+			status = "FALSE";
+		}
+				
+		response.setResponse(status);
+		response.setDataMapList(error);
+		
+		
+		return response;
+	}
+
+
+}

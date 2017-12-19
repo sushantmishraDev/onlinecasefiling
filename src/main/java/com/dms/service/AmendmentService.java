@@ -1,0 +1,140 @@
+package com.dms.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.Amendment;
+import com.dms.model.CaseFileDetail;
+import com.dms.model.CaseFileStage;
+import com.dms.model.RegisteredCaseDetails;
+import com.dms.model.User;
+
+@Service
+public class AmendmentService {
+	@PersistenceContext
+	private EntityManager em;
+
+	public RegisteredCaseDetails getRegisterCase(Long fd_case_type, Integer fd_case_no, Integer fd_case_year) {
+		RegisteredCaseDetails result=new RegisteredCaseDetails();
+		try{
+		Query query=null;
+		query = em.createQuery("SELECT rcd from RegisteredCaseDetails rcd where rcd.rcd_ct_id=:fd_case_type and rcd.rcd_case_no=:fd_case_no and rcd.rcd_case_year=:fd_case_year").setParameter("fd_case_type", fd_case_type).setParameter("fd_case_no", fd_case_no).setParameter("fd_case_year", fd_case_year);
+		result=(RegisteredCaseDetails)query.setMaxResults(1).getSingleResult();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return result;		
+	}
+
+	public List<User> getApplicationUsers(Long fd_id,Long ap_stage_lid) {
+		// TODO Auto-generated method stub
+		List<User> result=new ArrayList<User>();
+		try{
+		Query query=null;
+		query = em.createQuery("SELECT u from User u where u.um_id IN (select distinct(ap_cr_by) from Application where ap_fd_mid=:ap_fd_mid and ap_stage_lid=:ap_stage_lid)").setParameter("ap_fd_mid", fd_id).setParameter("ap_stage_lid", ap_stage_lid);
+		result=query.getResultList();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	public CaseFileDetail getCaseFile(Long fd_id) {
+		CaseFileDetail result=null;
+	    try {
+			String query=" SELECT cfd from CaseFileDetail cfd where cfd.fd_id=:fd_id";
+			result= (CaseFileDetail) em.createQuery(query).setParameter("fd_id", fd_id).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+	public List<User> searchUser(String name) {
+		// TODO Auto-generated method stub
+		List<User> result=new ArrayList<>();
+	    try {
+			String query="SELECT u from User u where lower(u.um_fullname) like '%"+name.toLowerCase()+"%' ";
+			result= em.createQuery(query).getResultList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return result;
+	}
+	
+	@Transactional
+	public Amendment saveAmendment(Amendment amendment) {
+		// TODO Auto-generated method stub
+		Amendment master = null;
+		try {
+			master = em.merge(amendment);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	public Amendment getAmendment(Long am_id) {
+		// TODO Auto-generated method stub
+		Amendment master = null;
+	    try {
+			String query="SELECT a from Amendment a where a.am_id=:am_id";
+			master= (Amendment) em.createQuery(query).setParameter("am_id", am_id).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return master;
+	}
+
+	public Amendment getAmendment(Long am_fd_mid, String am_type, Long am_status) {
+		// TODO Auto-generated method stub
+		Amendment master = null;
+	    try {
+			String query="SELECT a from Amendment a where a.am_fd_mid=:am_fd_mid and a.am_type=:am_type and am_status=:am_status";
+			master= (Amendment) em.createQuery(query).setParameter("am_fd_mid", am_fd_mid).setParameter("am_type", am_type).setParameter("am_status", am_status).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return master;
+	}
+
+	public List<Amendment> getAmendments(Long am_fd_mid) {
+		// TODO Auto-generated method stub
+		List<Amendment> result=new ArrayList<>();
+	    try {
+			String query="SELECT a from Amendment a where a.am_fd_mid=:am_fd_mid";
+			result= em.createQuery(query).setParameter("am_fd_mid",am_fd_mid).getResultList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return result;
+	}
+
+	public List<Amendment> getAmendmentsByUser(Long user_id, Long lk_id) {
+		// TODO Auto-generated method stub
+		List<Amendment> result=new ArrayList<>();
+	    try {
+			String query="SELECT a from Amendment a where a.am_um_mid=:am_um_mid and a.am_status=:am_status";
+			result= em.createQuery(query).setParameter("am_um_mid",user_id).setParameter("am_status", lk_id).getResultList();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return result;
+	}
+}

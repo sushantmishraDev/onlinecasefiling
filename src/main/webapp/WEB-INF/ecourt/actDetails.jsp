@@ -1,0 +1,179 @@
+	<div class="smooth container w-xxxl w-auto-xs">
+		<form name="leadStage" class="form-validation">
+		<h3></h3>
+			<fieldset class="scheduler-border">
+				<div class="col-sm-10">
+					<div class="panel panel-default" style="margin-left: 140px;">
+						<div class="panel-heading font-bold">Act Details</div>
+						<div class="panel-body">
+							<div class="form-group pull-in clearfix">
+								<div class="col-sm-6">
+                                  <div ng-init="actDetails.act_type=1">
+									<label>Belongs To:&emsp; 
+									<input type="radio"  id="central"  data-ng-click="changeAct($event)" ng-model="actDetails.act_type"
+										name="actType" value="1">Central&emsp; 
+										<input type="radio"  id="state" data-ng-click="changeAct($event)" name="actType"
+										ng-model="actDetails.act_type" value="state">State
+									</label>
+								</div>
+								</div>
+
+							</div>
+							<div class="form-group pull-in clearfix" ng-show="centralShow">
+								<div class="col-sm-6">
+									<label>Central Act (Title)</label> <select
+										class="form-control" 
+										ng-model="actDetails.act_code"
+										ng-options="actMaster.act_id as actMaster.act_name for actMaster in centralActList">
+										<option value="">Select Act Title</option>
+										</select>
+
+								</div>
+
+								<div class="col-sm-6">
+
+									<label class="control-label">Central Rule(Title)
+									</label> <input type="text" class="form-control"
+										ng-model="actDetails.act_rule">
+								</div>
+								
+							
+								<div class="col-sm-6">
+									<label>Section</label> 
+									<input type="text" class="form-control"
+										ng-model="actDetails.act_section">
+									</div>
+
+								<div class="col-sm-6">
+									<label>Rule No(s)</label> <input
+										type="text" class="form-control" ng-model="actDetails.act_rule_no" required>
+								</div>
+								</div>
+								
+								
+								
+								
+								<div ng-show="stateShow">
+								
+								<div class="col-sm-6">
+									<label>State</label>  <select
+									class="form-control" id="s_id" name="s_id"
+									ng-model="actDetails.act_s_id"
+									 ng-options="state.s_id as state.s_name for state in stateList">
+									<option value="">Select State</option>
+								</select>
+								</div>
+								<div class="form-group pull-in clearfix">
+								<div class="col-sm-6">
+									<label>State Rule(Title)</label> <input type="text"
+										class="form-control" id="caseDetail" name="caseDetail"
+										ng-model="actDetails.act_rule">
+										
+								</div>
+								
+								<div class="col-sm-6">
+									<label>State Act(Title)</label> <select
+										class="form-control" 
+										ng-model="actDetails.act_code"
+										ng-options="actMaster.act_id as actMaster.act_name for actMaster in stateActList"></select>
+								</div>
+								
+								<div class="col-sm-6">
+									<label>Rule.No(s)</label> <input type="text"
+										class="form-control" id="caseDetail" name="caseDetail"
+										ng-model="actDetails.act_rule_no">
+								</div>
+								
+								
+								<div class="col-sm-6">
+									<label>Section</label>
+									<input type="text"
+										class="form-control" id="caseDetail" name="caseDetail"
+										ng-model="actDetails.act_section">
+
+							</div>
+								
+								
+								
+								
+								<div class="col-sm-6">
+									<label>Other</label> <input type="text"
+										class="form-control" id="caseDetail" name="caseDetail"
+										ng-model="actDetails.act_other">
+										
+								</div>
+								
+																		
+							
+                           
+
+						</div>
+						</div>
+						
+						 <div class="row pull-right">
+                                                      <div class="col-sm-12">
+						                  <button class="btn btn-success"  ng-disabled="!actDetails.act_code" ng-click="addActDetails(actDetails)">Add ActDetails</button>
+						                     </div>
+                                                           
+                                             </div>
+
+
+						
+						
+						
+					</div>
+				</div>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+	
+	
+	
+	
+	
+                  <div class="panel-body no-padder">
+                        <div class="col-md-12 no-padder">
+                              <div class="box-div no-padder">
+                                    <div class=" col-md-12 pull-right">
+                                          <div class="table-container">
+                                                 <div class="panel-body">
+                                        <div class="table-responsive">
+                                                        <table id="data-table" class="table table-striped table-bordered">
+                                                            <thead>
+
+                                                                  <tr>
+                                                                        <th>Act Belongs To</th>
+                                                                           <th>Act (Title)</th>
+                                                                           <th>Section</th>
+                                                                           <th>Rule (Title)</th>
+                                                                           <th>Rule Number</th>
+                                                                        <th class="text-center">Action</th>
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  <tr ng-repeat="row in actDataList" class="odd gradeX">
+                                                                                        <td>{{row.act_type}}</td>
+                                                                                        <td>{{row.actMaster.act_name}}</td>
+                                                                                        <td>{{row.act_section}}</td>   
+                                                                                          <td>{{row.act_rule}}</td> 
+                                                                                          <td>{{row.act_rule_no}}</td>
+                                                                                          <td class="text-center">
+                                                                                    <a  ng-click="editAct(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
+                                                                          <a  ng-click="deleteActDetails(row.act_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
+                                                                            
+                                                                             
+                                                                             
+                                                                        </td>
+                                                                  </tr>
+                                                            </tbody>
+                                                      </table>
+                                                </div>
+                                          </div>
+                                    </div>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+		
+	

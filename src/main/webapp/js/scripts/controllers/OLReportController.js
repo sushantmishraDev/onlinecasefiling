@@ -1,0 +1,87 @@
+var edmsApp = angular.module("EDMSApp", ['ngFileUpload','ngMask']);
+edmsApp.controller("OLReportController",['$scope','$http','Upload', function($scope,$http,Upload) {
+	var urlBase="/onlinecasefiling/";
+	  //$scope.usingFlash = FileAPI && FileAPI.upload != null;
+		$scope.model={};
+	  $scope.invalidFiles = [];
+	  $scope.type_id= $('#type_id').val();
+	  $scope.$watch('files', function (files) {
+	    $scope.formUpload = false;
+	    if (files != null) {
+	      if (!angular.isArray(files)) {
+	        $timeout(function () {
+	          $scope.files = files = [files];
+	        });
+	        return;
+	      }
+	      for (var i = 0; i < files.length; i++) {
+	        $scope.errorMsg = null;
+	        (function (f) {
+	          $scope.upload(f, true);
+	        })(files[i]);
+	      }
+	    }
+	  });
+
+	$scope.getList=function(){
+		getData();
+	}
+	function getData(){	
+		$http.get(urlBase+'olreport/getall')
+			.success(function(data) {
+				$scope.olreports=data.modelList;
+		}).error(function(data, status, headers, config) {
+			console.log("Error in getting Cause List Data ");
+		});	
+	};
+		$scope.onFileSelect = function ($files) {
+        $scope.uploadProgress = 0;
+        $scope.selectedFile = $files;
+    };
+    $scope.files = [];
+
+    //listen for the file selected event
+    $scope.$on("fileSelected", function (event, args) {
+    	$scope.$apply(function () {            
+            $scope.files.push(args.file);
+        });
+    });
+    
+	$scope.save=function() 
+	{
+		  var file=$scope.picFile;
+		  
+		    file.upload = Upload.upload({
+		      url: urlBase + 'olreport/uploadolreport',
+		      headers: {
+		    	  'optional-header': 'header-value'
+		        },
+		        fields:$scope.model,
+    		   file:file,
+		    });
+
+		    file.upload.then(function (response) {
+		        if(response.data.response=="TRUE"){
+		        	$scope.errorlist =null;
+		        	alert("Successfully uploaded OL Report");
+		        	$("#uploadDocument").modal("hide");
+		        	//window.location.reload();
+		        }else{
+		        	$("#uploadDocument").modal("hide");
+		        }
+		      }, function (response) {
+		        
+		      }, function (evt) {
+		        // Math.min is to fix IE which reports 200% sometimes
+		        //file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+		      });
+
+		      file.upload.xhr(function (xhr) {
+		        // xhr.upload.addEventListener('abort', function(){console.log('abort complete')}, false);
+		      });
+		}  	  
+	$scope.viewFile=function(id){
+		  window.open(urlBase+"olreport/viewdocument/"+id,"_blank");
+	  }
+		
+}]);

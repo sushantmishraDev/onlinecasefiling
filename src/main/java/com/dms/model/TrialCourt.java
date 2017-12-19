@@ -1,0 +1,277 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="trial_court")
+public class TrialCourt {
+	
+	
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="trialcourt_seq")
+	@SequenceGenerator(name="trialcourt_seq", sequenceName="trialcourt_seq", allocationSize=1)	
+	@Column(name = "tr_id")
+	  private Long tr_id;
+	
+	   @Column(name = "tr_sub_courtname")
+	  private  String  tr_sub_courtname;
+	  
+	   
+	   @Column(name = "tr_judge_name") 
+	   private  String tr_judge_name;
+	   
+	   @Column(name = "tr_case_type") 
+	   private  Long tr_case_type;
+	   
+	   @Column(name = "tr_case_no")   
+	   private  String tr_case_no;
+	   
+	   @Column(name = "tr_district")  
+	   private Long tr_district;
+	   
+	   @Column(name = "tr_order_date") 
+	   private  Date tr_order_date;
+	   
+
+	   @Column(name = "tr_cr_by") 
+	   private  Long tr_cr_by; 
+
+	   @Column(name = "tr_s_id") 
+	   private Long  tr_s_id;
+	   
+	   @Column(name = "tr_cr_date") 
+	   private  Date tr_cr_date;
+	   
+	   @Column(name = "tr_mod_by") 
+	   private  Long tr_mod_by;
+	   
+	   
+	   @Column(name = "tr_mod_date") 
+	   private  Date tr_mod_date;
+	   
+	   @Column(name = "tr_rec_status")  
+	   private Integer  tr_rec_status;
+	   
+	  @Column(name = "tr_decision_date")   
+	   private Date  tr_decision_date;
+	 
+	  @Column(name = "tr_applied_date")  
+	   private  Date tr_applied_date;
+	  
+	  @Column(name = "tr_case_year") 
+	  private  Long tr_case_year;
+	  
+	  @Column(name = "tr_sequence") 
+	   private  Integer tr_sequence;
+
+	  @Column(name="tr_ct_mid")
+	  private Long tr_ct_mid;
+	  
+	  @Column(name="tr_rcd_mid")
+	  private Long tr_rcd_mid;
+	  
+	  @Column(name="tr_lct_mid")
+	  private Integer tr_lct_mid;
+	  
+	  @OneToOne(cascade = CascadeType.PERSIST)
+	    @JoinColumn(name = "tr_ct_mid",insertable = false, updatable = false)
+		private LowerCourtCaseType caseType;
+	  
+	  @OneToOne(cascade = CascadeType.PERSIST)
+	    @JoinColumn(name = "tr_lct_mid",insertable = false, updatable = false)
+		private LowerCourtTypes courtType;
+	  
+	  
+	public Long getTr_id() {
+		return tr_id;
+	}
+
+	public void setTr_id(Long tr_id) {
+		this.tr_id = tr_id;
+	}
+
+	public String getTr_sub_courtname() {
+		return tr_sub_courtname;
+	}
+
+	public void setTr_sub_courtname(String tr_sub_courtname) {
+		this.tr_sub_courtname = tr_sub_courtname;
+	}
+
+	public String getTr_judge_name() {
+		return tr_judge_name;
+	}
+
+	public void setTr_judge_name(String tr_judge_name) {
+		this.tr_judge_name = tr_judge_name;
+	}
+
+	public Long getTr_case_type() {
+		return tr_case_type;
+	}
+
+	public void setTr_case_type(Long tr_case_type) {
+		this.tr_case_type = tr_case_type;
+	}
+
+	public String getTr_case_no() {
+		return tr_case_no;
+	}
+
+	public void setTr_case_no(String tr_case_no) {
+		this.tr_case_no = tr_case_no;
+	}
+
+	public Long getTr_district() {
+		return tr_district;
+	}
+
+	public void setTr_district(Long tr_district) {
+		this.tr_district = tr_district;
+	}
+
+	public Date getTr_order_date() {
+		return tr_order_date;
+	}
+
+	public void setTr_order_date(Date tr_order_date) {
+		this.tr_order_date = tr_order_date;
+	}
+
+	public Long getTr_cr_by() {
+		return tr_cr_by;
+	}
+
+	public void setTr_cr_by(Long tr_cr_by) {
+		this.tr_cr_by = tr_cr_by;
+	}
+
+	public Long getTr_s_id() {
+		return tr_s_id;
+	}
+
+	public void setTr_s_id(Long tr_s_id) {
+		this.tr_s_id = tr_s_id;
+	}
+
+	public Date getTr_cr_date() {
+		return tr_cr_date;
+	}
+
+	public void setTr_cr_date(Date tr_cr_date) {
+		this.tr_cr_date = tr_cr_date;
+	}
+
+	public Long getTr_mod_by() {
+		return tr_mod_by;
+	}
+
+	public void setTr_mod_by(Long tr_mod_by) {
+		this.tr_mod_by = tr_mod_by;
+	}
+
+	public Date getTr_mod_date() {
+		return tr_mod_date;
+	}
+
+	public void setTr_mod_date(Date tr_mod_date) {
+		this.tr_mod_date = tr_mod_date;
+	}
+
+	public Integer getTr_rec_status() {
+		return tr_rec_status;
+	}
+
+	public void setTr_rec_status(Integer tr_rec_status) {
+		this.tr_rec_status = tr_rec_status;
+	}
+
+	public Date getTr_decision_date() {
+		return tr_decision_date;
+	}
+
+	public void setTr_decision_date(Date tr_decision_date) {
+		this.tr_decision_date = tr_decision_date;
+	}
+
+	public Date getTr_applied_date() {
+		return tr_applied_date;
+	}
+
+	public void setTr_applied_date(Date tr_applied_date) {
+		this.tr_applied_date = tr_applied_date;
+	}
+
+	public Long getTr_case_year() {
+		return tr_case_year;
+	}
+
+	public void setTr_case_year(Long tr_case_year) {
+		this.tr_case_year = tr_case_year;
+	}
+
+	public Integer getTr_sequence() {
+		return tr_sequence;
+	}
+
+	public void setTr_sequence(Integer tr_sequence) {
+		this.tr_sequence = tr_sequence;
+	}
+
+	public Long getTr_rcd_mid() {
+		return tr_rcd_mid;
+	}
+
+	public void setTr_rcd_mid(Long tr_rcd_mid) {
+		this.tr_rcd_mid = tr_rcd_mid;
+	}
+
+	public Long getTr_ct_mid() {
+		return tr_ct_mid;
+	}
+
+	public void setTr_ct_mid(Long tr_ct_mid) {
+		this.tr_ct_mid = tr_ct_mid;
+	}
+
+	public Integer getTr_lct_mid() {
+		return tr_lct_mid;
+	}
+
+	public void setTr_lct_mid(Integer tr_lct_mid) {
+		this.tr_lct_mid = tr_lct_mid;
+	}
+
+	public LowerCourtCaseType getCaseType() {
+		return caseType;
+	}
+
+	public void setCaseType(LowerCourtCaseType caseType) {
+		this.caseType = caseType;
+	}
+
+	public LowerCourtTypes getCourtType() {
+		return courtType;
+	}
+
+	public void setCourtType(LowerCourtTypes courtType) {
+		this.courtType = courtType;
+	}
+
+	
+	  
+	  
+
+}

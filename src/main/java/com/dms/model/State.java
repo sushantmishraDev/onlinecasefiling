@@ -1,0 +1,38 @@
+package com.dms.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="states")
+public class State {
+
+	@Id
+	@Column(name="s_id")
+	private Long s_id;
+	
+	@Column(name="s_name")
+	private  String s_name;
+
+	public Long getS_id() {
+		return s_id;
+	}
+
+	public void setS_id(Long s_id) {
+		this.s_id = s_id;
+	}
+
+	public String getS_name() {
+		return s_name;
+	}
+
+	public void setS_name(String s_name) {
+		this.s_name = s_name;
+	}
+	
+	
+	
+	
+}

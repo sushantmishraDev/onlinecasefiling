@@ -1,0 +1,1279 @@
+package com.dms.controller.report;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.CaseFileTemp;
+import com.dms.model.DailyActivityReport;
+import com.dms.model.Judge;
+import com.dms.model.Lookup;
+import com.dms.model.ReportsView;
+import com.dms.service.JudgeService;
+import com.dms.service.LookupService;
+import com.dms.service.report.CommonReportsService;
+import com.dms.utility.GlobalFunction;
+
+
+@Controller
+public class CommonReportsController {
+	private GlobalFunction globalfunction;
+	
+	public static final String Carton_Report_View="views/report/cartonReport";
+	
+	public static final String DateWise_Report_View="views/report/datewiseReport";
+	
+	public static final String LocationWise_Report_View="views/report/locationwiseReport";
+	
+	public static final String Parameterized_View="views/report/parameterizedSearch";
+	
+    public static final String FirstDE_View="views/report/firstDEReport";
+	
+	public static final String SecondDE_View="views/report/secondDEReport";
+
+    public static final String ScanProductivity_View="views/report/scanningProductivityReport";
+    
+    
+    public static final String WorkProgress_View="views/report/workProgressReport";
+    public static final String SearchByJudgeName_View = "views/report/searchByJudgeNameReport";
+
+	public static final String SearchByCounselName_View = "views/report/searchByCounselNameReport";
+
+	public static final String AdvanceSearch_View = "views/report/advanceSearchReport";
+    
+
+	public static final String searchByCaseNumber_View = "views/report/searchByCaseNumber";
+
+	public static final String searchByJudgementDate_View = "views/report/searchByJudgementDate";
+
+	public static final String searchbyTitle = "views/report/SearchbyTitle";
+
+	public static final String searchByFullBenchJudgmentOrder_View = "views/report/searchByFullBenchJudgmentOrder";
+	
+	@Autowired
+	CommonReportsService reportsService;
+	
+	//ccc
+	@Autowired
+	private LookupService lkService;
+	
+	@Autowired
+	private JudgeService judgeService;
+	
+	
+	public CommonReportsController()
+	{
+		globalfunction = new GlobalFunction();
+	}
+	
+	@RequestMapping(value="/report/documentSearch" , method = RequestMethod.GET)
+	public String documentSearch(){
+		
+	
+	return "/views/report/documentSearch";
+	
+	}
+	
+	@RequestMapping(value="/report/cartonReport" , method = RequestMethod.GET)
+	public String Search(){
+		
+	
+	return Carton_Report_View;
+	
+	}
+	
+	@RequestMapping(value="/report/dailyActivityReport" , method = RequestMethod.GET)
+	public String getdailyReport(){
+		
+	
+	return "/views/report/dailyActivityReport";
+	
+	}
+	
+	@RequestMapping(value="/report/datewiseReport" , method = RequestMethod.GET)
+	public String getdatewiseReport(){
+		
+	
+	return DateWise_Report_View;
+	
+	}
+	
+	@RequestMapping(value="/report/firstDEReport" , method = RequestMethod.GET)
+	public String getFirstDEReport(){
+		
+	return FirstDE_View;	
+	}
+	
+	@RequestMapping(value="/report/secondDEReport" , method = RequestMethod.GET)
+	public String getSecondDEReport(){
+		
+	return SecondDE_View;	
+	}
+	
+	
+	@RequestMapping(value="/report/scanningProductivity" , method = RequestMethod.GET)
+	public String getScanningReport(){
+		
+	return ScanProductivity_View;	
+	}
+	
+	
+	@RequestMapping(value="/report/locationwiseReport" , method = RequestMethod.GET)
+	public String getLocationwiseReport(){
+		
+	
+	return LocationWise_Report_View;
+	
+	}
+	
+	@RequestMapping(value="/report/parameterizedSearch" , method = RequestMethod.GET)
+	public String getparameterizedSearch()
+	{
+	return Parameterized_View;
+	
+	}
+	
+	@RequestMapping(value="/report/searchByJudgeNameReport" , method = RequestMethod.GET)
+	public String getjudgeNameSearch()
+	{
+	return SearchByJudgeName_View;
+	
+	}
+	
+	@RequestMapping(value="/report/searchByCounselNameReport" , method = RequestMethod.GET)
+	public String getByCounselNameSearch()
+	{
+	return SearchByCounselName_View;
+	
+	}
+	
+	@RequestMapping(value="/report/workProgressReport" , method = RequestMethod.GET)
+	public String getWorkProgress()
+	{
+	return WorkProgress_View;
+	
+	}
+	@RequestMapping(value = "/report/advanceSearchReport", method = RequestMethod.GET)
+	public String getAdvanceSearch() {
+		return AdvanceSearch_View;
+
+	}
+		
+	@RequestMapping(value = "/report/getbenchcode",method = RequestMethod.GET)
+	public @ResponseBody String getbenchcode() {
+		String jsonData=null;
+		String branchData=null;
+			
+		
+		List<Lookup> lkData=lkService.getAll("BRANCH");		
+		if(lkData != null){
+			branchData = globalfunction.convert_to_json(lkData);
+		}
+	
+		jsonData = "{\"branchData\":"+branchData+"}";
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/report/getcasetypedata", method = RequestMethod.GET)
+	public @ResponseBody String getcasetypedata() {
+		String jsonData = null;
+		String casetypeData = null;
+
+		List<Lookup> lkData = lkService.getAll("CASE_TYPE");
+		if (lkData != null) {
+			casetypeData = globalfunction.convert_to_json(lkData);
+		}
+
+		jsonData = "{\"casetypeData\":" + casetypeData + "}";
+		return jsonData;
+	}
+	
+	@RequestMapping(value="/report/getjudgeDetails",method=RequestMethod.GET)
+	public @ResponseBody String getJudgeData(Model model)
+	{  
+		String JudgeName=null;
+		String jsonData=null;
+		List<Judge> getDetails=judgeService.getAll();
+		if(getDetails!=null)
+		{
+			JudgeName = globalfunction.convert_to_json(getDetails);
+		}
+		System.out.println(jsonData);
+		jsonData = "{\"JudgeName\":"+JudgeName+"}";
+		return jsonData;
+
+	}
+		
+	
+	@RequestMapping(value = "report/getDailyReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getDailyReportData(@RequestParam(value = "ib_branch")Long  ib_branch, @RequestParam(value = "ib_inward_date")  String ib_inward_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List  reportList=reportsService.getReportData(ib_branch,ib_inward_date);
+		List innerList = reportList;
+			
+		
+		
+		//outer for
+		for(int i=0;i<reportList.size();){
+			
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			
+			//ct_temp = row1[0].toString();
+			
+			//inner for
+			for(int j=i;j<innerList.size();j++){
+				Object[] row2 = (Object[]) innerList.get(j);
+				
+				if(ct_temp.equals(""))
+				{
+					ct_temp = row1[0].toString();
+				}
+				else
+				{
+					if(ct_temp.equals(row2[0].toString()))
+						flag = true;
+					else
+						flag = false;
+				}
+				
+				if(flag == false)
+				{
+					result.add(dar);
+					ct_temp = row2[0].toString();
+					dar  = new DailyActivityReport();
+					break;
+				}
+				else
+				{
+					dar.setParameter1(row2[1].toString());
+					switch(Integer.parseInt(row2[2].toString()))
+					{
+						case 26: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 16: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 19: if(dar.getParameter3().equals("")) { dar.setParameter3(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter3())+ Integer.parseInt(row2[5].toString());
+									 	dar.setParameter3(""+sum); }
+								break;
+						case 20: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+						 		 			dar.setParameter4(""+sum); }
+								break;
+						case 13: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+				 		 			dar.setParameter4(""+sum); }
+								break;
+						case 14: if(dar.getParameter4()==null || dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 224: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 225: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 226: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 17: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 223: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 235: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 236: dar.setParameter5(row2[5].toString());	break;
+		
+					}
+				}
+				i++;
+			}
+			
+			
+			
+			
+		}
+		
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	
+
+	
+	@RequestMapping(value = "report/getLocationWiseReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getLocationwiseReportData(@RequestParam(value = "ib_inward_date")  String ib_inward_date,@RequestParam(value = "ib_inwrd_date")  String ib_inwrd_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List  reportList=reportsService.getLocationwiseData(ib_inward_date,ib_inwrd_date);
+		List innerList = reportList;
+			
+		
+		
+		//outer for
+		for(int i=0;i<reportList.size();){
+			
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			
+			//ct_temp = row1[0].toString();
+			
+			//inner for
+			for(int j=i;j<innerList.size();j++){
+				Object[] row2 = (Object[]) innerList.get(j);
+				
+				if(ct_temp.equals(""))
+				{
+					ct_temp = row1[0].toString();
+				}
+				else
+				{
+					if(ct_temp.equals(row2[0].toString()))
+						flag = true;
+					else
+						flag = false;
+				}
+				
+				if(flag == false)
+				{
+					result.add(dar);
+					ct_temp = row2[0].toString();
+					dar  = new DailyActivityReport();
+					break;
+				}
+				else
+				{
+					dar.setParameter1(row2[1].toString());
+					switch(Integer.parseInt(row2[2].toString()))
+					{
+						case 26: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 16: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 19: if(dar.getParameter3().equals("")) { dar.setParameter3(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter3())+ Integer.parseInt(row2[5].toString());
+									 	dar.setParameter3(""+sum); }
+								break;
+						case 20: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+						 		 			dar.setParameter4(""+sum); }
+								break;
+						case 13: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+				 		 			dar.setParameter4(""+sum); }
+								break;
+						case 14: if(dar.getParameter4()==null || dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 224: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 225: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 226: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 17: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 223: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 235: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 236: dar.setParameter5(row2[5].toString());	break;
+		
+					}
+				}
+				i++;
+			}
+			
+			
+			
+			
+		}
+		
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getDatewiseReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getDatewiseReportData(@RequestParam(value = "ib_branch")Long  ib_branch, @RequestParam(value = "ib_inward_date")  String ib_inward_date,@RequestParam(value = "ib_inwrd_date")  String ib_inwrd_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List  reportList=reportsService.getdatewiseData(ib_branch,ib_inward_date,ib_inwrd_date);
+		List innerList = reportList;
+			
+		
+		
+		//outer for
+		for(int i=0;i<reportList.size();){
+			
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			
+			//ct_temp = row1[0].toString();
+			
+			//inner for
+			for(int j=i;j<innerList.size();j++){
+				Object[] row2 = (Object[]) innerList.get(j);
+				
+				if(ct_temp.equals(""))
+				{
+					ct_temp = row1[0].toString();
+				}
+				else
+				{
+					if(ct_temp.equals(row2[0].toString()))
+						flag = true;
+					else
+						flag = false;
+				}
+				
+				if(flag == false)
+				{
+					result.add(dar);
+					ct_temp = row2[0].toString();
+					dar  = new DailyActivityReport();
+					break;
+				}
+				else
+				{
+					dar.setParameter1(row2[1].toString());
+					switch(Integer.parseInt(row2[2].toString()))
+					{
+						case 26: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 16: if(dar.getParameter2().equals("")) { dar.setParameter2(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter2())+ Integer.parseInt(row2[5].toString());
+								 	dar.setParameter2(""+sum); }
+								break;
+						case 19: if(dar.getParameter3().equals("")) { dar.setParameter3(row2[5].toString()); }
+								 else { int sum = Integer.parseInt(dar.getParameter3())+ Integer.parseInt(row2[5].toString());
+									 	dar.setParameter3(""+sum); }
+								break;
+						case 20: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+						 		 			dar.setParameter4(""+sum); }
+								break;
+						case 13: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+						 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+				 		 			dar.setParameter4(""+sum); }
+								break;
+						case 14: if(dar.getParameter4()==null || dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 224: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 225: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 226: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 17: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 223: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 235: if(dar.getParameter4().equals("")) { dar.setParameter4(row2[5].toString()); }
+							 		 else { int sum = Integer.parseInt(dar.getParameter4())+ Integer.parseInt(row2[5].toString());
+					 		 			dar.setParameter4(""+sum); }
+								break;
+						case 236: dar.setParameter5(row2[5].toString());	break;
+		
+					}
+				}
+				i++;
+			}
+			
+			
+			
+			
+		}
+		
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+
+
+	
+	
+	
+	
+	
+	
+	@RequestMapping(value = "report/getscanningProductivityReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getscanningProductivityReportData(@RequestParam(value = "ib_inward_date")  String ib_inward_date,@RequestParam(value = "ib_inwrd_date")  String ib_inwrd_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		
+		List  reportList=reportsService.getScanningProductivitySearch(ib_inward_date, ib_inwrd_date);
+		List innerList = reportList;
+		  
+	   for(int i=0;i<reportList.size(); i++)
+	   {
+			
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));	
+			dar  = new DailyActivityReport();
+			
+			
+			dar.setParameter1(row1[0].toString());
+			dar.setParameter2(row1[3].toString());
+			dar.setParameter3("00:00");
+			dar.setParameter4(row1[2].toString());
+			dar.setParameter5(row1[1].toString());
+			/*dar.setParameter5(row1[2].toString());
+			dar.setParameter6(row1[2].toString());
+			dar.setParameter7(row1[2].toString());	
+			*/
+			result.add(dar);
+	   }	
+		
+		/*//outer for
+		for(int i=0;i<reportList.size();){
+			
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			
+			//ct_temp = row1[0].toString();
+			
+			//inner for
+			for(int j=i;j<innerList.size();j++){
+				Object[] row2 = (Object[]) innerList.get(j);
+				
+				if(ct_temp.equals(""))
+				{
+					ct_temp = row1[0].toString();
+				}
+				else
+				{
+					if(ct_temp.equals(row2[0].toString()))
+						flag = true;
+					else
+						flag = false;
+				}
+				
+				if(flag == false)
+				{
+					result.add(dar);
+					ct_temp = row2[0].toString();
+					dar  = new DailyActivityReport();
+					break;
+				}
+				else
+				{
+					dar.setParameter1(row2[0].toString());
+					dar.setParameter2(row2[1].toString());
+					dar.setParameter3(row2[2].toString());
+					
+				}
+			
+			}
+			
+			i++;
+			
+			
+		}
+		*/
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+
+	
+	
+	
+	
+	
+	@RequestMapping(value = "report/getFirstDEReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getFirstDEReportData( @RequestParam(value = "ib_inward_date")  String ib_inward_date,@RequestParam(value = "ib_inwrd_date")  String ib_inwrd_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List  reportList=reportsService.getFirstDEData(ib_inward_date,ib_inwrd_date);
+		List innerList = reportList;
+		
+		for(int i=0;i<reportList.size();i++){
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			dar  = new DailyActivityReport();
+			
+			dar.setParameter1(row1[0].toString());
+			dar.setParameter2(row1[3].toString());
+			dar.setParameter3("00:00");
+			
+			/*if(row1[1].toString().equals("N"))
+				dar.setParameter4(row1[2].toString());
+			else
+				dar.setParameter5(row1[2].toString());*/
+			
+			dar.setParameter5(row1[1].toString());
+			dar.setParameter6(row1[2].toString());
+			
+			result.add(dar);
+			
+		}
+		
+	
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getSecondDEReportData",method = RequestMethod.GET)	    
+	public @ResponseBody String getSecondDEReportData( @RequestParam(value = "ib_inward_date")  String ib_inward_date,@RequestParam(value = "ib_inwrd_date")  String ib_inwrd_date) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>() ;
+		DailyActivityReport  dar  = new DailyActivityReport(); 
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List  reportList=reportsService.getSecondDEData(ib_inward_date,ib_inwrd_date);
+		List innerList = reportList;
+		
+		for(int i=0;i<reportList.size();i++){
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element "+i+Arrays.toString(row1));
+			dar  = new DailyActivityReport();
+			
+			dar.setParameter1(row1[0].toString());
+			dar.setParameter2(row1[3].toString());
+			dar.setParameter3("00:00");
+			
+			/*if(row1[1].toString().equals("N"))
+				dar.setParameter4(row1[2].toString());
+			else
+				dar.setParameter5(row1[2].toString());*/
+			
+			dar.setParameter5(row1[1].toString());
+			dar.setParameter6(row1[2].toString());
+			
+			result.add(dar);
+			 
+		}
+		
+	
+		response.setModelList(result);
+		
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/report/getWorkProgressReportData",method = RequestMethod.GET)
+	public @ResponseBody String getWorkProgressdata(HttpServletRequest request) {
+		
+		String jsonData=null;
+		String SearchedData=null;
+		String tempCaseType=null;
+		Boolean flag=true;
+		String ct_temp="";
+		String fromDt=request.getParameter("fromDate");
+		String toDt=request.getParameter("toDate");
+		
+		Integer openingBalance=0;
+		System.out.println("From Date="+fromDt+" toDate= "+toDt);
+		List<DailyActivityReport> workProgressList = new ArrayList<DailyActivityReport>() ;
+		SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = Calendar.getInstance();
+		
+		try {
+			Date fromDate=formatter.parse(fromDt);
+			
+			Date toDate=formatter.parse(toDt);
+			
+			cal.setTime(fromDate);
+			
+			openingBalance=reportsService.getOpeningBalance(fromDt);
+			DailyActivityReport  dar  = new DailyActivityReport();
+			
+			dar.setValue1(""+fromDate);
+			dar.setValue2(""+openingBalance);
+			
+			Integer closingBalance=0;
+			
+			while(!fromDate.after(toDate)){
+				
+				System.out.println("fromDate  "+fromDate );
+				
+				Integer bundleInward=reportsService.getBundleInwardCount(fromDt);
+				Integer receiveFileCount=reportsService.getReceiveFileCount(fromDt);
+				Integer scannedFileCount=reportsService.getScannedFileCount(fromDt);
+				Integer makerFileCount=reportsService.getMakerFileCount(fromDt);
+				Integer checkerFileCount=reportsService.getCheckerFileCount(fromDt);
+				Integer verifiedFileCount=reportsService.getVerifiedFileCount(fromDt);
+				
+				Integer cumreceiveFileCount=reportsService.getCumReceiveFileCount(fromDt);
+				Integer cumscannedFileCount=reportsService.getCumScannedFileCount(fromDt);
+//				Integer cummakerFileCount=reportsService.getCumMakerFileCount(fromDt);
+//				Integer cumcheckerFileCount=reportsService.getCumCheckerFileCount(fromDt);
+				Integer cumverifiedFileCount=reportsService.getCumVerifiedFileCount(fromDt);
+				
+				closingBalance=Math.abs(openingBalance-Math.abs(receiveFileCount-checkerFileCount));
+				
+				dar.setValue3(""+bundleInward);
+				dar.setValue4(""+receiveFileCount);
+				dar.setValue5(""+scannedFileCount);
+				dar.setValue6(""+makerFileCount);
+				dar.setValue7(""+checkerFileCount);
+				dar.setValue8(""+closingBalance);
+				dar.setValue9(""+verifiedFileCount);
+				dar.setValue10("0");
+				dar.setValue11(""+cumreceiveFileCount);
+				dar.setValue12(""+cumscannedFileCount);
+				dar.setValue13(""+cumverifiedFileCount);
+				dar.setValue14("0");
+				
+				
+				cal.add(Calendar.DATE,1);
+				fromDate = formatter.parse(formatter.format(cal.getTime()));
+				
+				workProgressList.add(dar);
+				dar=new DailyActivityReport();
+				
+				dar.setValue1(""+fromDate);
+				dar.setValue2(""+closingBalance);
+				
+			}
+						
+				
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		
+		
+		response.setModelList(workProgressList);
+		
+		if (workProgressList != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+
+	@RequestMapping(value = "/report/searchByCaseNumber", method = RequestMethod.GET)
+	public String getsearchByCaseNumberReport() {
+		
+		
+		return searchByCaseNumber_View;
+	}
+
+	@RequestMapping(value = "/report/searchByJudgementDate", method = RequestMethod.GET)
+	public String getsearchByJudgementDate() {
+
+		return searchByJudgementDate_View;
+	}
+
+
+
+	@RequestMapping(value = "/report/searchbyTitle", method = RequestMethod.GET)
+	public String getSearchbyTitle() {
+
+		return searchbyTitle;
+	}
+
+	@RequestMapping(value = "/report/searchByFullBenchJudgmentOrder", method = RequestMethod.GET)
+	public String getsearchByFullBenchJudgmentOrder() {
+
+		return searchByFullBenchJudgmentOrder_View;
+	}
+	
+	@RequestMapping(value = "report/getSearchByCaseNumberData", method = RequestMethod.GET)
+	public @ResponseBody
+	String getSearchByCaseNumberData(HttpServletRequest request) {
+		String benchCodeId=request.getParameter("benchCodeId");
+		String caseTypeId=request.getParameter("caseTypeId");
+		String year=request.getParameter("year");
+		String caseNumber=request.getParameter("caseNumber");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List<ReportsView> reportsData= reportsService.getSearchByCaseNumberData(year, benchCodeId,caseTypeId,caseNumber);
+
+//		for (int i = 0; i < reportList.size(); i++) {
+//			Object[] row1 = (Object[]) reportList.get(i);
+//			System.out.println("Element " + i + Arrays.toString(row1));
+//			dar = new DailyActivityReport();
+//
+//			dar.setParameter1(row1[0].toString());
+//			dar.setParameter2(row1[1].toString());
+//			dar.setParameter3(row1[2].toString());
+//			dar.setParameter4(row1[3].toString());
+//			dar.setParameter5(row1[4].toString());
+//			dar.setParameter6(row1[5].toString());
+//
+//			result.add(dar);
+//
+//		}
+
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getsearchByfullBenchJudgmentOrder", method = RequestMethod.GET)
+	public @ResponseBody
+	String getsearchByfullBenchJudgmentOrder(
+			@RequestParam(value = "ib_inward_date") String ib_inward_date,
+			@RequestParam(value = "ib_inwrd_date") String ib_inwrd_date,
+			@RequestParam(value = "firstJudge") String firstJudge,
+			@RequestParam(value = "secondJudge") String secondJudge,
+			@RequestParam(value = "thirdJudge") String thirdJudge,
+			@RequestParam(value = "judgeType") String judgeType,
+			@RequestParam(value = "judgmentType") String judgmentType)
+	
+	{
+
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List reportList = reportsService.getsearchByfullBenchJudgmentOrder(
+				ib_inward_date, ib_inwrd_date, firstJudge,secondJudge,thirdJudge,judgeType,judgmentType);
+
+		for (int i = 0; i < reportList.size(); i++) {
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element " + i + Arrays.toString(row1));
+			dar = new DailyActivityReport();
+
+			dar.setParameter1(row1[0].toString());
+			dar.setParameter2(row1[1].toString());
+			dar.setParameter3(row1[2].toString());
+			dar.setParameter4(row1[3].toString());
+			dar.setParameter5(row1[4].toString());
+			dar.setParameter6(row1[5].toString());
+
+			result.add(dar);
+
+		}
+
+		response.setModelList(result);
+
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+
+	@RequestMapping(value = "report/getsearchByJudgmentData", method = RequestMethod.GET)
+	public @ResponseBody
+	String getsearchByJudgmentData(HttpServletRequest request) {
+		String benchCodeId=request.getParameter("benchCodeId");
+		String fromDate=request.getParameter("fromDate");
+		String toDate=request.getParameter("toDate");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List<ReportsView> reportsData = reportsService.getSearchByJudgementDateData(fromDate, toDate, benchCodeId);
+
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+
+	@RequestMapping(value = "report/getsearchByTitle", method = RequestMethod.GET)
+	public @ResponseBody
+	String getsearchByTitle(HttpServletRequest request) {
+		String counsel=request.getParameter("counsel");
+		String counselName=request.getParameter("counselName");
+		String benchCodeId=request.getParameter("benchCodeId");
+		String fromDate=request.getParameter("fromDate");
+		String toDate=request.getParameter("toDate");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List <ReportsView>reportsData = reportsService.getSearchByTitle(counsel,counselName, benchCodeId, fromDate, toDate);
+
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getSearchByJudgeNameReportData", method = RequestMethod.GET)
+    public @ResponseBody String getSearchByJudgeNameReportData(HttpServletRequest request) {
+        
+		String benchCodeId=request.getParameter("benchCodeId");
+        String judgeIds=request.getParameter("judgeId"); 
+        String fromDate=request.getParameter("fromDate");
+        String toDate=request.getParameter("toDate");
+        
+        System.out.println("judgeId"+judgeIds);
+        String jsonData = null;
+        String SearchedData = null;
+        String tempCaseType = null;
+        Boolean flag = true;
+        String ct_temp = "";
+        DailyActivityReport dar = new DailyActivityReport();
+        ActionResponse<ReportsView> response = new ActionResponse();
+        
+        Integer count=judgeIds.length() - judgeIds.replaceAll(",", "").length()+1;
+        
+        List<CaseFileTemp> FileIds=reportsService.getJudgeNameWiseCaseFileList(judgeIds,count);
+        System.out.println("fileids"+FileIds.toString());
+        List <ReportsView> reportsData =new ArrayList<ReportsView>();
+        
+        if(!FileIds.isEmpty())
+        	reportsData = reportsService.getSearchByJudgeNameData(FileIds,benchCodeId, fromDate, toDate);
+        
+        response.setModelList(reportsData);
+
+        if (reportsData != null) {
+            response.setResponse("TRUE");
+            jsonData = globalfunction.convert_to_json(response);
+        } else {
+            response.setResponse("FALSE");
+        }
+
+        return jsonData;
+        
+    }	
+	@RequestMapping(value = "report/getSearchByCounselNameReportData", method = RequestMethod.GET)
+	public @ResponseBody String getSearchByCounselNameReportData(HttpServletRequest request) {
+		String counsel = request.getParameter("counsel");
+		String benchCodeId = request.getParameter("benchCodeId");
+		String fromDate = request.getParameter("fromDate");
+		String toDate = request.getParameter("toDate");
+		String counselName = request.getParameter("counselName");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List <ReportsView> reportsData = reportsService.getSearchByCounselNameData(counsel,benchCodeId, fromDate, toDate, counselName);
+		
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+
+
+	}
+
+	@RequestMapping(value = "report/getAdvanceSearchReportData", method = RequestMethod.GET)
+	public @ResponseBody String getAdvanceSearchReportData(
+			@RequestParam(value = "branchCode") Long branchCode,
+			@RequestParam(value = "casetype") Long casetype,
+			@RequestParam(value = "fromYear") String fromYear,
+			@RequestParam(value = "toYear") String toYear,
+			@RequestParam(value = "judgeType") String judgeType,
+			@RequestParam(value = "firstJudgeName") String firstJudgeName,
+			@RequestParam(value = "secondJudgeName") String secondJudgeName,
+			@RequestParam(value = "thirdJudgeName") String thirdJudgeName,
+			@RequestParam(value = "fourthJudgeName") String fourthJudgeName,
+			@RequestParam(value = "fifthJudgeName") String fifthJudgeName) {
+
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<DailyActivityReport> response = new ActionResponse();
+		List reportList = reportsService.getAdvanceSearchData(branchCode,casetype, fromYear, toYear,judgeType,firstJudgeName,secondJudgeName,thirdJudgeName,fourthJudgeName,fifthJudgeName);
+		List innerList = reportList;
+
+		for (int i = 0; i < reportList.size(); i++) {
+			Object[] row1 = (Object[]) reportList.get(i);
+			System.out.println("Element " + i + Arrays.toString(row1));
+			dar = new DailyActivityReport();
+
+			dar.setParameter1(row1[0].toString());
+			dar.setParameter2(row1[3].toString());
+
+			dar.setParameter5(row1[1].toString());
+			dar.setParameter6(row1[2].toString());
+
+			result.add(dar);
+
+		}
+
+		response.setModelList(result);
+
+		if (result != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getBasicSearchData", method = RequestMethod.GET)
+	public @ResponseBody String getBasicSearchData(HttpServletRequest request) {
+		String caseTypeId = request.getParameter("caseTypeId");
+		String benchCodeId = request.getParameter("benchCodeId");
+		String year = request.getParameter("year");
+		String judgeId = request.getParameter("judgeId");
+		String caseNumber = request.getParameter("caseNumber");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List <ReportsView> reportsData = reportsService.getBasicSearchData(caseTypeId,benchCodeId, year, judgeId, caseNumber);
+		
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "report/getdocuments", method = RequestMethod.GET)
+	public @ResponseBody String getdocuments(HttpServletRequest request) {
+		String caseTypeId = request.getParameter("caseTypeId");
+		String benchCodeId = request.getParameter("benchCodeId");
+		String year = request.getParameter("year");
+		String judgeId = request.getParameter("judgeId");
+		String caseNumber = request.getParameter("caseNumber");
+		
+		String jsonData = null;
+		String SearchedData = null;
+		String tempCaseType = null;
+		Boolean flag = true;
+		String ct_temp = "";
+
+		List<DailyActivityReport> result = new ArrayList<DailyActivityReport>();
+		DailyActivityReport dar = new DailyActivityReport();
+		ActionResponse<ReportsView> response = new ActionResponse();
+		List <ReportsView> reportsData = reportsService.getBasicSearchData(caseTypeId,benchCodeId, year, judgeId, caseNumber);
+		
+		response.setModelList(reportsData);
+
+		if (reportsData != null) {
+			response.setResponse("TRUE");
+			jsonData = globalfunction.convert_to_json(response);
+		} else {
+			response.setResponse("FALSE");
+		}
+
+		return jsonData;
+	}
+
+}

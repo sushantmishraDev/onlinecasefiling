@@ -1,0 +1,135 @@
+package com.dms.controller;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.Lookup;
+import com.dms.model.OLReport;
+import com.dms.model.User;
+import com.dms.service.LookupService;
+import com.dms.service.OLReportService;
+import com.dms.utility.GlobalFunction;
+import com.itextpdf.text.DocumentException;
+
+@Controller
+@RequestMapping("/olreport")
+public class OLReportController {
+	@Autowired
+	ServletContext context;
+	
+	@Autowired
+	private LookupService lookupService;
+	
+	@Autowired
+	private OLReportService olReportService;
+		
+	private GlobalFunction globalfunction;
+	
+	public OLReportController() {
+		// registrationPartyValidation = new RegistrationpartyValidation();
+		globalfunction = new GlobalFunction();
+	}
+	@RequestMapping(value = "/manage", method = RequestMethod.GET)
+	public String manage()
+	{
+		return "/olreport/manage";
+	}
+	@RequestMapping(value = "/getall", method = RequestMethod.GET)
+	public @ResponseBody String getall()
+	{
+		ActionResponse<OLReport> response = new ActionResponse();
+		String jsonData="";
+		List<OLReport> olReports=olReportService.getAll();
+		response.setModelList(olReports);
+		response.setResponse("TRUE");
+		jsonData=globalfunction.convert_to_json(response);
+		return jsonData;
+	}
+	@RequestMapping(value = "/uploadolreport", method = RequestMethod.POST)
+	public @ResponseBody String uploadolreport(MultipartHttpServletRequest request,HttpSession session) throws DocumentException 
+	{
+		ActionResponse<OLReport> response = new ActionResponse();
+		User u=(User) session.getAttribute("USER");
+		String jsonData="";
+		Lookup lookup=lookupService.getLookUpObject("OLREPORTPATH");
+		Integer ol_no=Integer.parseInt(request.getParameter("ol_no"), 10);
+		Integer ol_year=Integer.parseInt(request.getParameter("ol_year"), 10);
+		
+		MultipartFile mpf = null;
+    	Iterator<String> itr = request.getFileNames();
+    	while (itr.hasNext()) 
+		{
+			mpf = request.getFile(itr.next());
+			OLReport olReport=new OLReport();
+			olReport.setOl_no(ol_no);
+			olReport.setOl_year(ol_year);
+			olReport.setOl_created(new Date());
+			olReport.setOl_created_by(u.getUm_id());
+			olReport=olReportService.save(olReport);
+			String filename=lookup.getLk_longname()+File.separator+olReport.getOl_id()+"_"+olReport.getOl_year()+".pdf";
+			try {
+				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(filename));				
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+    	response.setResponse("TRUE");
+    	jsonData = globalfunction.convert_to_json(response);
+		return jsonData;
+	}
+	@RequestMapping(value = "/viewdocument/{id}", method = RequestMethod.GET)
+	public void copysubdocument(@PathVariable("id") Long ol_id,HttpServletRequest request,
+		       HttpServletResponse response) throws IOException {
+		
+		OLReport olReport = olReportService.getByPK(ol_id);
+		Lookup lookup=lookupService.getLookUpObject("OLREPORTPATH");
+		String filename=lookup.getLk_longname()+File.separator+olReport.getOl_id()+"_"+olReport.getOl_year()+".pdf";
+		System.out.println("filename="+filename);	
+		File file = new File(filename);	
+		response.setHeader("content-disposition", "inline" );
+		response.setContentType("application/pdf");       
+		response.setContentLength((int)file.length());
+		  
+		ServletOutputStream out = response.getOutputStream();
+		FileInputStream stream = new FileInputStream(file);
+		BufferedInputStream bis = new BufferedInputStream(stream);
+		BufferedOutputStream bos = new BufferedOutputStream(out);
+		  
+		byte[] buff = new byte[2048];
+		int bytesRead;
+		  
+		while(-1 != (bytesRead = bis.read(buff, 0, buff.length))) 
+		{
+		bos.write(buff, 0, bytesRead);
+		}
+		bis.close();
+		stream.close();
+		bos.close();
+		out.close();
+	}
+}

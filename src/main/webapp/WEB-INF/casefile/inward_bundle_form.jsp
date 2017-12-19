@@ -1,0 +1,182 @@
+<form class="form-horizontal reduce-gap" name="addinwardForm" novalidate
+	role="form">
+
+	<div ng-show="errorlist" class="alert alert-block alert-danger">
+		<ul>
+			<span ng-repeat="errors in errorlist"> <span
+				ng-repeat="n in errors track by $index">
+					<li>{{(n)}}</li>
+			</span>
+			</span>
+		</ul>
+	</div>
+	<!-- begin #content -->
+	<div id="content" class="content" style="width: 154%;">
+		<div class="row">
+			<div class="col-md-6 ui-sortable">
+				<div data-sortable-id="form-validation-1">
+					<div class="panel-body panel-form">
+						<div class="form-group" 
+						ng-class="{ 'has-error' : addinwardForm.ib_branch.$dirty && addinwardForm.ib_branch.$invalid &&addinwardForm.ib_branch.$error && addinwardForm.ib_branch.$pristine}">
+							<label class="control-label col-md-4 col-sm-4" for="usr">Branch Code * :</label>
+							<div class="col-md-6 col-sm-6">
+								<!-- <select ng-model="masterentity.ib_branch" class="form-control"
+									id="ib_branch" required name="ib_branch"
+									ng-options="bcd.lk_id as bcd.lk_longname for bcd in branchData  | orderBy: 'lk_longname'">
+								</select> -->
+								
+								<input class="form-control" type="text" id="ib_in_shcil_user"
+									name="caseCnt" placeholder=${benchCodeStr } required
+									data-parsley-required="true" data-parsley-id="6096" disabled>
+									
+							</div>
+						</div>
+						
+							<div class="form-group"
+						ng-class="{ 'has-error' : addinwardForm.ib_carton_no.$dirty && addinwardForm.ib_carton_no.$invalid && addinwardForm.ib_carton_no.$error && addinwardForm.ib_carton_no.$pristine}">
+							<label class="control-label col-md-4 col-sm-4" for="fullname">Carton Number * :</label>
+								<div class="col-md-6 col-sm-6">
+									<input class="form-control" type="text" id="ib_carton_no" name="ib_carton_no"
+										ng-model="masterentity.ib_carton_no" placeholder="Carton Number" ng-minlength=1 ng-maxlength=15
+										ng-pattern="/^[a-zA-Z0-9 ]*$/" required
+										data-parsley-required="true" data-parsley-id="5819"> 
+									<span style="color: red"
+										ng-show="addinwardForm.ib_carton_no.$dirty && addinwardForm.ib_carton_no.$invalid && addinwardForm.ib_carton_no.$error && addinwardForm.ib_carton_no.$pristine">
+										<span ng-show="addinwardForm.ib_carton_no.$error.required">Carton number is required.</span>
+										 <span class="error"ng-show="addinwardForm.ib_carton_no.$error.minlength">Carton number is required to be at least 1 characters</span>
+										<span ng-show="addinwardForm.ib_carton_no.$error.pattern">Enter valid Carton number  </span>
+										<span class="error" ng-show="addinwardForm.ib_carton_no.$error.maxlength">Carton number cannot be longer than 15 characters</span>
+									</span> 
+								<ul class="parsley-errors-list" id="parsley-id-5819"></ul>
+							</div>
+						</div>
+						
+						<div class="form-group"
+						ng-class="{ 'has-error' : addinwardForm.ib_bundle_number.$dirty && addinwardForm.ib_bundle_number.$invalid && addinwardForm.ib_bundle_number.$error && addinwardForm.ib_bundle_number.$pristine}">
+							<label class="control-label col-md-4 col-sm-4" for="fullname">Bundle number * :</label>
+								<div class="col-md-6 col-sm-6">
+									<input class="form-control" type="text" id="ib_bundle_number" name="ib_bundle_number"
+										ng-model="masterentity.ib_bundle_number"placeholder="Bundle Number" ng-minlength=1 ng-maxlength=15
+										ng-pattern="/^[a-zA-Z0-9 ]*$/" required
+										data-parsley-required="true" data-parsley-id="5819"> 
+									<span style="color: red"
+										ng-show="addinwardForm.ib_bundle_number.$dirty && addinwardForm.ib_bundle_number.$invalid && addinwardForm.ib_bundle_number.$error && addinwardForm.ib_bundle_number.$pristine">
+										<span ng-show="addinwardForm.ib_bundle_number.$error.required">Bundle number is required.</span>
+										 <span class="error"ng-show="addinwardForm.ib_bundle_number.$error.minlength">Bundle number is required to be at least 1 characters</span>
+										<span ng-show="addinwardForm.ib_bundle_number.$error.pattern">Enter valid Bundle number  </span>
+										<span class="error" ng-show="addinwardForm.ib_bundle_number.$error.maxlength">Bundle number cannot be longer than 15 characters</span>
+									</span>
+								<ul class="parsley-errors-list" id="parsley-id-5819"></ul>
+							</div>
+						</div>
+
+						<div class="form-group"
+						ng-class="{ 'has-error' : addinwardForm.ib_record_room.$dirty && addinwardForm.ib_record_room.$invalid &&addinwardForm.ib_record_room.$error && addinwardForm.ib_record_room.$pristine}">
+							<label class="control-label col-md-4 col-sm-4">Record Room * :</label>
+							<div class="col-md-6 col-sm-6">
+								<select ng-model="masterentity.ib_record_room" class="form-control"
+									id="ib_record_room" required name="ib_record_room"
+									ng-options="rrd.rr_id as rrd.rr_roomname for rrd in rrData  | orderBy: 'rr_roomname'">
+									
+									<span ng-show="addinwardForm.ib_record_room.$error.required">Record_room number is required</span>
+								</select>
+							<!-- 
+							
+								<input class="form-control" type="text" id="ib_record_room" name="ib_record_room" ng-model="masterentity.ib_record_room"
+									placeholder="Record room number" ng-maxlength=20 ng-pattern="/^[a-zA-Z0-9 ]*$/" required
+									data-parsley-required="true" data-parsley-id="5819"> 
+									<span style="color: red"
+										ng-show="addinwardForm.ib_record_room.$dirty && addinwardForm.ib_record_room.$invalid &&addinwardForm.ib_record_room.$error && addinwardForm.ib_record_room.$pristine">
+										<span ng-show="addinwardForm.ib_record_room.$error.required">Record_room number is required</span> 
+								   		<span ng-show="addinwardForm.ib_record_room.$error.pattern">Please Enter valid Record Room Number </span> 
+										<span class="error" ng-show="addinwardForm.ib_record_room.$error.maxlength">Record Room Number cannot be longer than 20 characters</span>
+									</span>
+								<ul class="parsley-errors-list" id="parsley-id-5819"></ul> -->
+							</div>
+						</div>
+						<div class="form-group"
+							ng-class="{ 'has-error' : addinwardForm.caseCnt.$dirty && addinwardForm.caseCnt.$invalid && addinwardForm.caseCnt.$error && addinwardForm.caseCnt.$pristine }">
+							<label class="control-label col-md-4 col-sm-4" for="email">Case file count * :</label>
+							<div class="col-md-6 col-sm-6">
+								<input type="number" class="form-control"
+									id="ib_case_file_count" name="caseCnt" ng_model="masterentity.ib_case_file_count"
+									placeholder="file count" ng-maxlength=3 min="1" required
+									data-parsley-required="true" data-parsley-id="6096"> 
+									<span style="color: red"
+										ng-show="addinwardForm.caseCnt.$dirty && addinwardForm.caseCnt.$invalid && addinwardForm.caseCnt.$error && addinwardForm.caseCnt.$pristine">
+										<span ng-show="addinwardForm.caseCnt.$error.required">Case file count is required.</span> 
+										<span class="error" ng-show="addinwardForm.caseCnt.$error.number"> Not valid number!</span> 
+										<span class="error" ng-show="addinwardForm.caseCnt.$error.maxlength">Case file count cannot be longer than 3 characters</span>
+									</span>
+								<ul class="parsley-errors-list" id="parsley-id-6096"></ul>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4">AHC user id * :</label>
+							<div class="col-md-6 col-sm-6">
+								<select ng-model="masterentity.ib_in_ahc_user"
+									class="form-control" id="ib_in_ahc_user" required
+									name="ib_in_ahc_user"
+									ng-options="ahcu.um_id as ahcu.um_fullname for ahcu in ahcuserData  | orderBy: 'um_fullname'"
+									required>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4">SHCIL user id * :</label>
+							<div class="col-md-6 col-sm-6">
+								<select  ng-model="masterentity.ib_in_shcil_user" class="form-control" id="ib_in_shcil_user" required name="ib_in_shcil_user" 
+										ng-options="shcilu.um_id as shcilu.um_fullname for shcilu in shciluserData">
+										</select>
+								<%-- <input class="form-control" type="text" id="ib_in_shcil_user"
+									name="caseCnt" placeholder=${username } required
+									data-parsley-required="true" data-parsley-id="6096" disabled>
+								<ul class="parsley-errors-list" id="parsley-id-6096"></ul> --%>
+							</div>
+						</div>
+						
+					
+						
+						<div class="form-group"
+						ng-class="{ 'has-error' : addinwardForm.ib_remark.$dirty && addinwardForm.ib_remark.$invalid && addinwardForm.ib_remark.$error && addinwardForm.ib_remark.$pristine}">
+							<label class="control-label col-md-4 col-sm-4" for="fullname">Remark  :</label>
+								<div class="col-md-6 col-sm-6">
+									<input class="form-control" type="text" id="ib_remark" name="ib_remark"
+										ng-model="masterentity.ib_remark" placeholder="Remark" ng-minlength=1 ng-maxlength=15
+										ng-pattern="/^[a-zA-Z0-9 ]*$/" required
+										data-parsley-required="true" data-parsley-id="5819"> 
+									<!-- <span style="color: red"
+										ng-show="addinwardForm.ib_bundle_number.$dirty && addinwardForm.ib_bundle_number.$invalid && addinwardForm.ib_bundle_number.$error && addinwardForm.ib_bundle_number.$pristine">
+										<span ng-show="addinwardForm.ib_bundle_number.$error.required">Bundle number is required.</span>
+										 <span class="error"ng-show="addinwardForm.ib_bundle_number.$error.minlength">Bundle number is required to be at least 1 characters</span>
+										<span ng-show="addinwardForm.ib_bundle_number.$error.pattern">Enter valid Bundle number  </span>
+										<span class="error" ng-show="addinwardForm.ib_bundle_number.$error.maxlength">Bundle number cannot be longer than 15 characters</span>
+									</span> -->
+								<ul class="parsley-errors-list" id="parsley-id-5819"></ul>
+							</div>
+						</div>
+						
+					</div>
+					<div class="form-group">
+						<div ng-if="!masterentity.ib_id" style="padding-left: 107px;">
+							<input type="submit" id="submitbtn"
+								data-loading-text="Loading..." value="Submit"
+								ng-click="ib_create(masterentity) " class="btn btn-success" />
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+						</div>
+						<div ng-if="masterentity.ib_id" style="padding-left: 107px;">
+							<input type="submit" id="updatebtn" value="Update"
+								data-loading-text="Loading..."
+								ng-click="ib_update(masterentity)" class="btn btn-success" />
+							<button type="button" onclick="javascript:removeErrorClass()"
+								class="btn btn-danger" data-dismiss="modal">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+</form>

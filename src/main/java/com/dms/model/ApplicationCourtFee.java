@@ -1,0 +1,117 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="application_court_fee")
+public class ApplicationCourtFee {
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="application_court_fee_seq")
+	@SequenceGenerator(name="application_court_fee_seq", sequenceName="application_court_fee_seq", allocationSize=1)
+	@Column(name="acf_id")
+    private Long acf_id;
+	
+	@Column(name="acf_receipt_no")
+	private String acf_receipt_no;
+   
+   	@Column(name="acf_amount")
+    private Long  acf_amount;
+   
+   	@Column(name="acf_date")
+	private Date  acf_date;
+	
+   
+	@Column(name="acf_ap_mid")
+	private Long  acf_ap_mid;
+
+
+	@Column(name="acf_rec_status")
+	private Integer acf_rec_status;
+	
+	
+	@Column(name="acf_cr_date")
+	private Date  acf_cr_date;
+
+
+	public Long getAcf_id() {
+		return acf_id;
+	}
+
+
+	public void setAcf_id(Long acf_id) {
+		this.acf_id = acf_id;
+	}
+
+
+	public String getAcf_receipt_no() {
+		return acf_receipt_no;
+	}
+
+
+	public void setAcf_receipt_no(String acf_receipt_no) {
+		this.acf_receipt_no = acf_receipt_no;
+	}
+
+
+	public Long getAcf_amount() {
+		return acf_amount;
+	}
+
+
+	public void setAcf_amount(Long acf_amount) {
+		this.acf_amount = acf_amount;
+	}
+
+
+	public Date getAcf_date() {
+		return acf_date;
+	}
+
+
+	public void setAcf_date(Date acf_date) {
+		this.acf_date = acf_date;
+	}
+
+
+	public Long getAcf_ap_mid() {
+		return acf_ap_mid;
+	}
+
+
+	public void setAcf_ap_mid(Long acf_ap_mid) {
+		this.acf_ap_mid = acf_ap_mid;
+	}
+
+
+	public Integer getAcf_rec_status() {
+		return acf_rec_status;
+	}
+
+
+	public void setAcf_rec_status(Integer acf_rec_status) {
+		this.acf_rec_status = acf_rec_status;
+	}
+
+
+	public Date getAcf_cr_date() {
+		return acf_cr_date;
+	}
+
+
+	public void setAcf_cr_date(Date acf_cr_date) {
+		this.acf_cr_date = acf_cr_date;
+	}
+	
+	
+
+	
+}

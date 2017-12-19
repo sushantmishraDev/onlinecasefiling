@@ -1,0 +1,225 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.management.loading.PrivateClassLoader;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "user_details")
+public class UserDetails {
+
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="user_detailsseq")
+	@SequenceGenerator(name="user_detailsseq", sequenceName="user_detailsseq", allocationSize=1)
+	
+	@Column(name = "ud_id")
+	private Long ud_id;
+	
+	@Column(name="ud_username")
+	private String ud_username;
+	
+	@Column(name ="ud_password")
+	private String ud_password;
+	
+	@Column(name="ud_mobileno")
+	private Integer ud_mobileno;
+	
+	@Column(name="ud_address")
+	private String ud_address;
+	
+	@Column(name="ud_state")
+	private Integer ud_state;
+	
+	@Column(name="ud_city")
+	private Integer ud_city;
+	
+	@Column(name="ud_pincode")
+	private Integer ud_pincode;
+	
+	@Column(name="ud_last_login")
+	private Date ud_last_login;
+	
+	@Column(name="ud_cr_date")
+	private Date ud_cr_date;
+	
+	@Column(name="ud_mod_by")
+	private Long ud_mod_by;
+	
+	@Column(name="ud_mod_date")
+	private Date ud_mod_date;
+	
+	@Column(name="ud_rec_status")
+	private Integer ud_rec_status;
+	
+	@Column(name="ud_firstname")
+	private String ud_firstname;
+	
+	@Column(name="ud_lastname")
+	private String ud_lastname;
+	
+	@Column(name="ud_pass_validity_date")
+	private Date ud_pass_validity_date;
+
+	@Column(name="ud_bench_code")
+	private Integer ud_bench_code;
+	
+	@Column(name="ud_gender")
+	private Integer ud_gender;
+
+	public Long getUd_id() {
+		return ud_id;
+	}
+
+	public void setUd_id(Long ud_id) {
+		this.ud_id = ud_id;
+	}
+
+	public String getUd_username() {
+		return ud_username;
+	}
+
+	public void setUd_username(String ud_username) {
+		this.ud_username = ud_username;
+	}
+
+	public String getUd_password() {
+		return ud_password;
+	}
+
+	public void setUd_password(String ud_password) {
+		this.ud_password = ud_password;
+	}
+
+	
+	public Integer getUd_mobileno() {
+		return ud_mobileno;
+	}
+
+	public void setUd_mobileno(Integer ud_mobileno) {
+		this.ud_mobileno = ud_mobileno;
+	}
+	
+	
+
+	public String getUd_address() {
+		return ud_address;
+	}
+
+	public void setUd_address(String ud_address) {
+		this.ud_address = ud_address;
+	}
+
+	public Integer getUd_state() {
+		return ud_state;
+	}
+
+	public void setUd_state(Integer ud_state) {
+		this.ud_state = ud_state;
+	}
+
+	public Integer getUd_city() {
+		return ud_city;
+	}
+
+	public void setUd_city(Integer ud_city) {
+		this.ud_city = ud_city;
+	}
+
+	public Integer getUd_pincode() {
+		return ud_pincode;
+	}
+
+	public void setUd_pincode(Integer ud_pincode) {
+		this.ud_pincode = ud_pincode;
+	}
+
+	public Date getUd_last_login() {
+		return ud_last_login;
+	}
+
+	public void setUd_last_login(Date ud_last_login) {
+		this.ud_last_login = ud_last_login;
+	}
+
+	public Date getUd_cr_date() {
+		return ud_cr_date;
+	}
+
+	public void setUd_cr_date(Date ud_cr_date) {
+		this.ud_cr_date = ud_cr_date;
+	}
+
+	public Long getUd_mod_by() {
+		return ud_mod_by;
+	}
+
+	public void setUd_mod_by(Long ud_mod_by) {
+		this.ud_mod_by = ud_mod_by;
+	}
+
+	public Date getUd_mod_date() {
+		return ud_mod_date;
+	}
+
+	public void setUd_mod_date(Date ud_mod_date) {
+		this.ud_mod_date = ud_mod_date;
+	}
+
+	public Integer getUd_rec_status() {
+		return ud_rec_status;
+	}
+
+	public void setUd_rec_status(Integer ud_rec_status) {
+		this.ud_rec_status = ud_rec_status;
+	}
+
+	public String getUd_firstname() {
+		return ud_firstname;
+	}
+
+	public void setUd_firstname(String ud_firstname) {
+		this.ud_firstname = ud_firstname;
+	}
+
+	public String getUd_lastname() {
+		return ud_lastname;
+	}
+
+	public void setUd_lastname(String ud_lastname) {
+		this.ud_lastname = ud_lastname;
+	}
+
+	public Date getUd_pass_validity_date() {
+		return ud_pass_validity_date;
+	}
+
+	public void setUd_pass_validity_date(Date ud_pass_validity_date) {
+		this.ud_pass_validity_date = ud_pass_validity_date;
+	}
+
+	public Integer getUd_bench_code() {
+		return ud_bench_code;
+	}
+
+	public void setUd_bench_code(Integer ud_bench_code) {
+		this.ud_bench_code = ud_bench_code;
+	}
+
+	public Integer getUd_gender() {
+		return ud_gender;
+	}
+
+	public void setUd_gender(Integer ud_gender) {
+		this.ud_gender = ud_gender;
+	}
+	
+	
+	 
+}

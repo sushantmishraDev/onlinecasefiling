@@ -1,0 +1,373 @@
+package com.dms.service;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.CaseType;
+import com.dms.model.Caveat;
+import com.dms.model.CaveatCheckListMapping;
+import com.dms.model.CaveatCourtFee;
+import com.dms.model.CaveatDocuments;
+import com.dms.model.CaveatPetitionerDetails;
+import com.dms.model.CaveatRespondentDetails;
+import com.dms.model.CaveatStage;
+import com.dms.model.Document;
+import com.dms.model.LowerCourtCaseType;
+import com.dms.model.RegisteredCaseDetails;
+import com.dms.model.User;
+
+
+
+@Service
+public class CaveatService 
+{
+	@PersistenceContext
+	private EntityManager em;
+	
+	@Transactional
+	public List<Caveat> getCaveatDetails(Long um_id) {
+	List<Caveat> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT cav FROM Caveat cav where cav.cav_cr_by ="+um_id+" order by cav.cav_id ").getResultList();
+		return rcdDetails;
+	}
+	
+	@Transactional
+	public Caveat getRegisterCaveat(Long id) {
+		Caveat result=null;
+	    Query query=null;
+		try {
+			query = em.createQuery(" SELECT cav from Caveat cav where cav.cav_id=:id").setParameter("id", id);
+			result=(Caveat) query.getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+	
+	@Transactional
+	public List<CaveatPetitionerDetails> getPetitioner(Long id) {
+		
+		List<CaveatPetitionerDetails> result=null;
+		Query query=null;
+		query = em.createQuery(" SELECT pt from CaveatPetitionerDetails pt where pt.cpt_rec_status=1 and pt.cpt_cav_mid=:id order by pt.cpt_sequence asc").setParameter("id", id);
+		result=query.getResultList();
+		return result;
+	}
+
+
+	@Transactional
+	public List<CaveatRespondentDetails> getRespondent(Long id) {
+		List<CaveatRespondentDetails> result=null;
+		Query query=null;
+		query = em.createQuery(" SELECT rt from CaveatRespondentDetails rt where rt.crt_rec_status=1 and rt.crt_cav_mid=:id order by rt.crt_sequence asc").setParameter("id", id);
+		result=query.getResultList();
+		return result;
+	}
+	
+	
+	@Transactional
+    public Caveat save(Caveat c) {
+    
+		Caveat caveat = null;
+    	try 
+    	{	
+    		caveat= em.merge(c);	    	
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return caveat;
+    }
+	
+	@Transactional
+	public Caveat addCaveat(Caveat caveat) {
+		Caveat cav=null;
+		 try {
+			
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			cav=em.merge(caveat);
+			cav.setCav_draft_no(cav.getCav_id()+"_"+year);
+			cav= em.merge(cav);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return cav;
+	}
+	
+	@Transactional
+    public CaveatStage saveCaveatStage(CaveatStage cs) {
+    
+		CaveatStage caveatstage = null;
+    	try 
+    	{	
+    		caveatstage= em.merge(cs);	    	
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return caveatstage;
+    }
+	
+	@Transactional
+    public CaveatDocuments saveCaveatDocument(CaveatDocuments cs) {
+    
+		CaveatDocuments caveatdocument = null;
+    	try 
+    	{	
+    		caveatdocument= em.merge(cs);	    	
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return caveatdocument;
+    }
+	
+	@Transactional
+	public Long getCPSequenceCount(Long id) {
+
+		Long result=0L;
+		 Query query=null;
+		try{
+			query = em.createQuery("SELECT count(pt.cpt_id) FROM CaveatPetitionerDetails pt where pt.cpt_cav_mid=:id").setParameter("id", id);
+		   result= (Long) query.getSingleResult();
+		}catch(Exception e)	{
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	 @Transactional
+		public CaveatPetitionerDetails addPetitioner(CaveatPetitionerDetails pDetails) {
+	    	
+		 CaveatPetitionerDetails pd=null;
+	    	 try {
+	    		
+				pd=em.merge(pDetails);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return pd;
+		}
+	 
+	 @Transactional
+	public CaveatPetitionerDetails deletePetitioner(User user, Long id) {
+			CaveatPetitionerDetails oldPetitioner=null;
+			CaveatPetitionerDetails pDetails=null;
+		    user.setMod_by(id);
+		    user.setMod_date(new Date());
+		    oldPetitioner=em.find(CaveatPetitionerDetails.class, id);
+		    oldPetitioner.setCpt_rec_status(2);
+		    pDetails =em.merge(oldPetitioner);
+			
+			return pDetails;
+		}
+	 
+	 @Transactional
+	 public Long getCRSeqCount(Long id) {
+
+	 	Long result=0L;
+	 	
+	 	try{
+	 		result = (Long) em.createQuery("SELECT count(rt.crt_id) FROM CaveatRespondentDetails rt where rt.crt_cav_mid=:id").setParameter("id", id).getSingleResult();
+	 	}catch(Exception e)	{
+	 		e.printStackTrace();
+	 	}
+	 	return result;
+	 }
+	 
+	 @Transactional
+	 public CaveatRespondentDetails addRespondent(CaveatRespondentDetails rDetails) {
+	 	CaveatRespondentDetails rd=null;
+	 	 try {
+	 		
+	 		rd=em.merge(rDetails);
+	 	} catch (Exception e) {
+	 		// TODO Auto-generated catch block
+	 		e.printStackTrace();
+	 	}
+	 	
+	 	return rd;
+	 }
+	 @Transactional
+	 public CaveatRespondentDetails deleteRespondent(Long user, Long id) {
+	 	CaveatRespondentDetails rDetails=null;
+	 	rDetails=em.find(CaveatRespondentDetails.class, id);
+	 	rDetails.setCrt_rec_status(2);
+	    rDetails =em.merge(rDetails);
+	 	
+	 	return rDetails;
+	 }
+	 
+	 @Transactional
+	 public CaveatCourtFee addCourtFee(CaveatCourtFee courtFee) {
+	 	CaveatCourtFee result=null;
+	     
+	 	  result=em.merge(courtFee);
+	 	
+	 	return result;
+	 }
+	 
+	 @Transactional
+		public List<CaveatCourtFee> getCaveatCourtFee(Long id) {
+			
+			List<CaveatCourtFee> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT cf from CaveatCourtFee cf where cf.ccf_rec_status=1 and cf.ccf_cav_mid=:id").setParameter("id", id);
+			result=query.getResultList();
+			return result;
+		}
+	 
+	 @Transactional
+	 public List<CaveatDocuments> getUploadedCaveates(Long cav_id) 
+	 {
+			List<CaveatDocuments> result=new ArrayList<CaveatDocuments>();
+			
+			try{
+				result = em.createQuery("SELECT cd FROM CaveatDocuments cd  where cd.cd_cav_mid="+cav_id+" and cd.cd_rec_status=1 ").getResultList();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+	}
+	 
+	 @Transactional
+		public Caveat getByPk(Long id) {
+		 Caveat result =null;
+		 try {
+			result = (Caveat) em.createQuery("select c from Caveat c where c.cav_id = :cav_id").setParameter("cav_id", id).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			return result;
+		}
+	 
+	 	@Transactional
+		public CaveatPetitionerDetails getFirstPetitioner(Long id) {
+		 CaveatPetitionerDetails result=new CaveatPetitionerDetails();
+			try{
+			Query query=null;
+			query = em.createQuery("SELECT pt from CaveatPetitionerDetails pt where pt.cpt_rec_status=1 and pt.cpt_cav_mid=:id order by cpt_id asc").setParameter("id", id);
+			result=(CaveatPetitionerDetails) query.setMaxResults(1).getSingleResult();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			return result;
+		}
+	 
+	    @Transactional
+		public CaveatRespondentDetails getFirstRespondent(Long id) {
+	    	   CaveatRespondentDetails result=new CaveatRespondentDetails();
+			try{
+			Query query=null;
+			query = em.createQuery(" SELECT rt from CaveatRespondentDetails rt where rt.crt_rec_status=1 and rt.crt_cav_mid=:id order by crt_id asc").setParameter("id", id);
+			result=(CaveatRespondentDetails) query.setMaxResults(1).getSingleResult();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+	           return result;
+	    }
+	    
+	    @Transactional
+		public List<CaveatCourtFee> getCourtFee(Long id) {
+			
+			List<CaveatCourtFee> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT cf from CaveatCourtFee cf where cf.ccf_rec_status=1 and cf.ccf_cav_mid=:id").setParameter("id", id);
+			result=query.getResultList();
+			return result;
+		}
+	    
+	    @Transactional
+		public Long  getDiarySequence() {
+			
+			Long  sequence = 0L;
+			
+			String query = "select nextval('diary_sequence')";
+			
+			try {
+				sequence= ((BigInteger) em.createNativeQuery(query).getResultList().get(0)).longValue();
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+			return sequence;
+		}
+
+		public List<Caveat> getDraftDetails(Long um_id) {
+			// TODO Auto-generated method stub
+			List<Caveat> cavDetails=null;
+			cavDetails= em.createQuery("SELECT cav FROM Caveat cav where cav.cav_assign_to ="+um_id+" order by cav.cav_id ").getResultList();
+			return cavDetails;
+		}
+		
+		@Transactional
+		public CaveatDocuments getCaveatDocuments(Long cd_id) 
+		{
+			CaveatDocuments result=new CaveatDocuments();
+			
+			try{
+				result = (CaveatDocuments) em.createQuery("SELECT cd FROM CaveatDocuments cd  where cd.cd_id="+cd_id).getSingleResult();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+		}
+		
+		@Transactional
+		 public boolean deleteCaveatDocuments(Long id) 
+		 {
+			 boolean flag=false;
+			 	CaveatDocuments oldDocument=null;
+			 	oldDocument=em.find(CaveatDocuments.class, id);
+			    em.remove(oldDocument);
+			    flag= true;
+			    return flag;
+		 }
+		
+		public List<CaveatCheckListMapping> getCaveatCheckList(Long doc) {
+			// TODO Auto-generated method stub
+			List<CaveatCheckListMapping> result=null;
+			Query query=null;
+			query = em.createQuery("SELECT c from CaveatCheckListMapping c where c.cm_rec_status=1 and c.cm_cav_mid=:id").setParameter("id", doc);
+			result=query.getResultList();
+			return result;
+		}
+		public List<CaveatCheckListMapping> getCaveatReportingHistory(Long doc) {
+			// TODO Auto-generated method stub
+			List<CaveatCheckListMapping> result=null;
+			Query query=null;
+			query = em.createQuery("SELECT c from CaveatCheckListMapping c where c.cm_cav_mid=:id").setParameter("id", doc);
+			result=query.getResultList();
+			return result;
+		}
+		
+		@Transactional
+		public boolean checkDateValidity(Long id)
+		{
+			boolean flag=false;
+			
+			Date scrutinydate= (Date) em.createQuery("SELECT cm_cr_date from CaveatCheckListMapping  where cm_cav_mid =:id order by cm_id desc").setParameter("id", id).setMaxResults(1).getSingleResult();
+			
+			long difference = (scrutinydate.getTime()-new Date().getTime())/86400000; 
+			long days= Math.abs(difference); 
+			if(days<=15)flag=true;
+			
+			return flag;
+		}
+
+}

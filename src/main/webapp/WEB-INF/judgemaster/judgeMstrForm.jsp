@@ -1,0 +1,122 @@
+<form class="form-horizontal reduce-gap" name="addjudgeForm" novalidate
+	role="form">
+	<div ng-show="errorlist.length!=0" class="alert alert-block alert-danger">
+		<ul>
+			<span ng-repeat="errors in errorlist"> <span
+				ng-repeat="n in errors track by $index">
+					<li>{{(n)}}</li>
+			</span>
+			</span>
+		</ul>
+	</div>
+	<!-- begin #content -->
+	<div id="content" class="content" style="width: 154%;">
+		<div class="row">
+			<div class="col-md-6 ui-sortable">
+				<div data-sortable-id="form-validation-1">
+<!-- 							<div class="form-group"> -->
+<!-- 							<label class="control-label col-md-4 col-sm-4" for="usr">Bench Code :</label> -->
+<!-- 							<div class="col-md-6 col-sm-6"> -->
+<!-- 								<select ng-model="addjudge.jg_bench_code" class="form-control" -->
+<!-- 									id="jg_bench_code" name="jg_bench_code" -->
+<!-- 									ng-options="bcd.lk_id as bcd.lk_longname for bcd in branchData  | orderBy: 'lk_longname'" ng-required="required"> -->
+<!-- 								</select> -->
+<!-- 							</div> -->
+<!-- 						</div> -->
+					<div class="panel-body panel-form">
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4" for="usr">Judge name :</label>
+									<div class="col-md-6 col-sm-6" >											
+											
+											<input required type="text" name="jg_name" id="jg_name" class="form-control" 
+											placeholder="judge Name" ng-pattern="/^[ a-zA-Z.]*$/" ng-maxlength=45 
+											ng-model="addjudge.jg_name" /> 
+										 	
+										 	<span style="color:red"
+										 		 ng-show="addjudgeForm.jg_name.$dirty && addjudgeForm.jg_name.$invalid && addjudgeForm.jg_name.$error ">							
+												 <span ng-show="addjudgeForm.jg_name.$error.required">Judge name is required.</span> 
+												 <small class="error" ng-show="addjudgeForm.jg_name.$error.pattern"> Enter valid Judge Name </small> 
+												 <small class="error" ng-show="addjudgeForm.jg_name.$error.maxlength">Judge name cannot be longer than 45 characters</small>
+											</span>
+											
+							    	</div>
+						</div>
+
+					</div>
+					<div class="form-group">
+						<label class="control-label col-md-4 col-sm-4">Judge Code
+							:</label>
+						<div class="col-md-6 col-sm-6">
+							<input class="form-control" type="text" id="jg_code"
+								name="jg_code" ng-model="addjudge.jg_code"
+								placeholder="Judge Code" ng-maxlength=10
+								ng-pattern="/^[a-zA-Z0-9]*$/">
+							
+							<span style="color:red"
+									ng-show="addjudgeForm.jg_code.$dirty && addjudgeForm.jg_code.$invalid && addjudgeForm.jg_code.$error ">							
+									<small class="error" ng-show="addjudgeForm.jg_code.$error.pattern"> Enter valid Judge Code </small> 
+									<small class="error" ng-show="addjudgeForm.jg_code.$error.maxlength">Judge name cannot be longer than 10 characters</small>
+							</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-4 col-sm-4" for="usr">Judge
+							Type :</label>
+						<div class="col-md-6 col-sm-6">
+							<select ng-model="addjudge.jg_type" class="form-control"
+								id="jg_type" required name="jg_type"
+								ng-options="judgetype.lk_id as judgetype.lk_longname for judgetype in judgeList  | orderBy: 'lk_longname'">
+							</select>
+						</div>
+					</div>
+					
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4" for="usr">Year of Joining* :</label>
+							<div class="col-md-6 col-sm-6">
+								<select ng-model="addjudge.jg_joining_year" class="form-control" id="jg_joining_year" required name="jg_joining_year"
+								ng-options="year as year for year in years">
+								</select>
+							</div>
+						</div>
+						
+						<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4" for="usr">Year of Retirement :</label>
+							<div class="col-md-6 col-sm-6">
+								<select ng-model="addjudge.jg_retirement_year" class="form-control"
+								id="jg_retirement_year" required name="jg_retirement_year" ng-options="year as year for year in years">
+								</select>
+							</div>
+						</div>
+					
+					
+					<div class="form-group">
+							<label class="control-label col-md-4 col-sm-4" for="usr">Judge
+								Status:</label>
+							<div class="col-md-6 col-sm-6">
+								<input type="radio" name="Active" value="1"
+									ng-model="addjudge.jg_rec_status" /> Active <input
+									type="radio" name="InActive" value="2"
+									ng-model="addjudge.jg_rec_status" /> InActive
+							</div>
+						</div>
+
+				</div>
+				<div class="form-group">
+						<label class="control-label col-md-4 col-sm-4"></label>
+						<!--<div ng-if="!acceptanceOfBundlesForm.ib_id" style="padding-left: 107px;">-->
+
+						<input type="submit" id="submitbtn" data-loading-text="Loading..."
+							value="Submit" ng-click="save(addjudge)" class="btn btn-success" />
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+				
+					</div>
+
+			</div>
+		</div>
+	</div>
+	
+
+
+
+</form>

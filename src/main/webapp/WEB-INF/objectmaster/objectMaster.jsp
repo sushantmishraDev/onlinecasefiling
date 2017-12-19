@@ -1,0 +1,240 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<jsp:include page="../content/header.jsp"></jsp:include>
+
+<style type="text/css">
+.iui-treeview-item-content {
+	padding: 4px;
+}
+</style>
+
+<div id="content" class="content" ng-controller="objectMasterCtrl">
+	<div class="row">
+		<div class="col-md-11">
+			<div class="panel panel-inverse">
+				<div class="panel-heading">
+					<div class="panel-heading-btn">
+						<!-- <button type="button" class="btn btn-primary btn-sm pull-right" 
+								ng-click="resetMasterdata()" data-toggle="modal" 
+								data-target="#objectmaster_Modal">
+								 <span class="glyphicon glyphicon-plus-sign"></span> Add New Object Master
+								</button>-->
+					</div>
+					<h4 class="panel-title">Object Master</h4>
+				</div>
+				<form class="form-horizontal reduce-gap" name="addobjectForm"
+					novalidate role="form">
+					<div ng-show="errorlist.length!=0"
+						class="alert alert-block alert-danger">
+						<ul>
+							<span ng-repeat="errors in errorlist"> <span
+								ng-repeat="n in errors track by $index">
+									<li>{{(n)}}</li>
+							</span>
+							</span>
+						</ul>
+					</div>
+					<div class="panel-body" style="float: left; width: 50%;">
+						<table id="data-table" st-table="displayedCollection"
+							st-safe-src="masterdata"
+							class="table table-striped table-bordered nowrap table-hover"
+							width="100%">
+							<thead>
+							</thead>
+							<tbody>
+								<tr>
+									<!-- 								<treecontrol class="tree-classic" tree-model="tree_data" -->
+									<!-- 									icon-leaf="icon-file" icon-expand="icon-plus-sign" -->
+									<!-- 									icon-collapse="icon-minus-sign" options="opts" -->
+									<!-- 									on-selection="showSelected(node)" > {{node.name}} -->
+									<!-- 								</treecontrol> -->
+								<!-- 	 	{{selectedNode}} -->
+									<treecontrol class="tree-classic" tree-model="tree_data"
+										on-selection="showSelected(node)" icon-leaf="icon-file"
+										icon-expand="icon-plus-sign" icon-collapse="icon-minus-sign">
+									{{node.om_object_name}} 
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div>
+						<div id="content" class="content" style="width: 150%;">
+							<div class="row">
+								<div class="col-md-4 ui-sortable">
+									<div data-sortable-id="form-validation-1">
+
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4"
+												for="om_object_name">Object name *</label>
+											<div class="col-md-4 col-sm-4">
+												<ng-form name="addobjectForm"> <input required
+													type="text" name="om_object_name" id="om_object_name"
+													class="form-control" placeholder="Object Name"
+													ng-pattern="/^[ a-zA-Z]*$/" ng-maxlength=30
+													ng-model="addobject.om_object_name"
+													id="{{selectedNode.om_object_name}}"
+													value="{{selectedNode.om_object_name}}" />
+												<span style="color: red"
+													ng-show="addobjectForm.om_object_name.$dirty && addobjectForm.om_object_name.$invalid && addobjectForm.om_object_name.$error ">
+													<!-- 				<span
+														ng-show="addobjectForm.om_object_name.$error.required">Object
+															name is required.</span> <small class="error"
+														ng-show="addobjectForm.om_object_name.$error.minlength">Object
+															Name is required to be at least 1 characters</small> <small
+														class="error"
+														ng-show="addobjectForm.om_object_name.$error.maxlength">Object
+															name cannot be longer than 20 characters</small>
+													</span>  --></ng-form>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4"
+												for="om_object_link">Object Link *</label>
+											<div class="col-md-4 col-sm-4">
+												<ng-form name="addobjectForm"> <input required
+													type="text" name="om_object_link" id="om_object_link"
+													class="form-control" placeholder="Object Link"
+													ng-pattern="/^[ _#/a-zA-Z]*$/" ng-maxlength=30
+													ng-model="addobject.om_object_link"
+													id="{{selectedNode.om_object_link}}"
+													value="{{selectedNode.om_object_link}}" /> <span
+													style="color: red"
+													ng-show="addobjectForm.om_object_link.$dirty && addobjectForm.om_object_link.$invalid && addobjectForm.om_object_link.$error ">
+													<!-- <span
+													ng-show="addobjectForm.om_object_link.$error.required">Object
+														name is required.</span> <small class="error"
+													ng-show="addobjectForm.om_object_link.$error.minlength">Object
+														Name is required to be at least 1 characters</small>  -->
+													<!--<small
+													class="error"
+											 	ng-show="addobjectForm.om_object_link.$error.maxlength">Object
+														Name cannot be longer than 20 characters</small>
+ -->
+												</span> </ng-form>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4" for="usr">
+												Object Parent *</label>
+											<div class="col-md-4 col-sm-4">
+												<select ng-model="addobject.om_parent_id"
+													id={{selectedNode.om_parent_id}} class="form-control"
+													required name="om_parent_id"
+													ng-options="objetctype.om_id as objetctype.om_object_name for objetctype in tree_data  | orderBy: 'name'">
+													<option value="">Parent</option>
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4">Object
+												Stage </label>
+											<div class="col-md-4 col-sm-4">
+												<input class="form-control" type="text"
+													name="om_object_stages"
+													ng-model="addobject.om_object_stages"
+													placeholder="Object Stage" ng-maxlength=2
+													ng-pattern="/^[0-9]*$/" id="{{selectedNode.objectStage}}"
+													value="{{selectedNode.objectStage}}">
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4" for="usr">Object
+												Status *</label>
+											<div class="col-md-4 col-sm-4"
+												ng-init="addobject.om_rec_status=1">
+												<input type="radio" name="Active" value="1"
+													ng-model="addobject.om_rec_status" /> Active <input
+													type="radio" name="InActive" value="2"
+													ng-model="addobject.om_rec_status" /> InActive
+											</div>
+										</div>
+
+									</div>
+
+									<div class="form-group">
+										<label class="control-label col-md-4 col-sm-4"></label>
+										<!-- <div ng-if="!addobjectForm.ib_id" style="padding-left: 107px;"> -->
+
+										<input type="submit" id="submitbtn"
+											data-loading-text="Loading..." value="Submit"
+											ng-click="save(addobject)" class="btn btn-success"
+											ng-disabled="addobjectForm.$invalid" />
+										<!-- <button type="button" class="btn btn-danger"
+											ng-click="resetModel()" data-dismiss="modal">Cancel</button> -->
+
+										<!-- 				</div> -->
+
+									</div>
+								</div>
+							</div>
+						</div>
+				</form>
+			</div>
+
+			<!-- end panel -->
+		</div>
+		<!-- end col-10 -->
+	</div>
+	<!-- end row -->
+</div>
+<div class="modal fade" id="objectmaster_Modal" tabindex="-1"
+	role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" style="width: 110%">
+			<div class="modal-header" style="background-color: black;">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">
+					<strong style="color: #FBFCFD;"> Object Details</strong>
+				</h4>
+			</div>
+			<%-- 	 <%@ include file="objectMstrForm.jsp"%>  --%>
+		</div>
+	</div>
+</div>
+</div>
+</treecontrol>
+
+
+<!-- begin scroll to top btn -->
+<a href="javascript:;"
+	class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+	data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+<!-- end scroll to top btn -->
+
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/scripts/controllers/objectMasterController.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap/ui-bootstrap-tpls.0.11.2.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/angular-tree-control.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/tree-grid-directive.js"></script>
+
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/tree-control.css'>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/tree-control-attribute.css'>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/treeGrid.css'>
+<script>
+	$(function() {
+		$(".btn").click(function() {
+			$(this).button('loading').delay(1000).queue(function() {
+				$(this).button('reset');
+				$(this).dequeue();
+			});
+		});
+	});
+
+	$(document).ready(function() {
+		App.init();
+		Notification.init();
+	});
+</script>
+
+
+
+
+
+
+
+
+

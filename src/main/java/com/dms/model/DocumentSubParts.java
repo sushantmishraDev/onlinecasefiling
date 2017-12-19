@@ -1,0 +1,223 @@
+package com.dms.model;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name="document_sub_parts")
+public class DocumentSubParts {
+	
+	@Id 
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="document_sub_parts_seq")
+	@SequenceGenerator(name="document_sub_parts_seq", sequenceName="document_sub_parts_seq", allocationSize=1)
+	@Column(name = "dsp_id") 
+	private Long dsp_id;
+	
+	@Column(name = "dsp_fd_mid")
+	private Long dsp_fd_mid;
+	
+	@Column(name = "dsp_if_mid")
+	private Long dsp_if_mid;
+	
+	@Column (name="dsp_document_name")
+	private String dsp_document_name;
+	
+	@Column (name = "dsp_no_of_pages")
+	private int dsp_no_of_pages;
+	
+	@Column (name = "dsp_version")
+	private int dsp_version;
+	
+	@Column (name = "dsp_uploaded_date")
+	private Date dsp_uploaded_date;
+	
+	@Column (name = "dsp_uploaded_by")
+	private int dsp_uploaded_by;
+	
+	@Column (name= "dsp_rec_status")
+	private int dsp_rec_status;
+	
+	@Column (name= "dsp_major_sequence")
+	private int dsp_major_sequence;
+	
+	@Column (name= "dsp_minor_sequence")
+	private int dsp_minor_sequence;
+	
+	@ManyToOne
+    @JoinColumn(name="dsp_if_mid",referencedColumnName="if_id",insertable = false, updatable = false)
+    private IndexField indexField;
+	
+	@Transient
+	private List<DocumentSubParts> childrens;
+
+	
+
+	public Long getDsp_id() {
+		return dsp_id;
+	}
+
+
+
+	public void setDsp_id(Long dsp_id) {
+		this.dsp_id = dsp_id;
+	}
+
+
+
+	public Long getDsp_fd_mid() {
+		return dsp_fd_mid;
+	}
+
+
+
+	public void setDsp_fd_mid(Long dsp_fd_mid) {
+		this.dsp_fd_mid = dsp_fd_mid;
+	}
+
+
+
+	public Long getDsp_if_mid() {
+		return dsp_if_mid;
+	}
+
+
+
+	public void setDsp_if_mid(Long dsp_if_mid) {
+		this.dsp_if_mid = dsp_if_mid;
+	}
+
+
+
+	public String getDsp_document_name() {
+		return dsp_document_name;
+	}
+
+
+
+	public void setDsp_document_name(String dsp_document_name) {
+		this.dsp_document_name = dsp_document_name;
+	}
+
+
+
+	public int getDsp_no_of_pages() {
+		return dsp_no_of_pages;
+	}
+
+
+
+	public void setDsp_no_of_pages(int dsp_no_of_pages) {
+		this.dsp_no_of_pages = dsp_no_of_pages;
+	}
+
+
+	public int getDsp_version() {
+		return dsp_version;
+	}
+
+
+
+	public Date getDsp_uploaded_date() {
+		return dsp_uploaded_date;
+	}
+
+
+
+	public void setDsp_uploaded_date(Date dsp_uploaded_date) {
+		this.dsp_uploaded_date = dsp_uploaded_date;
+	}
+
+
+
+	public int getDsp_uploaded_by() {
+		return dsp_uploaded_by;
+	}
+
+
+
+	public void setDsp_uploaded_by(int dsp_uploaded_by) {
+		this.dsp_uploaded_by = dsp_uploaded_by;
+	}
+
+
+
+	public void setDsp_version(int dsp_version) {
+		this.dsp_version = dsp_version;
+	}
+
+
+	public int getDsp_rec_status() {
+		return dsp_rec_status;
+	}
+
+
+
+	public void setDsp_rec_status(int dsp_rec_status) {
+		this.dsp_rec_status = dsp_rec_status;
+	}
+
+
+
+	public int getDsp_major_sequence() {
+		return dsp_major_sequence;
+	}
+
+
+
+	public void setDsp_major_sequence(int dsp_major_sequence) {
+		this.dsp_major_sequence = dsp_major_sequence;
+	}
+
+
+
+	public int getDsp_minor_sequence() {
+		return dsp_minor_sequence;
+	}
+
+
+
+	public void setDsp_minor_sequence(int dsp_minor_sequence) {
+		this.dsp_minor_sequence = dsp_minor_sequence;
+	}
+
+
+
+	public IndexField getIndexField() {
+		return indexField;
+	}
+
+
+
+	public void setIndexField(IndexField indexField) {
+		this.indexField = indexField;
+	}
+
+
+
+	public List<DocumentSubParts> getChildrens() {
+		return childrens;
+	}
+
+
+
+	public void setChildrens(List<DocumentSubParts> childrens) {
+		this.childrens = childrens;
+	}
+	
+
+	
+}

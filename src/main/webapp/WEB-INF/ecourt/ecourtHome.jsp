@@ -1,0 +1,217 @@
+<jsp:include page="../content/header2.jsp"></jsp:include>
+<%@ page import="com.dms.model.User"%>	
+
+<% 
+User user = null;
+if(session.getAttribute("USER")!=null)
+	 user = (User)session.getAttribute("USER");
+
+String role=user.getUserroles().get(0).getLk().getLk_longname();
+
+%>
+	<div id="content" class="content">
+	<% System.out.println("Rolename="+role); %>
+	<% if(role.equals("Advocate") || role.equals("InPerson")){ %>
+		<div class="container-fluid" ng-controller="TabsDemoCtrl" >
+		<div class="row">
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+						<div class="stats-info">
+							<h4>{{dashboardData.parameter1}}</h4>
+							<p>{{dashboardData.value1}}</p>
+						</div>
+						<div class="stats-link">
+							<a href="${pageContext.request.contextPath}/{{dashboardData.link1}}">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-blue"> -->
+<!-- 					<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter2}}</h4> -->
+<!-- 							<p>{{dashboardData.value2}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+				
+<!-- 				end col-3 -->
+<!-- 				begin col-3 -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-red"> -->
+<!-- 					<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter3}}</h4> -->
+<!-- 							<p>{{dashboardData.value3}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-purple"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter4}}</h4> -->
+<!-- 							<p>{{dashboardData.value4}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+						<div class="stats-info">
+							<h4>{{dashboardData.parameter5}}</h4>
+							<p>{{dashboardData.value5}}</p>	
+						</div>
+						<div class="stats-link">
+							<a href="${pageContext.request.contextPath}/{{dashboardData.link5}}">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+						<div class="stats-info">
+							<h4>{{dashboardData.parameter9}}</h4>
+							<p>{{dashboardData.value9}}</p>	
+						</div>
+						<div class="stats-link">
+							<a href="${pageContext.request.contextPath}/application/applicationDraftForm">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				</div>
+				<div class="row">
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-blue"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter6}}</h4> -->
+<!-- 							<p>{{dashboardData.value6}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-red"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter7}}</h4> -->
+<!-- 							<p>{{dashboardData.value7}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-purple"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter8}}</h4> -->
+<!-- 							<p>{{dashboardData.value8}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+				</div>
+<!-- 				<div class="row"> -->
+				
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-blue"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter10}}</h4> -->
+<!-- 							<p>{{dashboardData.value10}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-red"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter11}}</h4> -->
+<!-- 							<p>{{dashboardData.value11}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-purple"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-check-circle"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>{{dashboardData.parameter12}}</h4> -->
+<!-- 							<p>{{dashboardData.value12}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+<!-- 				</div> -->
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+<!-- 				<div class="col-md-3 col-sm-6"> -->
+<!-- 					<div class="widget widget-stats bg-red"> -->
+<!-- 						<div class="stats-icon"><i class="fa fa-floppy-o"></i></div> -->
+<!-- 						<div class="stats-info"> -->
+<!-- 							<h4>Drafts</h4> -->
+<!-- 							<p>{{count}}</p>	 -->
+<!-- 						</div> -->
+<!-- 						<div class="stats-link"> -->
+<!-- 							<a href="draftForm">View Detail <i class="fa fa-arrow-circle-o-right"></i></a> -->
+<!-- 						</div> -->
+<!-- 					</div> -->
+<!-- 				</div> -->
+				<!-- end col-3 -->
+			</div>
+			
+		
+	</div>
+	<%}else{ %>
+			<div class="container-fluid" ng-controller="ScrutinyCtrl" >
+			
+			
+			</div>
+	<%} %>
+	</div>
+	
+	</div>
+	
+	</body>
+	<% //if(role.equals("Advocate") || role.equals("InPerson")){ %>
+		<script type="text/javascript"
+			src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtHomeController.js"></script>
+	<% //}else{ %>
+<!-- 	<script type="text/javascript" -->
+<%-- 	src="${pageContext.request.contextPath}/js/scripts/controllers/scrutinyHomeController.js"></script> --%>
+	<%//} %>
+	<script src="${pageContext.request.contextPath}/assets/js/apps.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			App.init();
+			
+		});
+	</script>
+</html>

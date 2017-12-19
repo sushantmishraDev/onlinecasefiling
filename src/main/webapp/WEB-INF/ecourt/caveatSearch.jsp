@@ -1,0 +1,80 @@
+
+<div class="smooth container w-xxxl w-auto-xs" >
+						<form class="form-validation">
+						<h3></h3>
+							<fieldset class="scheduler-border">
+								<div class="col-sm-10" style="float:centre">
+									<div class="panel panel-default" style="margin-left: 140px;">
+										<div class="panel-heading font-bold">Caveat Search</div>
+										<div class="panel-body">
+											<div class="row pull-right">
+                                               <div class="col-sm-12">
+						     						<button class="btn btn-success" ng-click="searchCaveat()">Search</button>
+						      					</div>
+                               				</div>
+                               				<div class="table-responsive">
+                                                        <table id="data-table" class="table table-striped table-bordered">
+                                                            <thead>
+                                                                  <tr>
+                                                                         <th>Caveat No</th>
+                                                                        <th>Caveator Name<br/>
+                                                                         Email<br/>
+                                                                        Mobile</th>
+                                                                        <th>Case Type</th>
+                                                                        <th>Case Number</th>
+                                                                        <th>Case Year</th>
+                                                                        <th>Order Passed By</th>
+                                                                        <!-- <th>District</th> -->
+                                                                        <th>Judgement Date</th>
+                                                                        
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  <tr ng-repeat="row in caveatDataList" class="odd gradeX">
+                                                                                       <td>{{row.cav_no}}</td>
+                                                                                        <td>{{row.cav_caveator_name}}<br/>
+                                                                                           {{row.cav_email}}<br/>
+                                                                                         {{row.cav_mobile}}</td>
+                                                                                        <td><span ng-if="row.cav_hc_case_type!=null">{{row.hcCaseType.ct_name}}</span><span ng-if="row.cav_lc_case_type">{{row.lcCaseType.ct_name}}</span></td>
+                                                                                        <td>{{row.cav_lc_case_no}}</td>
+                                                                                        <td>{{row.cav_lc_case_year}}</td>
+                                                                                        <td>{{row.cav_ord_psd_by}}</td>
+                                                                                        <!-- <td>{{row.district.dt_name}}</td> -->
+                                                                                        <td>{{row.cav_judgmnt_date | date:"dd/MM/yyyy"}}</td>
+                                                                                           
+                                                                                          
+                                                                  </tr>
+                                                                  <tr ng-repeat="row in oldcaveatDataList" class="odd gradeX">
+                                                                                      <td>{{row.cav_no}}</td>
+                                                                                        <td>{{row.cav_caveator_name}}<br/>
+                                                                                           {{row.cav_email}}<br/>
+                                                                                         {{row.cav_mobile}}</td>
+                                                                                        <td>{{row.cav_lc_case_type}}</td>
+                                                                                        <td>{{row.cav_lc_case_no}}</td>
+                                                                                        <td>{{row.cav_lc_case_year}}</td>
+                                                                                        <td>{{row.cav_ord_psd_by}}</td>
+                                                                                        <!-- <td>{{row.district.dt_name}}</td> -->
+                                                                                        <td>{{row.cav_judgmnt_date | date:"dd/MM/yyyy"}}</td>
+                                                                                           
+                                                                                          
+                                                                  </tr>
+                                                            </tbody>
+                                                      </table>
+                                                </div>
+                                                </div>
+		
+
+											
+										</div>
+									</div>
+									</fieldset>
+									</form>
+								</div>
+							
+		                			
+				
+
+					
+					
+					
+					

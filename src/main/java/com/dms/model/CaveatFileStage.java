@@ -1,0 +1,82 @@
+package com.dms.model;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name="caveat_file_stages")
+public class CaveatFileStage {
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="cfs_seq")
+	@SequenceGenerator(name="cfs_seq", sequenceName="cfs_seq", allocationSize=1)
+	@Column(name="cfs_id")
+	private Long cfs_id;
+	
+	@Column(name="cfs_cav_mid")
+	private Long cfs_cav_mid;
+	 
+	@Column(name="cfs_stage_lid")
+	private Long cfs_stage_lid;
+	
+	@Column(name="cfs_cr_by")
+	private Long cfs_cr_by;
+	
+	@Column(name="cfs_cr_date")
+	private Date cfs_cr_date;
+
+	public Long getCfs_id() {
+		return cfs_id;
+	}
+
+	public void setCfs_id(Long cfs_id) {
+		this.cfs_id = cfs_id;
+	}
+
+	public Long getCfs_cav_mid() {
+		return cfs_cav_mid;
+	}
+
+	public void setCfs_cav_mid(Long cfs_cav_mid) {
+		this.cfs_cav_mid = cfs_cav_mid;
+	}
+
+	public Long getCfs_stage_lid() {
+		return cfs_stage_lid;
+	}
+
+	public void setCfs_stage_lid(Long cfs_stage_lid) {
+		this.cfs_stage_lid = cfs_stage_lid;
+	}
+
+	public Long getCfs_cr_by() {
+		return cfs_cr_by;
+	}
+
+	public void setCfs_cr_by(Long cfs_cr_by) {
+		this.cfs_cr_by = cfs_cr_by;
+	}
+
+	public Date getCfs_cr_date() {
+		return cfs_cr_date;
+	}
+
+	public void setCfs_cr_date(Date cfs_cr_date) {
+		this.cfs_cr_date = cfs_cr_date;
+	}
+
+		
+	
+}
