@@ -32,6 +32,7 @@ String scrutinycase="";
 String scrutinycaveat="";
 String scrutinyapplication="";
 String olreport="";
+String amendmenthistory="";
 String uri=(String) request.getAttribute("javax.servlet.forward.request_uri");
 if(uri.equals("/onlinecasefiling/ecourt/ecourtHome"))
 	home="active";
@@ -49,6 +50,8 @@ if(uri.equals("/onlinecasefiling/scrutiny/applications"))
 	scrutinyapplication="active";
 if(uri.equals("/onlinecasefiling/olreport/manage"))
 	olreport="active";
+if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
+	amendmenthistory="active";
 
 %>
 <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
@@ -110,29 +113,23 @@ if(uri.equals("/onlinecasefiling/olreport/manage"))
 							<span>Fresh Case</span>
 					    </a>
 					</li>
-<!-- 					<li class="has-sub "> -->
-<%-- 						<a href="${pageContext.request.contextPath}/ecourt/draftForm"> --%>
-<!-- 						<i class="fa fa-file-o"></i> -->
-<!-- 							<span>Drafts</span> -->
-<!-- 					    </a> -->
-<!-- 					</li> -->
 					<li class="has-sub <%=newcaveat %>">
 						<a href="${pageContext.request.contextPath}/ecourt/addCaveat">
 						<i class="fa fa-file-o"></i>
 							<span>Caveat</span>
 							</a>
 					</li>
-<!-- 					<li class="has-sub "> -->
-<%-- 						<a href="${pageContext.request.contextPath}/ecourt/caveatDraftForm"> --%>
-<!-- 						<i class="fa fa-file-o"></i> -->
-<!-- 							<span>Caveat Drafts</span> -->
-<!-- 					    </a> -->
-<!-- 					</li> -->
 					<li class="has-sub <%=newapplication %>">
 						<a href="${pageContext.request.contextPath}/searchcasefile/search">
 						<i class="fa fa-file-o"></i>
 							<span>Pending Cases(Misc. Appl./Docs.)</span>
 							</a>
+					</li>
+					<li class="has-sub <%=amendmenthistory %>">
+						<a href="${pageContext.request.contextPath}/amendmenthistory/manage">
+						<i class="fa fa-file-o"></i>
+							<span>Amendments</span>
+					    </a>
 					</li>
 					<% } %>
 					<%-- <% }else{ %>
