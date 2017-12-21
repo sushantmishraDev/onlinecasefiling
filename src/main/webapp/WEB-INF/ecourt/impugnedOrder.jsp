@@ -103,8 +103,8 @@
 
                                                 
 											    <div class="col-sm-4">
-													<label class="control-label">Date of Decision: <span class="text-danger"> * </span></label>
-													<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="impugnedOrder.io_decision_date" required is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" ng-disabled="true" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
+													<label class="control-label">Date of Decision:</label>
+													<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="impugnedOrder.io_decision_date" is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" ng-disabled="true" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
 				            			          <span class="input-group-addon" ng-click="open1($event,'fromDate1')"><i class="glyphicon glyphicon-calendar"></i></span>
 												</div>
 
@@ -112,7 +112,7 @@
 											<div class="row pull-right">
                                                       <div class="col-sm-12">
                                                            <!-- <div class="col-sm-6" style="float:right"> -->
-						                  <button class="btn btn-success" ng-disabled="!impugnedOrder.io_decision_date || !impugnedOrder.io_case_year || !impugnedOrder.io_case_no" ng-click="addImpugnedOrder()">Save</button>
+						                  <button class="btn btn-success" ng-disabled="!impugnedOrder.io_case_year || !impugnedOrder.io_case_no" ng-click="addImpugnedOrder()">Save</button>
 						                     </div>
                                                            
                                              </div>

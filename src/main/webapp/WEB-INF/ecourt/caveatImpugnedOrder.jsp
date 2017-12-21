@@ -77,7 +77,7 @@
                                                 
 											    <div class="col-sm-4">
 													<label class="control-label">Date of Decision:</label>
-											<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="impugnedOrder.io_decision_date" required is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
+													<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="impugnedOrder.io_decision_date" is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
 				            			          <span class="input-group-addon" ng-click="open1($event,'fromDate1')"><i class="glyphicon glyphicon-calendar"></i></span>
 												</div>
 

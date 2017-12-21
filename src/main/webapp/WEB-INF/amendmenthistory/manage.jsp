@@ -3,8 +3,8 @@
 		<div class="row">
 			<div class="col-md-12">
 				<ul class="nav nav-tabs">
-					<li class="active"><a href="#nav-tab-1" id="1" data-toggle="tab" >Amendment Details</a></li>
-					<li class="">	   <a href="#nav-tab-2" id="2" data-toggle="tab" >History</a></li>
+					<li class="active"><a href="#nav-tab-1" data-toggle="tab" >New Amendments</a></li>
+					<li class="">	   <a href="#nav-tab-2" data-toggle="tab" >Amendments History</a></li>
 				</ul>
 				<div class="tab-content">
 				
@@ -13,7 +13,7 @@
  						<input type="hidden" class="form-control" value=${user_id} id="user_id" name="user_id">  
 					</div>
 					
-					<div class="tab-pane fade active in" id="nav-tab-2" >
+					<div class="tab-pane fade" id="nav-tab-2" >
 						<jsp:include page="../amendmenthistory/history.jsp"></jsp:include>
 					</div>
 					
