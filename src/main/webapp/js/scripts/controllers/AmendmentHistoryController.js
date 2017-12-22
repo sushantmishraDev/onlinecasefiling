@@ -27,8 +27,9 @@ EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',funct
 				   }
 	  });	  
 	 }
-	$scope.setModel=function(am_id){
-		$scope.am_id=am_id;
+	$scope.setModel=function(amendment){
+		$scope.am_id=amendment.am_id;
+		$scope.am_type=amendment.am_type;
 	}
 	$scope.save=function(){
 		$scope.amendment={'am_id':$scope.am_id,'am_document_no':$scope.am_document_no,'am_document_year':$scope.am_document_year};

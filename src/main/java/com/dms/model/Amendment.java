@@ -65,6 +65,10 @@ public class Amendment {
     @JoinColumn(name = "am_um_mid",insertable = false, updatable = false)
 	private User userMaster;
 	
+	@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "am_fd_mid",insertable = false, updatable = false)
+	private CaseFileDetail caseFileDetail;
+
 	public Long getAm_id() {
 		return am_id;
 	}
@@ -175,6 +179,14 @@ public class Amendment {
 
 	public void setAm_uploaded_date(Date am_uploaded_date) {
 		this.am_uploaded_date = am_uploaded_date;
+	}
+
+	public CaseFileDetail getCaseFileDetail() {
+		return caseFileDetail;
+	}
+
+	public void setCaseFileDetail(CaseFileDetail caseFileDetail) {
+		this.caseFileDetail = caseFileDetail;
 	}	
 	
 	
