@@ -67,6 +67,16 @@ public class Application {
 	@Column(name = "ap_diary_no")
 	private String ap_diary_no;
 	
+	@Column(name = "ap_olr_no")
+	private Integer ap_olr_no;
+
+
+	@Column(name = "ap_olr_year")
+	private Integer ap_olr_year;
+	
+	
+	
+	
 	@OneToOne
 	@JoinColumn(name="ap_at_mid",referencedColumnName="at_id",insertable=false,updatable=false)
 	private ApplicationTypes applicationType;
@@ -231,7 +241,28 @@ public class Application {
 
 	public void setCaseFileDetail(CaseFileDetail caseFileDetail) {
 		this.caseFileDetail = caseFileDetail;
+	}
+
+	public Integer getAp_olr_no() {
+		return ap_olr_no;
+	}
+
+	public void setAp_olr_no(Integer ap_olr_no) {
+		this.ap_olr_no = ap_olr_no;
+	}
+
+	public Integer getAp_olr_year() {
+		return ap_olr_year;
+	}
+
+	public void setAp_olr_year(Integer ap_olr_year) {
+		this.ap_olr_year = ap_olr_year;
 	}	
+	
+	
+	
+	
+	
 	
 	
 }

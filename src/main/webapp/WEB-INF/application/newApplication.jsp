@@ -30,6 +30,41 @@
 	</form>
 </div>
 
+<div  ng-show="application.ap_at_mid==50" class="smooth container w-xxxl w-auto-xs">
+	<form name="leadStage" class="form-validation">
+		<fieldset class="scheduler-border">
+			<div class="col-sm-10">
+				<div class="panel panel-default" style="margin-left: 140px;">
+					<div class="panel-heading font-bold">OLR Details</div>
+					<div class="panel-body">
+						<div class="form-group pull-in clearfix">
+						
+							<div class="col-sm-4">
+								<label class="control-label">OLR Number <span class="text-danger"> * </span> </label> 
+								<input type="text" max-length=60 class="form-control" id="caseDetail" name="name"
+														ng-model="application.ap_olr_no" required>
+							</div>
+							<div class="col-sm-3">
+							
+								<label>OLR Year <span class="text-danger"> * </span></label> 
+								
+								<input type="text" max-length=60 class="form-control" id="caseDetail" name="name"
+														ng-model="application.ap_olr_year" required>
+								
+							</div>
+						
+
+						</div>
+						
+
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</form>
+</div>
+
+
 <div class="smooth container w-xxxl w-auto-xs">
 	<form name="leadStage" class="form-validation">
 		<fieldset class="scheduler-border">
