@@ -1,0 +1,82 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name = "registar_verify")
+public class RegistarVerify {
+	
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "registar_seq")
+	@SequenceGenerator(name = "registar_seq", sequenceName = "registar_seq", allocationSize = 1)
+	@Column(name = "rv_id")
+	private Long rv_id;
+	
+	@Column(name="rv_ap_mid")
+	private Long rv_ap_mid;
+	
+	@Column(name="rv_cr_by")
+	private Long rv_cr_by;
+	
+      @Column(name="rv_cr_date")	
+       private Date  rv_cr_date;
+      
+      @Column(name="rv_rec_status")	
+      private Date  rv_rec_status;
+
+	public Long getRv_id() {
+		return rv_id;
+	}
+
+	public void setRv_id(Long rv_id) {
+		this.rv_id = rv_id;
+	}
+
+	public Long getRv_ap_mid() {
+		return rv_ap_mid;
+	}
+
+	public void setRv_ap_mid(Long rv_ap_mid) {
+		this.rv_ap_mid = rv_ap_mid;
+	}
+
+	public Long getRv_cr_by() {
+		return rv_cr_by;
+	}
+
+	public void setRv_cr_by(Long rv_cr_by) {
+		this.rv_cr_by = rv_cr_by;
+	}
+
+	public Date getRv_cr_date() {
+		return rv_cr_date;
+	}
+
+	public void setRv_cr_date(Date rv_cr_date) {
+		this.rv_cr_date = rv_cr_date;
+	}
+
+	public Date getRv_rec_status() {
+		return rv_rec_status;
+	}
+
+	public void setRv_rec_status(Date rv_rec_status) {
+		this.rv_rec_status = rv_rec_status;
+	}
+
+
+	
+	
+	  
+
+}

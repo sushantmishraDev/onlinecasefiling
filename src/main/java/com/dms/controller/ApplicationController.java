@@ -35,6 +35,7 @@ import com.dms.model.ApplicationCourtFee;
 import com.dms.model.ApplicationStage;
 import com.dms.model.ApplicationTypes;
 import com.dms.model.ApplicationUploaded;
+import com.dms.model.BSApplicationCheckListMapping;
 import com.dms.model.CaseFileStage;
 import com.dms.model.IndexField;
 import com.dms.model.Lookup;
@@ -95,6 +96,7 @@ public class ApplicationController
 		
 		String viewname="/content/access_denied";
 		String message="";
+		boolean flag=false;
 		Application app = applicationService.getByPk(id);
 		if(app!=null){
 			if(u.getUm_id().longValue()==app.getAp_cr_by().longValue())
@@ -105,7 +107,12 @@ public class ApplicationController
 				}
 				else if(app.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
 				{
-					boolean flag=applicationService.checkDateValidity(app.getAp_id());
+					 if(app.getAp_at_mid()==3L || app.getAp_at_mid()==25L || app.getAp_at_mid()==42L || app.getAp_at_mid()==46L){
+					          flag=applicationService.checkBsDateValidity(app.getAp_id());
+					 }
+					 else{
+						   flag=applicationService.checkDateValidity(app.getAp_id());
+					 }
 					if(flag)
 					{
 						viewname="/application/addApplication";
@@ -394,7 +401,8 @@ public class ApplicationController
 		ActionResponse<Application> response=new ActionResponse<Application>();
 		User user = (User) session.getAttribute("USER");
 		boolean submit=true;
-	
+		 boolean flag=false;
+		UserRole ur=null;
 		List<ApplicationCourtFee> courtFees = null;
 		courtFees = applicationService.getCourtFee(application.getAp_id());
 		List<ApplicationUploaded> applicationUploaded = null;
@@ -413,8 +421,14 @@ public class ApplicationController
 			application.setAp_diary_no(diary+"_"+year);
 			}
 			
-			UserRole ur=userRoleService.getByUserRole("ApplicationScrutiny");
-			
+			if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L){
+				 ur=userRoleService.getByUserRole("BSApplicationScrutiny");
+			  }
+			else{
+				
+				 ur=userRoleService.getByUserRole("ApplicationScrutiny");
+				
+			}
 			if(ur.getUr_id()!=null)
 			{
 				if(application.getCaseStage().getLk_longname().equals("DRAFT"))
@@ -439,7 +453,13 @@ public class ApplicationController
 				 }
 				 else if(application.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
 				 {
-					 boolean flag=applicationService.checkDateValidity(application.getAp_id());
+					 if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L){
+					  flag=applicationService.checkBsDateValidity(application.getAp_id());
+					 }
+					 else{
+						 flag=applicationService.checkDateValidity(application.getAp_id()); 
+						 
+					 }
 						if(flag)
 						{
 							Lookup lkStage=lookupService.getLookup("ECOURT_STAGE", "DIARY_NO_GENERATED");
@@ -575,18 +595,32 @@ public class ApplicationController
 
 		String id = request.getParameter("docId");
 		List<ApplicationCheckListMapping> mapping = null;
+		List<BSApplicationCheckListMapping> bsmapping = null;
 
 		Long doc = new Long(id);
 		ActionResponse<ApplicationCheckListMapping> response = new ActionResponse<ApplicationCheckListMapping>();
+		ActionResponse<BSApplicationCheckListMapping> bsresponse = new ActionResponse<BSApplicationCheckListMapping>();
 		String jsonData = null;
 
 		mapping = applicationService.getApplicationCheckList(doc);
+		 if(mapping.isEmpty()){
+			 
+			 bsmapping=applicationService.getBSApplicationCheckList(doc);
+		 }
+		
 
-		if (mapping != null) {
+		if (!mapping.isEmpty()) {
 			response.setModelList(mapping);
 			response.setResponse("TRUE");
 			jsonData = cm.convert_to_json(response);
 
+		}
+		else{
+			bsresponse.setModelList(bsmapping);
+			bsresponse.setResponse("TRUE");
+			jsonData = cm.convert_to_json(bsresponse);
+
+			
 		}
 		return jsonData;
 

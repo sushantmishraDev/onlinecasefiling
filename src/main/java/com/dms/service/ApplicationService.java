@@ -19,6 +19,7 @@ import com.dms.model.ApplicationCourtFee;
 import com.dms.model.ApplicationStage;
 import com.dms.model.ApplicationTypes;
 import com.dms.model.ApplicationUploaded;
+import com.dms.model.BSApplicationCheckListMapping;
 import com.dms.model.CaseCheckListMapping;
 
 
@@ -233,6 +234,20 @@ public class ApplicationService
 			result=query.getResultList();
 			return result;
 		}
+		
+		@Transactional
+		public List<BSApplicationCheckListMapping> getBSApplicationCheckList(Long ap_id) {
+			// TODO Auto-generated method stub
+			List<BSApplicationCheckListMapping> result=null;
+			Query query=null;
+			query = em.createQuery("SELECT a from BSApplicationCheckListMapping a where a.cm_rec_status=1 and a.cm_ap_mid=:id").setParameter("id", ap_id);
+			result=query.getResultList();
+			return result;
+		}
+		
+		
+		
+		
 		@Transactional
 		public List<ApplicationCheckListMapping> getApplicationReportingHistory(Long ap_id) {
 			// TODO Auto-generated method stub
@@ -256,6 +271,23 @@ public class ApplicationService
 			
 			return flag;
 		}
+		
+		
+		@Transactional
+		public boolean checkBsDateValidity(Long id)
+		{
+			boolean flag=false;
+			
+			Date scrutinydate= (Date) em.createQuery("SELECT cm_cr_date from BSApplicationCheckListMapping  where cm_ap_mid =:id order by cm_id desc").setParameter("id", id).setMaxResults(1).getSingleResult();
+			
+			long difference = (scrutinydate.getTime()-new Date().getTime())/86400000; 
+			long days= Math.abs(difference); 
+			if(days<=15)flag=true;
+			
+			return flag;
+		}
+		
+		
 
 
 }

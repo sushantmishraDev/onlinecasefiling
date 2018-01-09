@@ -74,6 +74,8 @@ public class Application {
 	@Column(name = "ap_olr_year")
 	private Integer ap_olr_year;
 	
+	@Column(name = "ap_source")
+	private String ap_source;
 	
 	
 	
@@ -257,6 +259,14 @@ public class Application {
 
 	public void setAp_olr_year(Integer ap_olr_year) {
 		this.ap_olr_year = ap_olr_year;
+	}
+
+	public String getAp_source() {
+		return ap_source;
+	}
+
+	public void setAp_source(String ap_source) {
+		this.ap_source = ap_source;
 	}	
 	
 	
