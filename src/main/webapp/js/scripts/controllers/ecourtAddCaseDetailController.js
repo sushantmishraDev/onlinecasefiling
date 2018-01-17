@@ -296,6 +296,7 @@ EDMSApp.controller('addCaseDetailController',['$scope','$http','Upload',function
 			getImpugnedOrder($scope.draftId);
 			getTrialCourt($scope.draftId);
 			getCourtFee($scope.draftId);
+			
 			getUploadedDocuments();
 			}}
 			
@@ -473,6 +474,7 @@ $scope.ShowId = function(event)
 	$scope.tabShow6=true;
 	$scope.tabShow7=true;
 	$scope.tabShow8=true;
+	$scope.tabShow9=true;
 	$scope.tabShow=true;
 };
 	
@@ -1358,6 +1360,107 @@ $scope.addShow=true;
 		/////////////////Document Upload Close///////////////
 	
 	 
+		/************************link Case *********************************/
+		
+		
+		getCaseTypes();
+		$scope.model={};
+		
+		 function getCaseTypes()
+		 {
+				$http.get(urlBase+'ecourt/getCaseTypes').
+		        success(function (data) {
+		        	$scope.caseTypeList=data.modelList;
+		        	
+		        }).
+		        error(function(data, status, headers, config) {
+		        	console.log("Error in getting tree data");
+		        });
+		 };
+		 
+		 $scope.searchCaseFile=function(){
+			 $http.get(urlBase+'searchcasefile/searchCaseFile', {params : {'case_year' :$scope.model.fd_case_year,'case_type' :$scope.model.fd_case_type,'case_no' :$scope.model.fd_case_no}}).
+		        success(function (data) {
+		        	
+		        	if(data.modelList.length>0){
+		        	$scope.caseFileList=data.modelList;
+		        	}else{
+		        		alert("Case not found...!");
+		        	}
+		        	
+		        }).
+		        error(function(data, status, headers, config) {
+		        	console.log("Error in getting tree data");
+		        });
+			 
+		 }
+		
+		 getLinkedCase($scope.draftId);
+		 
+			$scope.LinkedCaseList=[]; 
+			function getLinkedCase(id){
+			    $http.get(urlBase+ 'ecourt_add_case/getLinkedCase', {
+					params : {
+						'rcd_id' : id
+					}
+				}).success(function(data, status, headers, config) {
+			              $scope.LinkedCaseList = data.modelList;
+			               
+			}).error(function(data, status, headers, config) {
+				});
+
+			}
+		
+		 $scope.case_link=function(data){
+			 $scope.LinkedCaseDetails.lcd_case_year=data.fd_case_year;
+			 $scope.LinkedCaseDetails.lcd_case_type=data.fd_case_type;
+			 $scope.LinkedCaseDetails.lcd_case_no=data.fd_case_no;
+			 $scope.LinkedCaseDetails.lcd_first_petitioner=data.fd_first_petitioner;
+			 $scope.LinkedCaseDetails.lcd_first_respondent=data.fd_first_respondent;
+			 $scope.LinkedCaseDetails.lcd_rcd_mid=$scope.registerCase.rcd_id;
+			 
+			 var response =$http.post(urlBase+'ecourt_add_case/addLinkedCase',$scope.LinkedCaseDetails);
+				response.success(function(data, status, headers, config){
+					   if(data.response=="TRUE"){
+						alert("case Linked Successfully!");
+						getLinkedCase($scope.registerCase.rcd_id);
+					
+						
+						
+					   }
+					   });
+						 
+			 
+		 };
+		 
+		 $scope.delete_linkCase=function(id){
+			  var result=confirm("Are you really want to Remove");
+				if (result) {
+			   $http({
+				method : 'DELETE',
+				url : urlBase + 'ecourt_add_case/delete_linkCase/' + id + '/'
+			}).success(function(res) {
+				   if(res.response=="TRUE"){
+					alert(" case Removed Successfully!");
+					if($scope.registerCase.rcd_id!=null && $scope.registerCase.rcd_id!=undefined){
+					//getDocument($scope.registerCase.rcd_id);
+						getLinkedCase($scope.registerCase.rcd_id);
+					}
+					
+				   }
+				
+			});	
+		}
+	
+			 
+			 
+			 
+			 
+			 
+		 }
+		 
+		 
+		 
 	 
 	
 }]);

@@ -33,6 +33,7 @@ import com.dms.model.CaseType;
 import com.dms.model.CourtFee;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.IndexField;
+import com.dms.model.LinkedCaseDetails;
 import com.dms.model.Lookup;
 import com.dms.model.LowerCourtCaseType;
 import com.dms.model.PetitionUploaded;
@@ -903,5 +904,76 @@ public @ResponseBody String create(MultipartHttpServletRequest request,HttpSessi
 		return jsonData;
 
 	}
+	
+	
+	@RequestMapping(value = "/addLinkedCase", method = RequestMethod.POST)
+	@ResponseBody
+	public String addLinkedCase(@RequestBody LinkedCaseDetails lCaseDetails,
+			HttpSession session) {
+
+		LinkedCaseDetails response = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<LinkedCaseDetails> rd = new ActionResponse<LinkedCaseDetails>();
+		String jsonData = null;
+           lCaseDetails.setLcd_cr_date(new Date());
+           lCaseDetails.setLcd_cr_by(user.getUm_id());
+           lCaseDetails.setLcd_rec_status(1);
+		
+		
+		response = ecourtAddCaseService.addLinkedCase(lCaseDetails);
+
+		if (response != null)
+			rd.setResponse("TRUE");
+		  rd.setModelData(response);
+			jsonData = cm.convert_to_json(rd);
+		   
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value="/getLinkedCase", method=RequestMethod.GET)
+	@ResponseBody
+	public String getLinkedCase(HttpServletRequest request)
+	{
+		String jsonData=null;
+		String file_id=request.getParameter("rcd_id");
+		Long rcd_id=Long.valueOf(file_id);
+		List<LinkedCaseDetails> lCaseDetails=null;
+	    lCaseDetails=ecourtAddCaseService.getLinkedCase(rcd_id);
+		ActionResponse<LinkedCaseDetails> response=new ActionResponse<LinkedCaseDetails>();
+		response.setModelList(lCaseDetails);
+		response.setResponse("TRUE");
+		
+	     jsonData=cm.convert_to_json(response);
+	     return jsonData;
+	}
+
+	
+	@RequestMapping(value = "/delete_linkCase/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String delete_linkCase(@PathVariable Long id, HttpSession session) {
+		LinkedCaseDetails response = null;
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<LinkedCaseDetails> pd = new ActionResponse<LinkedCaseDetails>();
+		String jsonData = null;
+
+		response = ecourtAddCaseService.delete_linkCase(user, id);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	
+	
+	
+	
 
 }

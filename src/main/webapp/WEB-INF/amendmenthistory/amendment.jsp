@@ -6,10 +6,11 @@
 				<thead>
 				<tr>
 					<th style="text-align: center;">Document Type</th>
+					<th style="text-align: center;">Document Status</th>
 					<th style="text-align: center;">Case Type</th>
 					<th style="text-align: center;">Case No</th>
 					<th style="text-align: center;">Case Year</th>
-					<th style="text-align: center;">Status</th>
+					<!-- <th style="text-align: center;">Status</th> -->
 					<th style="text-align: center;">Date</th>
 					<th style="text-align: center;">Action</th>
 				</tr>

@@ -18,6 +18,7 @@ import com.dms.model.CaseType;
 import com.dms.model.CourtFee;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.IndexField;
+import com.dms.model.LinkedCaseDetails;
 import com.dms.model.LowerCourtCaseType;
 import com.dms.model.PetitionUploaded;
 import com.dms.model.PetitionerDetails;
@@ -479,6 +480,51 @@ public RegisteredCaseDetails saveCaseDetails(RegisteredCaseDetails r) {
 
 
 
+		@Transactional
+		public LinkedCaseDetails addLinkedCase(LinkedCaseDetails lCaseDetails) {
+			LinkedCaseDetails result=null;
+			try{
+            	result=em.merge(lCaseDetails);
+            	
+            }catch(Exception e){
+            	e.printStackTrace();
+            }
+
+			return result;
+			
+		}
+
+
+
+		@Transactional
+		public List<LinkedCaseDetails> getLinkedCase(Long rcd_id) {
+			List<LinkedCaseDetails> result=new ArrayList<LinkedCaseDetails>();
+			
+			try{
+				result =em.createQuery("SELECT lcd FROM LinkedCaseDetails lcd  where lcd.lcd_rcd_mid="+rcd_id+" and lcd.lcd_rec_status=1 ").getResultList();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+		}
+
+
+
+         @Transactional
+		public LinkedCaseDetails delete_linkCase(User user, Long id) {
+        	 LinkedCaseDetails old =null;
+        	 LinkedCaseDetails result=null;
+        	try{ 
+        	 old=em.find(LinkedCaseDetails.class,id);
+        	   old.setLcd_rec_status(2);
+        	    result=em.merge(old);
+			// TODO Auto-generated method stub
+        	}catch(Exception e){
+        		e.printStackTrace();
+        	}
+        	    return result;
+		
+         }
 }
 
 

@@ -10,6 +10,7 @@
 					<li class=""><a href="#nav-tab-5" id="5" data-toggle="tab" data-ng-click="ShowId($event)">Impunged Order Details</a></li>
 					<li class=""><a href="#nav-tab-8" id="8" data-toggle="tab" data-ng-click="ShowId($event)">Caveat Serach</a></li>
 					<li class=""><a href="#nav-tab-6" id="6" data-toggle="tab" data-ng-click="ShowId($event)">E-Court Fee </a></li>
+					<li class=""><a href="#nav-tab-9" id="9" data-toggle="tab" data-ng-click="ShowId($event)">LinkCase</a></li>
 					<li class=""><a href="#nav-tab-7" id="7" data-toggle="tab" data-ng-click="ShowId($event)">Upload Document </a></li>
 				</ul>
 				<div class="tab-content">
@@ -34,6 +35,9 @@
 					</div>	
 					<div class="tab-pane fade active in" id="nav-tab-6" ng-show="tabShow6">
 						<jsp:include page="../ecourt/courtFee.jsp"></jsp:include>
+					</div>
+					<div class="tab-pane fade active in" id="nav-tab-9" ng-show="tabShow9">
+						<jsp:include page="../ecourt/caseLink.jsp"></jsp:include>
 					</div>
 					<div class="tab-pane fade active in" id="nav-tab-7" ng-show="tabShow7">
 						<jsp:include page="../ecourt/uploadDocument.jsp"></jsp:include>

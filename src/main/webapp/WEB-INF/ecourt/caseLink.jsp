@@ -1,0 +1,152 @@
+
+		<div class="smooth container w-xxxl w-auto-xs" >
+			<div class="col-md-10">
+				
+				<!-- begin panel -->
+			<div class="panel panel-inverse">
+				<div class="panel-body">
+					<div>
+						<table id="data-table" st-table="displayedCollection"
+							st-safe-src="masterdata"
+							class="table table-striped table-bordered nowrap table-hover" width="100%">
+								<thead>
+									<tr>
+										<th style="text-align: center;" width="25%" st-sort="fd_case_year">Case Year</th>
+										<th style="text-align: center;" width="40%" st-sort="fd_case_type">Case Type</th>
+										<th style="text-align: center;" width="20%"  st-sort="fd_case_no">Case Number</th>
+										<th style="text-align: center;" width="10%">Search</th>
+									</tr>
+									<tr>
+										<th>
+										 <input numbers-only  id="fd_case_year"  type="text" name="fd_case_year"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  maxlength=4 ng-model="model.fd_case_year"  />
+										</th>
+										
+										<th>
+											<select ng-options="caseType.ct_id as caseType.ct_name for caseType in caseTypeList"
+											class="form-control" id="caseTypeData" 
+											name="fd_case_type" ng-model="model.fd_case_type" required>
+											<option value="">--Select--</option>
+											</select>
+										</th>
+									
+										<th>
+										 <input  numbers-only id="fd_case_no"  type="text" name="fd_case_no"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  ng-model="model.fd_case_no"  />
+										</th>
+										
+														  
+ 										<th>
+										
+										<button id="search" type="submit" class="btn btn-primary btn-sm pull-right"
+												ng-click="searchCaseFile()" data-toggle="modal" style="size: 2px">
+										<span class="glyphicon glyphicon-plus-sign"></span>Search</button>
+										</th>
+									</tr>
+				 
+								</thead>
+								</table>
+								</div>
+								</div>
+								
+					      <div class="panel-body">
+						<table id="data-table" st-table="displayedCollection"
+							st-safe-src="masterdata"
+							class="table table-striped table-bordered nowrap table-hover" width="100%">
+								<thead>
+								<tr>
+										<th style="text-align: center;" width="20%" st-sort="fd_case_year">Case Year</th>
+										<th style="text-align: center;" width="20%" st-sort="fd_case_type">Case Type</th>
+										<th style="text-align: center;" width="20%"  st-sort="fd_case_no">Case Number</th>
+								    <th style="text-align: center;" width="20%"  st-sort="fd_first_petitioner">First Petitioner </th>
+									<th style="text-align: center;" width="20%"  st-sort="fd_first_respondent">First Respondent</th>
+								<th style="text-align: center;" width="20%">Action</th>
+								</tr>
+								</thead>
+								
+								
+								<tbody>
+									<tr ng-repeat="data in caseFileList" class="odd gradeX">
+										<td align="center">{{data.fd_case_year}}</td>
+										<td align="center">{{data.caseType.ct_name}}</td>
+										<td align="center">{{data.fd_case_no}}</td>
+										<td align="center">{{data.fd_first_petitioner}}</td>
+										<td align="center">{{data.fd_first_respondent}}</td>
+										<td align="center">
+										<button id="Submit" type="submit" class="btn btn-success"
+												ng-click="case_link(data)" >
+										Add</button>
+										</td>
+										
+									
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="9" class="text-center">
+											<div st-pagination="" st-items-by-page="10"
+											st-displayed-pages="8">
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+						 </table>
+					</div>
+					   <div class="panel-body">
+					   <h5>Linked Case Details</h5>
+						<table id="data-table" 
+							st-safe-src="masterdata"
+							class="table table-striped table-bordered nowrap table-hover" width="100%">
+								<thead>
+								<tr>
+										<th style="text-align: center;" width="20%" st-sort="fd_case_year">Case Year</th>
+										<th style="text-align: center;" width="20%" st-sort="fd_case_type">Case Type</th>
+										<th style="text-align: center;" width="20%"  st-sort="fd_case_no">Case Number</th>
+								    <th style="text-align: center;" width="20%"  st-sort="fd_first_petitioner">First Petitioner </th>
+									<th style="text-align: center;" width="20%"  st-sort="fd_first_respondent">First Respondent</th>
+									<th style="text-align: center;">Action</th>
+								</tr>
+								</thead>
+								
+								
+								<tbody>
+								<!-- ng-repeat="data in linkedCaseList" -->
+									<tr  ng-repeat="data in LinkedCaseList" class="odd gradeX">
+										<td align="center">{{data.lcd_case_year}}</td>
+										<td align="center">{{data.caseType.ct_name}}</td>
+										<td align="center">{{data.lcd_case_no}}</td>
+										<td align="center">{{data.lcd_first_petitioner}}</td>
+										<td align="center">{{data.lcd_first_respondent}}</td>
+										<td ng-if="data.lcd_id" link"><button id="search" type="submit" class="btn btn-primary btn-sm pull-right"
+												ng-click="delete_linkCase(data.lcd_id)" data-toggle="modal" style="size: 2px">
+										<span  class="fa fa-trash" aria-hidden="true"></span>Remove</button>
+										</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="9" class="text-center">
+											<div st-pagination="" st-items-by-page="10"
+											st-displayed-pages="8">
+											</div>
+										</td>
+									</tr>
+								</tfoot>
+						 </table>
+					</div>
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				</div>
+				<!-- end panel -->
+			</div>
+			<!-- end col-10 -->
+						
+				</div>
+		
+
