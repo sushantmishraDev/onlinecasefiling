@@ -13,13 +13,32 @@
                             </div>
                             <h4 class="panel-title">View Draft Details</h4>
                         </div>
+					<div style="position: absolute;">
+							<font size="2" face="verdana" color="red"> Note : Please click on submit button for generation of Diary No.</font><br/>
+							<font size="2" face="verdana" color="purple"> Remark : After generation of Diary No.,further reporting process should be started at High Court.</font>
+					</div><br/><br/><br/>
+
+					<div align="center">
+                                    <input type="radio" height="30px" width="30pax" id="civil" data-ng-click="changeCase(radioSelect)" checked name="caseType" ng-model="radioSelect" value="draft">
+                                    <label><b>Case In-Process</b>&emsp;
+                                        <input type="radio"  id="criminal" data-ng-click="changeCase(radioSelect)" 
+														ng-model="radioSelect" value="passed" name="caseType" >
+														<b>Passed Cases</b>
+										 <input type="radio"  id="criminal" data-ng-click="changeCase(radioSelect)" 
+														ng-model="radioSelect" value="defect" name="caseType" >
+														<b>Defect Expired Cases</b>				
+                                    </label>
+                                </div>
+                        
                         <div class="panel-body">
                             <div class="table-responsive">
                                 <table id="data-table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
+                                        	<th style="width: 2%;">Sr.<br>No.</th>
                                             <th>Draft No</th>
                                             <th>Diary No</th>
+                                            <th>Registered Date</th>
                                             <th>First Petitioner</th>
                                             <th>First Respondent</th>
                                             <th>Case Type</th>
@@ -29,16 +48,19 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="row in draftList"  class="odd gradeX">
+                                        	 <td>{{$index+1}}</td>
                                              <td>{{row.rcd_draft_no}}</td>
                                              <td>{{row.rcd_diary_no}}</td>
+                                             <td>{{row.rcd_cr_date | date:"dd/MM/yyyy HH:mm:ss"}}</td>
                                              <td>{{row.petitionerDetails.pt_name}}</td>
                                              <td>{{row.respondentDetails.rt_name}}</td>                                          
                                              <td>{{row.caseType.ct_name}}</td>
-                                             <td>{{row.caseStage.lk_longname}}</td>
+                                              <td ng-hide ="row.caseStage.lk_longname == 'RETURN_TO_COUNCIL'">{{row.caseStage.lk_longname}}</td>
+                                             <td class="col-md-2" ng-show ="row.caseStage.lk_longname == 'RETURN_TO_COUNCIL'">{{row.scrutionRemark.sr_remrk}}</td>
                                              <td>                               
-				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_longname=='SUPERVISIOR_DEFECTS' " ng-click="viewDetails(row.rcd_id)">Edit</button>
+				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_id==1000041 " ng-click="viewDetails(row.rcd_id)">Edit</button>
 				                                 <button class="btn btn-success" ng-click="previewDetails(row.rcd_id)">Preview</button>
-				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_longname=='SUPERVISIOR_DEFECTS'" ng-click="submitForm(row)">Submit</button>
+				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT'|| row.caseStage.lk_id==1000041" ng-click="submitForm(row)">Submit</button>
                                         	 </td>
                                           </tr>
                                     </tbody>
@@ -60,7 +82,7 @@
 	
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/scripts/controllers/draftViewController.js"></script>
+	src="${pageContext.request.contextPath}/js/scripts/controllers/draftViewController.js?v=3"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript"

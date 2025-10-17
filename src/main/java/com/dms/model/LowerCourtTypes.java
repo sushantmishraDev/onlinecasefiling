@@ -5,23 +5,44 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+
 @Entity
-@Table(name="lower_court_types")
+@Table(name="lower_court_types1")
+@IdClass(LowerCourtTypePk.class)
 public class LowerCourtTypes {
 	  
+	/*@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="lctypes1_seq")
+	@SequenceGenerator(name="lctypes1_seq", sequenceName="lctypes1_seq", allocationSize=1)*/
 	@Id
-	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="lctypes_seq")
-	@SequenceGenerator(name="lctypes_seq", sequenceName="lctypes_seq", allocationSize=1)
-	
 	@Column(name="lct_id")
 	private Integer lct_id;
+	@Id
+	@Column(name="lct_dt_mid")
+	private Long lct_dt_mid;
 	
 	
 	@Column(name="lct_name")
 	private String lct_name;
+	
+	
+
+
+
+
+
+	public Long getLct_dt_mid() {
+		return lct_dt_mid;
+	}
+
+
+	public void setLct_dt_mid(Long lct_dt_mid) {
+		this.lct_dt_mid = lct_dt_mid;
+	}
 
 
 	public Integer getLct_id() {

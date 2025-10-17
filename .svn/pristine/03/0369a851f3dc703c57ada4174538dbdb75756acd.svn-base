@@ -1,0 +1,243 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.DynamicUpdate;
+
+@DynamicUpdate
+@Entity
+@Table(name="caveat_respondent_details")
+public class CaveatRespondentDetails {
+
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="caveat_resp_seq")
+	@SequenceGenerator(name="caveat_resp_seq", sequenceName="caveat_resp_seq", allocationSize=1)
+	@Column(name = "crt_id")
+	private Long crt_id;
+	
+	@Column(name="crt_cav_mid")
+	private Long crt_cav_mid;
+
+	@Column(name = "crt_name")
+	private String crt_name;
+		
+	@Column(name = "crt_email")
+	private String crt_email;
+	
+	@Column(name = "crt_mobile")
+	private Long  crt_mobile;
+	
+	@Column(name = "crt_address")
+	private String crt_address;
+	
+	@Column(name = "crt_pincode")
+	private Long  crt_pincode;
+	
+	@Column(name = "crt_other_contact")
+	private String crt_other_contact;
+	
+	@Column(name="crt_cr_by")
+	private Long crt_cr_by;
+	
+	@Column(name="crt_cr_date")
+	private Date crt_cr_date;	
+	
+	@Column(name="crt_mod_by")
+	private Long crt_mod_by;	
+	
+	@Column(name="crt_mod_date")
+	private Date crt_mod_date;
+	
+	@Column(name = "crt_rec_status")
+	private Integer crt_rec_status;
+	
+	@Column(name = "crt_sequence")
+	private Long crt_sequence;
+
+	@Column(name="crt_s_id")
+	private Long crt_s_id;
+	
+	
+	@Column(name="crt_city")
+	private String crt_city;
+
+
+	
+
+
+	public Long getCrt_id() {
+		return crt_id;
+	}
+
+
+	public void setCrt_id(Long crt_id) {
+		this.crt_id = crt_id;
+	}
+
+
+	public Long getCrt_cav_mid() {
+		return crt_cav_mid;
+	}
+
+
+	public void setCrt_cav_mid(Long crt_cav_mid) {
+		this.crt_cav_mid = crt_cav_mid;
+	}
+
+
+	public String getCrt_name() {
+		return crt_name;
+	}
+
+
+	public void setCrt_name(String crt_name) {
+		this.crt_name = crt_name;
+	}
+
+
+	public String getCrt_email() {
+		return crt_email;
+	}
+
+
+	public void setCrt_email(String crt_email) {
+		this.crt_email = crt_email;
+	}
+
+
+	public Long getCrt_mobile() {
+		return crt_mobile;
+	}
+
+
+	public void setCrt_mobile(Long crt_mobile) {
+		this.crt_mobile = crt_mobile;
+	}
+
+
+	public String getCrt_address() {
+		return crt_address;
+	}
+
+
+	public void setCrt_address(String crt_address) {
+		this.crt_address = crt_address;
+	}
+
+
+	public Long getCrt_pincode() {
+		return crt_pincode;
+	}
+
+
+	public void setCrt_pincode(Long crt_pincode) {
+		this.crt_pincode = crt_pincode;
+	}
+
+
+	public String getCrt_other_contact() {
+		return crt_other_contact;
+	}
+
+
+	public void setCrt_other_contact(String crt_other_contact) {
+		this.crt_other_contact = crt_other_contact;
+	}
+
+
+	public Long getCrt_cr_by() {
+		return crt_cr_by;
+	}
+
+
+	public void setCrt_cr_by(Long crt_cr_by) {
+		this.crt_cr_by = crt_cr_by;
+	}
+
+
+	public Date getCrt_cr_date() {
+		return crt_cr_date;
+	}
+
+
+	public void setCrt_cr_date(Date crt_cr_date) {
+		this.crt_cr_date = crt_cr_date;
+	}
+
+
+	public Long getCrt_mod_by() {
+		return crt_mod_by;
+	}
+
+
+	public void setCrt_mod_by(Long crt_mod_by) {
+		this.crt_mod_by = crt_mod_by;
+	}
+
+
+	public Date getCrt_mod_date() {
+		return crt_mod_date;
+	}
+
+
+	public void setCrt_mod_date(Date crt_mod_date) {
+		this.crt_mod_date = crt_mod_date;
+	}
+
+
+	public Integer getCrt_rec_status() {
+		return crt_rec_status;
+	}
+
+
+	public void setCrt_rec_status(Integer crt_rec_status) {
+		this.crt_rec_status = crt_rec_status;
+	}
+
+
+	public Long getCrt_sequence() {
+		return crt_sequence;
+	}
+
+
+	public void setCrt_sequence(Long crt_sequence) {
+		this.crt_sequence = crt_sequence;
+	}
+
+
+	public Long getCrt_s_id() {
+		return crt_s_id;
+	}
+
+
+	public void setCrt_s_id(Long crt_s_id) {
+		this.crt_s_id = crt_s_id;
+	}
+
+
+	public String getCrt_city() {
+		return crt_city;
+	}
+
+
+	public void setCrt_city(String crt_city) {
+		this.crt_city = crt_city;
+	}
+	
+	
+	
+	
+	
+	
+}

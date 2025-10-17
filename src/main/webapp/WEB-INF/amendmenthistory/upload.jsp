@@ -14,7 +14,7 @@
 			<div class="form-group">
 				<label class="control-label col-md-4"><span ng-show="am_type=='P'">Case No.</span><span ng-show="am_type=='A'">Application No.</span><span class="text-danger"> * </span></label>
 				<div class="col-md-4">
-					<input type="text" required name="am_document_no" id="am_document_no" ng-model="am_document_no" class="form-control col-md-4"/>
+					<input type="text" ng-disabled = "true" required name="am_document_no" id="am_document_no" ng-model="am_document_no" class="form-control col-md-4"/>
 				</div>
 			</div>
 		</div>
@@ -22,7 +22,7 @@
 			<div class="form-group">
 				<label class="control-label col-md-4"><span ng-show="am_type=='P'">Case Year</span><span ng-show="am_type=='A'">Application Year</span><span class="text-danger"> * </span></label>
 				<div class="col-md-4">
-					<input type="text" required name="am_document_year" id="am_document_year" ng-model="am_document_year" class="form-control col-md-4"/>
+					<input type="text" ng-disabled = "true" required name="am_document_year" id="am_document_year" ng-model="am_document_year" class="form-control col-md-4"/>
 				</div>
 			</div>
 		</div>

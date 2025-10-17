@@ -18,8 +18,10 @@
                                 <table id="data-table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
+                                        	<th style="width: 2%;">Sr.<br>No.</th>
                                             <th>Caveat Draft No</th>
                                             <th>Diary No</th>
+                                            <th>Registered Date</th>
                                             <th>Caveator Name</th>
                                             <th>Case Type</th>
                                             <th>Stage</th>
@@ -29,15 +31,17 @@
                                     </thead>
                                     <tbody>
                                         <tr  ng-repeat="row in caveatList"  class="odd gradeX">
+                                        	 <td>{{$index+1}}</td>
                                              <td>{{row.cav_draft_no}}</td>
                                              <td>{{row.cav_diary_no}}</td>
+                                             <td>{{row.cav_cr_date | date:"dd/MM/yyyy HH:mm:ss"}}</td>
                                              <td>{{row.cav_caveator_name}}</td>
                                               <td>{{row.caseType.ct_name}}</td>
                                               <td>{{row.caseStage.lk_longname}}</td>
                                                  <td>                               
-                                					<button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_longname=='SUPERVISIOR_DEFECTS' " ng-click="viewDetails(row.cav_id)">Edit</button>
+                                					<button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_id==1000041 " ng-click="viewDetails(row.cav_id)">Edit</button>
 				                                 	<button class="btn btn-success" ng-click="previewDetails(row.cav_id)">Preview</button>
-				                                 	<button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT'  || row.caseStage.lk_longname=='SUPERVISIOR_DEFECTS'" ng-click="submitForm(row)">Submit</button>
+				                                 	<button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT'  || row.caseStage.lk_id==1000041" ng-click="submitForm(row)">Submit</button>
                                         		</td>
                                           </tr>
                                     </tbody>

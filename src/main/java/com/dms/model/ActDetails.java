@@ -68,9 +68,9 @@ public class ActDetails {
 	  @Column(name="act_rcd_mid")
 	  private Long act_rcd_mid;
 	  
-	  @OneToOne(cascade = CascadeType.PERSIST)
-	  @JoinColumn(name = "act_code",insertable = false, updatable = false)
-	  private ActMaster actMaster;
+	/*  @OneToOne(cascade = CascadeType.PERSIST)
+	  @JoinColumn(name = "act_code", insertable = false, updatable = false)
+	  private ActsectionMaster actMaster;*/
 	  
 	  
 	public Long getAct_id() {
@@ -192,13 +192,21 @@ public class ActDetails {
 		this.act_code = act_code;
 	}
 
-	public ActMaster getActMaster() {
+/*	public ActsectionMaster getActMaster() {
+		return actMaster;
+	}
+
+	public void setActMaster(ActsectionMaster actMaster) {
+		this.actMaster = actMaster;
+	}*/
+
+	/*public ActMaster getActMaster() {
 		return actMaster;
 	}
 
 	public void setActMaster(ActMaster actMaster) {
 		this.actMaster = actMaster;
-	}
+	}*/
 	  
 	  
 	  

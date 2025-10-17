@@ -23,32 +23,33 @@
 							class="table table-striped table-bordered nowrap table-hover" width="100%">
 								<thead>
 									<tr>
-										<th style="text-align: center;" width="25%" st-sort="fd_case_year">Case Year</th>
-										<th style="text-align: center;" width="40%" st-sort="fd_case_type">Case Type</th>
+										
+										<th style="text-align: center;" width="20%" st-sort="fd_case_type">Case Type</th>
 										<th style="text-align: center;" width="20%"  st-sort="fd_case_no">Case Number</th>
-										<th style="text-align: center;" width="10%">Search</th>
+										<th style="text-align: center;" width="20%" st-sort="fd_case_year">Case Year</th>
+										<th style="text-align: center;" width="20%">Search</th>
 									</tr>
 									<tr>
-										<th>
-										 <input numbers-only  id="fd_case_year"  type="text" name="fd_case_year"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  maxlength=4 ng-model="model.fd_case_year"  />
-										</th>
+										
 										
 										<th>
-											<select ng-options="caseType.ct_id as caseType.ct_name for caseType in caseTypeList"
+											<select ng-options="caseType.ct_id as (caseType.ct_label+'-'+caseType.ct_name+'') for caseType in caseTypeList  | orderBy:'ct_label'"
 											class="form-control" id="caseTypeData" 
 											name="fd_case_type" ng-model="model.fd_case_type" required>
-											<option value="">--Select--</option>
+											<option value="">Select Case Type</option>
 											</select>
 										</th>
 									
 										<th>
-										 <input  numbers-only id="fd_case_no"  type="text" name="fd_case_no"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  ng-model="model.fd_case_no"  />
+										 <input  numbers-only id="fd_case_no"  type="text" name="fd_case_no"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  ng-model="model.fd_case_no" placeholder="Enter Case No." />
 										</th>
-										
+										<th>
+										 <input numbers-only  id="fd_case_year"  type="text" name="fd_case_year"  class="form-control" ng-pattern="/^[a-zA-Z0-9]*$/"  maxlength=4 ng-model="model.fd_case_year" placeholder="Enter Case Year" />
+										</th>
 														  
  										<th>
 										
-										<button id="search" type="submit" class="btn btn-primary btn-sm pull-right"
+										<button id="search" type="submit" class="btn btn-primary btn-sm pull-left"
 												ng-click="searchCaseFile()" data-toggle="modal" style="size: 2px">
 										<span class="glyphicon glyphicon-plus-sign"></span>Search</button>
 										</th>
@@ -65,9 +66,10 @@
 							class="table table-striped table-bordered nowrap table-hover" width="100%">
 								<thead>
 								<tr>
-										<th style="text-align: center;" width="20%" st-sort="fd_case_year">Case Year</th>
-										<th style="text-align: center;" width="20%" st-sort="fd_case_type">Case Type</th>
-										<th style="text-align: center;" width="20%"  st-sort="fd_case_no">Case Number</th>
+										
+										<th style="text-align: center;" width="15%" st-sort="fd_case_type">Case Type</th>
+										<th style="text-align: center;" width="10%"  st-sort="fd_case_no">Case Number</th>
+										<th style="text-align: center;" width="10%" st-sort="fd_case_year">Case Year</th>
 								    <th style="text-align: center;" width="20%"  st-sort="fd_first_petitioner">First Petitioner </th>
 									<th style="text-align: center;" width="20%"  st-sort="fd_first_respondent">First Respondent</th>
 								<th style="text-align: center;" width="20%">Action</th>
@@ -77,15 +79,15 @@
 								
 								<tbody>
 									<tr ng-repeat="data in caseFileList" class="odd gradeX">
-										<td align="center">{{data.fd_case_year}}</td>
-										<td align="center">{{data.caseType.ct_name}}</td>
+										
+									<!-- 	<td align="center">{{data.caseType.ct_name}}<br/><ng-if="data.fd_cr_by==90009">Not E-filed case</ng-if></td> -->
+										<td align="center">{{data.caseType.ct_name}}<br/></td>
 										<td align="center">{{data.fd_case_no}}</td>
+										<td align="center">{{data.fd_case_year}}</td>
 										<td align="center">{{data.fd_first_petitioner}}</td>
 										<td align="center">{{data.fd_first_respondent}}</td>
 										<td align="center">
-										<button id="Submit" type="submit" class="btn btn-success"
-												ng-click="createApplication(data)" >
-										Add Document</button>
+										<button id="Submit" type="submit" class="btn btn-success"ng-click="createApplication(data)" >Add Document</button>
 										</td>
 										
 									

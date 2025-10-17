@@ -1,0 +1,81 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name="caveat_stage")
+public class CaveatStage 
+{
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="caveat_stage_seq")
+	@SequenceGenerator(name="caveat_stage_seq", sequenceName="caveat_stage_seq", allocationSize=1)
+	@Column(name="cs_id")
+	private Long cs_id;
+	
+	@Column(name="cs_cav_mid")
+	private Long cs_cav_mid;
+	 
+	@Column(name="cs_stage_lid")
+	private Long cs_stage_lid;
+	
+	@Column(name="cs_cr_by")
+	private Long cs_cr_by;
+	
+	@Column(name="cs_cr_date")
+	private Date cs_cr_date;
+
+	public Long getCs_id() {
+		return cs_id;
+	}
+
+	public void setCs_id(Long cs_id) {
+		this.cs_id = cs_id;
+	}
+
+	public Long getCs_cav_mid() {
+		return cs_cav_mid;
+	}
+
+	public void setCs_cav_mid(Long cs_cav_mid) {
+		this.cs_cav_mid = cs_cav_mid;
+	}
+
+	public Long getCs_stage_lid() {
+		return cs_stage_lid;
+	}
+
+	public void setCs_stage_lid(Long cs_stage_lid) {
+		this.cs_stage_lid = cs_stage_lid;
+	}
+
+	public Long getCs_cr_by() {
+		return cs_cr_by;
+	}
+
+	public void setCs_cr_by(Long cs_cr_by) {
+		this.cs_cr_by = cs_cr_by;
+	}
+
+	public Date getCs_cr_date() {
+		return cs_cr_date;
+	}
+
+	public void setCs_cr_date(Date cs_cr_date) {
+		this.cs_cr_date = cs_cr_date;
+	}
+
+	
+
+	
+}

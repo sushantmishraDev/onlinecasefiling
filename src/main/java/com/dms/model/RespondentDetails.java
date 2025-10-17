@@ -72,6 +72,20 @@ public class RespondentDetails {
 	@Column(name="rt_city")
 	private String rt_city;
 	
+/*	@Column(name="rt_accused")
+	private String rt_accused;
+	
+	
+	@Column(name = "rt_gender")
+	private String rt_gender;
+	
+
+	@Column(name="rt_age")
+	private Long rt_age;*/
+	
+	
+	
+	
 	
 	/*@ManyToOne
 	@JoinColumn(name="rt_rcd_mid",referencedColumnName="rcd_id",insertable=false,updatable=false)
@@ -231,8 +245,32 @@ public class RespondentDetails {
 	public void setRt_city(String rt_city) {
 		this.rt_city = rt_city;
 	}
+/*
+	public String getRt_accused() {
+		return rt_accused;
+	}
 
-	
+	public void setRt_accused(String rt_accused) {
+		this.rt_accused = rt_accused;
+	}
+
+	public String getRt_gender() {
+		return rt_gender;
+	}
+
+	public void setRt_gender(String rt_gender) {
+		this.rt_gender = rt_gender;
+	}
+
+	public Long getRt_age() {
+		return rt_age;
+	}
+
+	public void setRt_age(Long rt_age) {
+		this.rt_age = rt_age;
+	}
+
+	*/
 	
 	
 	

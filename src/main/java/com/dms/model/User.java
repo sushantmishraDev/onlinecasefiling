@@ -69,9 +69,38 @@ public class User {
 	
 	@Column(name="um_otp")
 	private Integer  um_otp;
+	
+	@Column(name="um_rec_status")
+	private Integer  um_rec_status;
+	
+	public Long getUm_adhar() {
+		return um_adhar;
+	}
+
+	public void setUm_adhar(Long um_adhar) {
+		this.um_adhar = um_adhar;
+	}
+
+
+
+	@Column(name = "um_adhar")
+	private Long um_adhar;
 		
+	public Integer getUm_rec_status() {
+		return um_rec_status;
+	}
+
+	public void setUm_rec_status(Integer um_rec_status) {
+		this.um_rec_status = um_rec_status;
+	}
+
+
+
 	@Transient 
 	private Long um_role_id;
+	
+	@Transient
+	private String newpassword;
 	
 	@Transient
 	private String confirmpassword;
@@ -84,8 +113,7 @@ public class User {
 		this.newpassword = newpassword;
 	}
 
-	@Transient
-	private String newpassword;
+	
 	
 	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval=true)
 	@JoinColumn(name = "ur_um_mid",referencedColumnName="um_id",insertable = false, updatable = false)	
@@ -238,6 +266,18 @@ public class User {
 	public void setUm_otp(Integer um_otp) {
 		this.um_otp = um_otp;
 	}
+
+	@Override
+	public String toString() {
+		return "User [um_id=" + um_id + ", username=" + username + ", password=" + password + ", last_login="
+				+ last_login + ", cr_by=" + cr_by + ", cr_date=" + cr_date + ", mod_by=" + mod_by + ", mod_date="
+				+ mod_date + ", um_fullname=" + um_fullname + ", um_bench_code=" + um_bench_code + ", um_ipaddress="
+				+ um_ipaddress + ", um_email=" + um_email + ", um_mobile=" + um_mobile + ", um_gender=" + um_gender
+				+ ", um_otp=" + um_otp + ", um_role_id=" + um_role_id + ", confirmpassword=" + confirmpassword
+				+ ", newpassword=" + newpassword + ", userroles=" + userroles + "]";
+	}
+	
+	
 	
 
 }

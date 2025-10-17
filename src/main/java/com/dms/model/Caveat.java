@@ -39,6 +39,17 @@ public class Caveat {
 
 	@Column(name = "cav_caveator_name")
 	private String cav_caveator_name;
+	
+	@Column(name = "cav_case_type")
+	private String cav_case_type;
+
+	public String getCav_case_type() {
+		return cav_case_type;
+	}
+
+	public void setCav_case_type(String cav_case_type) {
+		this.cav_case_type = cav_case_type;
+	}
 
 	@Column(name = "cav_court")
 	private Long cav_court;
@@ -97,6 +108,9 @@ public class Caveat {
 	
 	@Column(name = "cav_cnr_no")
 	private String cav_cnr_no;
+	
+	@Column(name="cav_mandamus_order")
+	private String  cav_mandamus_order;
 	
 	@Transient
 	private CaveatPetitionerDetails petitionerDetails; 
@@ -388,6 +402,16 @@ public class Caveat {
 	public void setCav_cnr_no(String cav_cnr_no) {
 		this.cav_cnr_no = cav_cnr_no;
 	}
+
+	public String getCav_mandamus_order() {
+		return cav_mandamus_order;
+	}
+
+	public void setCav_mandamus_order(String cav_mandamus_order) {
+		this.cav_mandamus_order = cav_mandamus_order;
+	}
+
+	
 	
 	
 	

@@ -71,14 +71,37 @@ EDMSApp.controller('searchCaseFileController',['$scope','$http',function ($scope
 	        });
 	 };
 	 
+	 
+	 $scope.validateCode=function(validate){
+		 validate.ae_code= Number(validate.ae_code);
+			window.open(urlBase+"searchcasefile/validateApplicationCode/"+validate.ae_code+","+validate.ae_appno,'_self');
+				/*var response =$http.post(urlBase+'ecourt_add_case/validateCode',code);
+				response.success(function(data, status, headers, config){
+					   if(data.response=="TRUE"){
+						   $scope.ct_id=data.modelData.ae_case_type;
+						window.open("/onlinecasefiling/ecourt/addNewCase","_self");
+						//$scope.registerCase.rcd_ct_id=data.modelData;
+					   }
+					   else if(data.data=="Update"){
+						   
+						alert(" caseDetails Updated Successfully!");
+					   }
+			
+					
+				});	*/
+			}
+	 
+	 
 	 $scope.searchCaseFile=function(){
 		 $http.get(urlBase+'searchcasefile/searchCaseFile', {params : {'case_year' :$scope.model.fd_case_year,'case_type' :$scope.model.fd_case_type,'case_no' :$scope.model.fd_case_no}}).
 	        success(function (data) {
 	        	
-	        	if(data.modelList.length>0){
+	        	if(data.response=="TRUE"){
 	        	$scope.caseFileList=data.modelList;
 	        	}else{
-	        		alert("Case not found...!");
+	        		//window.open(urlBase+"/ecourt/addApplication",'_self');
+	        		alert("This Case is not Efiled");
+	        		
 	        	}
 	        	
 	        }).

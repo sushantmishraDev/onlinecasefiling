@@ -1,0 +1,8 @@
+package com.dms.controller;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class RegisterCaseController {
+
+}

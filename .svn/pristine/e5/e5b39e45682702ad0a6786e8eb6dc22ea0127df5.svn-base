@@ -1,0 +1,43 @@
+
+<form class="form-horizontal reduce-gap" name="masterForm" novalidate enctype="multipart/form-data" role="form">      
+	<div class="modal-body">
+		<div ng-if="errorlist" class="alert alert-block alert-danger">
+				<ul>
+					<span ng-repeat="errors in errorlist "> <span
+						ng-repeat="n in errors track by $index">
+							<li>{{(n)}}</li>
+					</span>
+					</span>
+				</ul>
+		</div>
+		<div class="row">
+			<div class="form-group">
+				<label class="control-label col-md-4"><span ng-show="am_type=='P'">Case No.</span><span ng-show="am_type=='A'">Application No.</span><span class="text-danger"> * </span></label>
+				<div class="col-md-4">
+					<input type="text" required name="am_document_no" id="am_document_no" ng-model="am_document_no" class="form-control col-md-4"/>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="form-group">
+				<label class="control-label col-md-4"><span ng-show="am_type=='P'">Case Year</span><span ng-show="am_type=='A'">Application Year</span><span class="text-danger"> * </span></label>
+				<div class="col-md-4">
+					<input type="text" required name="am_document_year" id="am_document_year" ng-model="am_document_year" class="form-control col-md-4"/>
+				</div>
+			</div>
+		</div>
+		<div class="row">							  			      		
+				<div class="form-group">
+							<label class="col-md-4 control-label" for="file">File<span class="star">*</span></label>
+							<input required type="file" ngf-select ng-model="picFile" name="file"  >
+				 </div>
+		</div>
+	
+	</div>
+	<div class="modal-footer"> 
+		<div>
+		<input type="submit" value="Submit" ng-disabled="masterForm.$invalid" ng-click="save()"   class="btn btn-success"/>      
+				<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>  
+		</div>	     
+	</div>
+</form>

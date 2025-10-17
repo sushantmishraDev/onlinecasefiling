@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -70,6 +71,7 @@ public class PetitionerDetails {
 		@Column(name = "pt_rec_status")
 		private Integer pt_rec_status;
 		
+		
 		@Column(name = "pt_sequence")
 		private Long pt_sequence;
 		
@@ -81,15 +83,75 @@ public class PetitionerDetails {
 		@Column(name="pt_city")
 		private String pt_city;
 		
+		@Column(name = "pt_parantage_name")
+		private String pt_parantage_name;
 		
+		@Column(name="pt_adhar")
+		private Long pt_adhar;
 		
+		@Column(name = "pt_parantage")
+		private String pt_parantage;
+		
+		@Column(name = "pt_title")
+		private String pt_title;
+		
+	/*	@Column(name="pt_complainant")
+		private String pt_complainant;
+		
+		@Column(name ="pt_gender")
+		private String pt_gender;
+		
+		@Column(name="pt_age")
+		private Long pt_age;*/
+	
 		
 		/*@ManyToOne
 		@JoinColumn(name="pt_rcd_mid",referencedColumnName="rcd_id",insertable=false,updatable=false)
 		private RegisteredCaseDetails registeredCase;
 		*/
 		
-		
+		@Column(name = "pt_age")
+		private Integer pt_age;
+
+		public Integer getPt_age() {
+			return pt_age;
+		}
+
+		public void setPt_age(Integer pt_age) {
+			this.pt_age = pt_age;
+		}
+
+		public String getPt_title() {
+			return pt_title;
+		}
+
+		public void setPt_title(String pt_title) {
+			this.pt_title = pt_title;
+		}
+
+		public String getPt_parantage_name() {
+			return pt_parantage_name;
+		}
+
+		public void setPt_parantage_name(String pt_parantage_name) {
+			this.pt_parantage_name = pt_parantage_name;
+		}
+
+		public Long getPt_adhar() {
+			return pt_adhar;
+		}
+
+		public void setPt_adhar(Long pt_adhar) {
+			this.pt_adhar = pt_adhar;
+		}
+
+		public String getPt_parantage() {
+			return pt_parantage;
+		}
+
+		public void setPt_parantage(String pt_parantage) {
+			this.pt_parantage = pt_parantage;
+		}
 
 		public Long getPt_id() {
 			return pt_id;
@@ -221,6 +283,30 @@ public class PetitionerDetails {
 			this.pt_sequence = pt_sequence;
 		}
 
+/*		public String getPt_complainant() {
+			return pt_complainant;
+		}
+
+		public void setPt_complainant(String pt_complainant) {
+			this.pt_complainant = pt_complainant;
+		}
+
+		public String getPt_gender() {
+			return pt_gender;
+		}
+
+		public void setPt_gender(String pt_gender) {
+			this.pt_gender = pt_gender;
+		}
+
+		public Long getPt_age() {
+			return pt_age;
+		}
+
+		public void setPt_age(Long pt_age) {
+			this.pt_age = pt_age;
+		}
+*/
 		
 		
 		

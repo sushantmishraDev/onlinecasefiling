@@ -16,7 +16,7 @@
 												<div class="col-sm-6">
 													<label>Name <span class="text-danger">
 															* </span></label> <input type="text" maxlength=60 class="form-control" id="caseDetail" name="name"
-														ng-model="petitionerDetails.cpt_name" required>
+														oninput="this.value = this.value.toUpperCase()" ng-model="petitionerDetails.cpt_name" required>
 
 												</div>
 
@@ -132,10 +132,10 @@
                                                                                         <td>{{row.cpt_address}}</td>   
                                                                                           <td>{{row.cpt_mobile}}</td> 
                                                                                           <td class="text-center">
-                                                                                    <a  ng-click="editPet(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
-                                                                          <a  ng-click="deletePetitioner(row.cpt_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
-                                                                            
-                                                                             
+                                                                          <a  ng-click="editPet(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
+                                                                          <span ng-show=row.cpt_sequence!=1>
+                                                                         	 <a  ng-click="deletePetitioner(row.cpt_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
+                                                                         </span>
                                                                              
                                                                         </td>
                                                                   </tr>

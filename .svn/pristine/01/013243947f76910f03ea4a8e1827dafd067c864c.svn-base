@@ -1,0 +1,71 @@
+package com.dms.controller;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.CaseFileDetail;
+import com.dms.service.SearchFileService;
+import com.dms.utility.GlobalFunction;
+
+@Controller
+@RequestMapping("/searchcasefile")
+public class SearchFileController 
+{
+private GlobalFunction cm;
+	
+	@Autowired
+	private SearchFileService searchFileService;
+	
+	public SearchFileController()
+	{
+		cm = new GlobalFunction();
+	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	public String addCaveat() {
+
+		return "/application/searchCaseFile";
+	}
+	
+	@RequestMapping(value = "/searchCaseFile", method = RequestMethod.GET)
+	@ResponseBody
+	public String searchCaseFile(HttpServletRequest request) {
+
+		String case_year = request.getParameter("case_year");
+		String case_type = request.getParameter("case_type");
+		String caseno = request.getParameter("case_no");
+		
+		Long caseyear = new Long(case_year);
+		Long casetype = new Long(case_type);
+		
+		List<CaseFileDetail> cfd=searchFileService.getCaseFile(caseyear,casetype,caseno);
+
+		ActionResponse<CaseFileDetail> response = new ActionResponse<CaseFileDetail>();
+		String jsonData = null;
+
+
+		if (cfd != null) {
+			response.setResponse("TRUE");
+			response.setModelList(cfd);
+			jsonData = cm.convert_to_json(response);
+
+		}else{
+			response.setResponse("FALSE");
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+
+	}
+	
+
+}

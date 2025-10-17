@@ -21,10 +21,11 @@
                                         <tr>
                                             <th>Draft No</th>
                                             <th>Diary No</th>
+                                            <th>Case Type</th>
+                                            <th>Case No/Year</th>
                                             <th>First Petitioner</th>
                                             <th>First Respondent</th>
-                                            <th>Case Type</th>
-                                            <th>Case Year</th>
+                                            
                                            
                                         </tr>
                                     </thead>
@@ -32,10 +33,11 @@
                                         <tr class="odd gradeX">
                                              <td>{{registerCase.rcd_draft_no}}</td>
                                              <td>{{registerCase.rcd_diary_no}}</td>
+                                             <td>{{registerCase.caseType.ct_name}}</td>
+                                              <td>{{registerCase.rcd_case_no}}/{{registerCase.rcd_case_year}}</td>
                                              <td>{{registerCase.petitionerDetails.pt_name}}</td>
                                              <td>{{registerCase.respondentDetails.rt_name}}</td> 
-                                              <td>{{registerCase.caseType.ct_name}}</td>
-                                                  <td>{{registerCase.rcd_case_year}}</td>                             
+                                                     
                                     
                                           </tr>
                                     </tbody>
@@ -285,7 +287,44 @@
 								</div>
 							</div>
 						</div>
-						<div class="panel panel-inverse overflow-hidden" ng-show="registerCase.caseStage.lk_longname=='SUPERVISIOR_DEFECTS'">
+						
+						<div class="panel panel-inverse overflow-hidden">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseNinty">
+									    <i class="fa fa-plus-circle pull-right"></i> 
+										Stamp Reported
+									</a>
+								</h3>
+							</div>
+							<div id="collapseNinty" class="panel-collapse collapse in">
+								<div class="panel-body">
+									    <div class="table-responsive">
+                                                        <table id="data-table" class="table table-striped table-bordered">
+                                                            <thead>
+                                                                  <tr>
+                                                                        <th>In-Time</th>
+                                                                        <th>In-Time Remark</th>
+                                                                         <th>Remark</th>
+                                                                        
+                                                                  </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                  <tr class="odd gradeX">
+                                                                  <td>{{registerCase.stampReporterData.srd_intime|date:"dd/MM/yyyy"}}</td>
+                                                                  <td>{{registerCase.stampReporterData.srd_intime_remark}}</td>
+                                                                  <td>{{registerCase.stampReporterData.srd_remark}}</td>
+                                                                                       
+                                                                                          
+                                                                  </tr>
+                                                            </tbody>
+                                                      </table>
+                                                </div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="panel panel-inverse overflow-hidden" ng-show="registerCase.rcd_stage_lid==1000041">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">
@@ -303,6 +342,7 @@
                                                                         <th>ID</th>
                                                                         <th>Defect</th>
                                                                          <th>Remark</th>
+                                                                         <th>Defect Date</th>
                                                                         
                                                                   </tr>
                                                             </thead>
@@ -310,7 +350,8 @@
                                                                   <tr ng-repeat="row in checkList" class="odd gradeX">
                                                                                         <td>{{row.checklist.c_id}}</td>
                                                                                         <td>{{row.checklist.name}}</td>
-                                                                                        <td style="white-space: pre-line;" >{{row.cm_remark}}</td>   
+                                                                                        <td style="white-space: pre-line;" >{{row.cm_remark}}</td>  
+                                                                                         <td>{{row.cm_cr_date|date:"dd/MM/yyyy"}}</td> 
                                                                                           
                                                                   </tr>
                                                             </tbody>

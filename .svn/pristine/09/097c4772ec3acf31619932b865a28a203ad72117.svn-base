@@ -1,0 +1,42 @@
+package com.dms.validation;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Component;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.MetaField;
+import com.dms.model.MetaTemplate;
+
+@Component
+public class MetaTemplateValidator {
+
+	
+	public ActionResponse doValidation(MetaTemplate m){
+		
+		ActionResponse response = new ActionResponse();
+		Validator validation=new Validator();
+		
+
+		List<String> errorList = new ArrayList<String>();
+		Map<String, List> error = new HashMap<String, List>();
+		String status = "TRUE";
+		
+		validation.isRequired("name", m.getMt_name());
+		validation.alphabetsOnly("name", m.getMt_name());
+
+			
+		error=validation.getError();
+		if(!error.isEmpty())
+		{
+			status = "FALSE";
+		}
+				
+		response.setResponse(status);
+		response.setDataMapList(error);
+		return response;
+	}
+}

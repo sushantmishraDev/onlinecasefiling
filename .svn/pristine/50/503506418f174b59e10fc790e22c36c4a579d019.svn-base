@@ -1,0 +1,156 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="caveat_court_fee")
+public class CaveatCourtFee {
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE,generator="caveat_courtfee_seq")
+	@SequenceGenerator(name="caveat_courtfee_seq", sequenceName="caveat_courtfee_seq", allocationSize=1)
+	@Column(name="ccf_id")
+    private Long ccf_id;
+	
+	
+   @Column(name="ccf_receipt_no")
+   private String ccf_receipt_no;
+   
+   @Column(name="ccf_amount")
+    private Long  ccf_amount;
+   
+   @Column(name="ccf_date")
+	private Date  ccf_date;
+	
+   
+	@Column(name="ccf_cav_mid")
+	private Long  ccf_cav_mid;
+
+
+	@Column(name="ccf_rec_status")
+	private Integer ccf_rec_status;
+	
+	@Column(name="ccf_cr_by")
+    private Long ccf_cr_by;
+	
+	@Column(name="ccf_cr_date")
+	private Date  ccf_cr_date;
+	
+	
+	@Column(name="ccf_mod_by")
+	private Long  ccf_mod_by;
+	
+	
+	@Column(name="ccf_mod_date")
+	private Date ccf_mod_date;
+
+
+	public Long getCcf_id() {
+		return ccf_id;
+	}
+
+
+	public void setCcf_id(Long ccf_id) {
+		this.ccf_id = ccf_id;
+	}
+
+
+	public String getCcf_receipt_no() {
+		return ccf_receipt_no;
+	}
+
+
+	public void setCcf_receipt_no(String ccf_receipt_no) {
+		this.ccf_receipt_no = ccf_receipt_no;
+	}
+
+
+	public Long getCcf_amount() {
+		return ccf_amount;
+	}
+
+
+	public void setCcf_amount(Long ccf_amount) {
+		this.ccf_amount = ccf_amount;
+	}
+
+
+	public Date getCcf_date() {
+		return ccf_date;
+	}
+
+
+	public void setCcf_date(Date ccf_date) {
+		this.ccf_date = ccf_date;
+	}
+
+
+	public Long getCcf_cav_mid() {
+		return ccf_cav_mid;
+	}
+
+
+	public void setCcf_cav_mid(Long ccf_cav_mid) {
+		this.ccf_cav_mid = ccf_cav_mid;
+	}
+
+
+	public Integer getCcf_rec_status() {
+		return ccf_rec_status;
+	}
+
+
+	public void setCcf_rec_status(Integer ccf_rec_status) {
+		this.ccf_rec_status = ccf_rec_status;
+	}
+
+
+	public Long getCcf_cr_by() {
+		return ccf_cr_by;
+	}
+
+
+	public void setCcf_cr_by(Long ccf_cr_by) {
+		this.ccf_cr_by = ccf_cr_by;
+	}
+
+
+	public Date getCcf_cr_date() {
+		return ccf_cr_date;
+	}
+
+
+	public void setCcf_cr_date(Date ccf_cr_date) {
+		this.ccf_cr_date = ccf_cr_date;
+	}
+
+
+	public Long getCcf_mod_by() {
+		return ccf_mod_by;
+	}
+
+
+	public void setCcf_mod_by(Long ccf_mod_by) {
+		this.ccf_mod_by = ccf_mod_by;
+	}
+
+
+	public Date getCcf_mod_date() {
+		return ccf_mod_date;
+	}
+
+
+	public void setCcf_mod_date(Date ccf_mod_date) {
+		this.ccf_mod_date = ccf_mod_date;
+	}
+	
+	
+}

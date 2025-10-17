@@ -1,0 +1,190 @@
+var DocumentApp = angular.module("EDMSApp", ['ui.bootstrap','ng-bootstrap-datepicker','smart-table','ngSanitize', 'ngCsv']);
+
+
+DocumentApp.controller("advanceSearchReportCtrl",function($scope, $http,$filter) {
+	
+	$scope.masterdata = [];
+	$scope.masterentity = {};
+	$scope.model={};
+	
+	$scope.reportList=[];
+	$scope.reportListData={};
+	var baseUrl="/dms/";
+	 
+	
+	$scope.branchCode;
+	$scope.fromYear;
+	$scope.toYear;
+	$scope.casetype;
+    
+	$scope.judgeType;
+    $scope.firstJudgeName;
+    $scope.secondJudgeName;
+    $scope.thirdJudgeName;
+    $scope.fourthJudgeName;
+    $scope.fifthJudgeName;
+    
+	$scope.branchDataList={};
+	$scope.judgeDataList={};
+	$scope.years = [];
+	
+	getJudgeNamedata();	
+    getYears();
+	getCaseTypedata();
+	getBenchdata();
+
+
+	
+	$scope.today = function() {
+		$scope.model.fromdate = new Date();
+		$scope.model.todate = new Date();
+	};
+	
+	$scope.today();
+	
+	$scope.clear = function () {
+		$scope.model.fromdate = null;
+		$scope.model.todate = new Date();
+	};	
+
+	 $scope.open = function($event,opened) {
+		    $event.preventDefault();
+		    $event.stopPropagation();
+
+		    $scope[opened] = true;
+		  };
+    	
+	$scope.dateOptions = {
+	    formatYear: 'yy',
+	    startingDay: 1
+	};
+	
+
+	 $scope.formats = ['dd-MM-yyyy', 'yyyy-MM-dd', 'shortDate'];
+     $scope.format = $scope.formats[0];
+     
+	function getBenchdata() {			
+		var response = $http.get(baseUrl+'report/getbenchcode');
+		response.success(function(data, status, headers, config) {
+			console.log("--------branch data------")
+			console.log(data);
+			$scope.branchDataList=data.branchData;
+			
+			
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	
+	
+	
+	
+	function getCaseTypedata() {
+		var response = $http.get(baseUrl+'report/getcasetypedata');
+		response.success(function(data, status, headers, config) {
+			console.log("--------Case Type data------")
+			console.log(data);
+			$scope.casetypeDataList = data.casetypeData;
+
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+
+	}
+	;
+
+	function getYears() {
+		var currentYear = new Date().getFullYear();
+		for (var year = 1950; year <= currentYear; year++) {
+			$scope.years.push(year);
+		}
+	}
+	
+	
+	
+	
+	
+	function getJudgeNamedata() {			
+		var response = $http.get(baseUrl+'report/getjudgeDetails');
+		response.success(function(data, status, headers, config) {
+			console.log("--------Judge Names ------")
+			console.log(data);
+			$scope.judgeDataList=data.JudgeName;
+			
+			
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+		
+
+	$scope.getAdvanceSearchReportData = function() 
+	 {
+		$http.get(baseUrl+'report/getAdvanceSearchReportData ',{
+			      params: 
+			        {
+			    	   'branchCode': $scope.branchCode,
+			    	   'casetype'  : $scope.casetype,
+		               'fromYear'  : $scope.fromYear,  	  
+		               'toYear'    : $scope.toYear,			    	  
+		              'judgeType'  : $scope.judgeType,
+			      'firstJudgeName' : $scope.firstJudgeName,
+			      'secondJudgeName': $scope.secondJudgeName,
+			      'thirdJudgeName' :  $scope.thirdJudgeName,
+			      'fourthJudgeName': $scope.fourthJudgeName,
+			      'fifthJudgeName' :  $scope.fifthJudgeName }}).success(function(data) {
+			    	  
+			console.log("----Advance ReportData-------")
+			console.log(data);
+			$scope.ReportData=data.modelList;
+			$scope.displayedCollection= [].concat($scope.ReportData);
+			console.log("----********AdvanceSearchReportData*******------")
+			console.log($scope.ReportData);
+		$scope.dailyreportListData=[];
+			
+			for(var i=0;i<data.modelList.length;i++)
+			{
+			$scope.dailyreportList = {
+					'parameter1':data.modelList[i].parameter1,
+					'parameter2':data.modelList[i].parameter2,
+					'parameter3':data.modelList[i].parameter3,
+					'parameter4': data.modelList[i].parameter4,
+					'parameter5':data.modelList[i].parameter5,
+					
+			};					
+				$scope.dailyreportListData.push($scope.dailyreportList);
+				
+			}
+			
+		}).error(function(data, status, headers, config) {
+			console.log("Error in getting DailyReportData ");
+		});
+
+	};
+	
+});
+
+
+
+DocumentApp.filter('dateFormat1', function($filter)
+		{
+		 return function(input)
+		 {
+		  if(input == null){ return ""; } 
+		 
+		  var _date = $filter('date')(new Date(input), 'dd/ MM /yyyy');
+		 
+		  return _date.toUpperCase();
+
+		 };
+		});
+
+
+
+
+

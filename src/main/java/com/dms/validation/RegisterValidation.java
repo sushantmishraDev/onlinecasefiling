@@ -8,9 +8,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.cms.model.Advocate;
 import com.dms.model.ActionResponse;
+import com.dms.model.AdvocateEfiling;
 import com.dms.model.Register;
 import com.dms.model.User;
+import com.dms.service.AdvocateService;
 import com.dms.service.UserService;
 
 @Component
@@ -18,6 +21,9 @@ public class RegisterValidation {
 	
 	@Autowired 
 	private UserService userService;
+	
+	@Autowired 
+	private AdvocateService advocateService;
 	
 	@SuppressWarnings("deprecation")
 	public ActionResponse doValidation(Register r){
@@ -31,8 +37,8 @@ public class RegisterValidation {
 		
 		validation.isRequired("Username",r.getUsername());
 		validation.isRequired("Name",r.getName());
-		//validation.isRequired("Email",r.getEmail());
-		//validation.isRequired("Mobile",r.getMobile());
+		validation.isRequired("Email",r.getEmail());
+		validation.isRequired("Mobile",r.getMobile());
 		validation.isRequired("Gender",r.getGender());
 		validation.isRequired("Password",r.getPassword());
 		validation.isRequired("Confirm Password",r.getConfirmPassword());
@@ -66,6 +72,50 @@ public class RegisterValidation {
 				usernameErrorList.add("Username already exist");
 				error.put("Username", usernameErrorList);
 			}
+		}
+		
+		if(r.getMobile()!=null)
+		{
+			List<String> mobileErrorList = error.get("Mobile");
+			if(r.getMobile().length()<10) {
+				if(mobileErrorList == null ) {
+					mobileErrorList = new ArrayList<String>();
+				}
+				mobileErrorList.add("Mobile No not valid");
+				error.put("Mobile", mobileErrorList);
+			}else {
+			User u=userService.getUserByMobile(r.getMobile());
+			if(u.getUm_id()!=null){
+				
+				if(mobileErrorList == null ) {
+					mobileErrorList = new ArrayList<String>();
+				}
+				mobileErrorList.add("Mobile No already exist");
+				error.put("Mobile", mobileErrorList);
+			}
+			AdvocateEfiling adv=advocateService.getByMobile(r.getMobile());
+			if(adv.getAdv_id()!=null && r.getType().equals("inperson")) {
+				if(mobileErrorList == null ) {
+					mobileErrorList = new ArrayList<String>();
+				}
+				mobileErrorList.add("This Mobile No Is Already Registerd With AOR, Please Register with AOR");
+				error.put("Mobile", mobileErrorList);
+			}
+			}
+		}
+		
+		if(r.getAdhar()!=null)
+		{
+			List<String> adharErrorList = error.get("Adhar");
+			
+			if(String.valueOf(r.getAdhar()).length() <12) {
+				if(adharErrorList == null ) {
+					adharErrorList = new ArrayList<String>();
+				}
+				adharErrorList.add("Adhar No not valid");
+				error.put("Adhar", adharErrorList);
+			}
+			
 		}
 		
 		

@@ -59,6 +59,7 @@ EDMSApp.controller('ScrutinyCtrl',['$scope','$http',function ($scope, $http) {
 	window.open(urlBase+"ecourt/scrutinyView/"+id,"_blank");
 	}
 
+	
 
 	function getRegisterCase(id){
 	$http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
@@ -266,6 +267,20 @@ EDMSApp.controller('TabsDemoCtrl',['$scope','$http',function ($scope, $http) {
 
   $scope.count='';
  $scope.draftDataList=[];
+ 
+/* decreseDate();
+	function decreseDate(){
+		
+		const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+		const firstDate = new Date(2021, 02, 22);
+		const secondDate = new Date();
+
+		const diffDays = Math.round(Math.abs((firstDate - secondDate) / oneDay));
+		
+		$scope.daysRemain=7-diffDays;
+		
+		console.log($scope.daysRemain);
+	}*/
  
   getDraftDetails();
   

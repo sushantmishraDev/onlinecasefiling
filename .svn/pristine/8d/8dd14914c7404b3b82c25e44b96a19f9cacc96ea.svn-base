@@ -1,0 +1,31 @@
+package com.dms.service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.RegistrationFileStage;
+
+@Service
+public class RegistrationFileStageService {
+
+	@PersistenceContext
+	private EntityManager em;
+	
+	private DataSource datasource;
+	
+	@Transactional
+	public RegistrationFileStage save(RegistrationFileStage s) {
+
+		RegistrationFileStage master = null;
+		try {
+			master = em.merge(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+}

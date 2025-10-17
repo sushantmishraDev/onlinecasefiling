@@ -1,0 +1,165 @@
+package com.dms.model;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "registered_case_details")
+public class RegisteredCase {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator="registeredcase_seq")
+	@SequenceGenerator(name="registeredcase_seq", sequenceName="registeredcase_seq", allocationSize=1)
+	@Column(name = "rcd_id")
+	private Long rcd_id;  
+
+	@Column(name="rcd_first_petitioner")
+	private String rcd_first_petitioner;
+	
+	@Column(name="rcd_first_respondent")
+	private String rcd_first_respondent;
+	
+	@Column(name="rcd_specail_category")
+	private Long rcd_specail_category;
+	
+	@Column(name="rcd_mainsubject_category")
+	private Long rcd_mainsubject_category;
+	 
+	@Column(name="rcd_submainsubject_category")
+	private Long rcd_submainsubject_category;
+	
+	@Column(name="rcd_dealing_section")
+	private Long rcd_dealing_section;
+	
+	@Column(name="rcd_cr_by")
+	private Long rcd_cr_by;
+	
+	@Column(name = "rcd_cr_date")
+	private Date rcd_cr_date;
+	
+	@Column(name="rcd_mod_by")
+	private Long rcd_mod_by;
+	
+	@Column(name = "rcd_mod_date")
+	private Date rcd_mod_date;
+	
+	@Column(name="rcd_bench_code_lid")
+	private Long rcd_bench_code_lid;
+	
+	@Column(name="rcd_stage_lid")
+	private Long rcd_stage_lid;
+
+	public Long getRcd_id() {
+		return rcd_id;
+	}
+
+	public void setRcd_id(Long rcd_id) {
+		this.rcd_id = rcd_id;
+	}
+
+	public String getRcd_first_petitioner() {
+		return rcd_first_petitioner;
+	}
+
+	public void setRcd_first_petitioner(String rcd_first_petitioner) {
+		this.rcd_first_petitioner = rcd_first_petitioner;
+	}
+
+	public String getRcd_first_respondent() {
+		return rcd_first_respondent;
+	}
+
+	public void setRcd_first_respondent(String rcd_first_respondent) {
+		this.rcd_first_respondent = rcd_first_respondent;
+	}
+
+	public Long getRcd_specail_category() {
+		return rcd_specail_category;
+	}
+
+	public void setRcd_specail_category(Long rcd_specail_category) {
+		this.rcd_specail_category = rcd_specail_category;
+	}
+
+	public Long getRcd_mainsubject_category() {
+		return rcd_mainsubject_category;
+	}
+
+	public void setRcd_mainsubject_category(Long rcd_mainsubject_category) {
+		this.rcd_mainsubject_category = rcd_mainsubject_category;
+	}
+
+	public Long getRcd_submainsubject_category() {
+		return rcd_submainsubject_category;
+	}
+
+	public void setRcd_submainsubject_category(Long rcd_submainsubject_category) {
+		this.rcd_submainsubject_category = rcd_submainsubject_category;
+	}
+
+	public Long getRcd_dealing_section() {
+		return rcd_dealing_section;
+	}
+
+	public void setRcd_dealing_section(Long rcd_dealing_section) {
+		this.rcd_dealing_section = rcd_dealing_section;
+	}
+
+	public Long getRcd_cr_by() {
+		return rcd_cr_by;
+	}
+
+	public void setRcd_cr_by(Long rcd_cr_by) {
+		this.rcd_cr_by = rcd_cr_by;
+	}
+
+	public Date getRcd_cr_date() {
+		return rcd_cr_date;
+	}
+
+	public void setRcd_cr_date(Date rcd_cr_date) {
+		this.rcd_cr_date = rcd_cr_date;
+	}
+
+	public Long getRcd_mod_by() {
+		return rcd_mod_by;
+	}
+
+	public void setRcd_mod_by(Long rcd_mod_by) {
+		this.rcd_mod_by = rcd_mod_by;
+	}
+
+	public Date getRcd_mod_date() {
+		return rcd_mod_date;
+	}
+
+	public void setRcd_mod_date(Date rcd_mod_date) {
+		this.rcd_mod_date = rcd_mod_date;
+	}
+
+	public Long getRcd_bench_code_lid() {
+		return rcd_bench_code_lid;
+	}
+
+	public void setRcd_bench_code_lid(Long rcd_bench_code_lid) {
+		this.rcd_bench_code_lid = rcd_bench_code_lid;
+	}
+
+	public Long getRcd_stage_lid() {
+		return rcd_stage_lid;
+	}
+
+	public void setRcd_stage_lid(Long rcd_stage_lid) {
+		this.rcd_stage_lid = rcd_stage_lid;
+	}
+	
+	
+	
+}

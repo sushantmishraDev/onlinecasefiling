@@ -16,7 +16,9 @@
 									<input type="radio"  id="lowerCourt"  data-ng-click="changeCourt($event)" ng-model="impugnedOrder.io_court_type"
 										name="actType" value="1">Lower Court&emsp; 
 										<input type="radio"  id="highCourt" data-ng-click="changeCourt($event)" name="actType"
-										ng-model="impugnedOrder.io_court_type" value="2">High Court
+										ng-model="impugnedOrder.io_court_type" value="2">High Court&emsp;
+										<input type="radio"  id="authority" data-ng-click="changeCourt($event)" name="actType" ng-model="impugnedOrder.io_court_type"
+										 value="4">Authority/Other Details
 									</label>
 								</div>
 										
@@ -42,10 +44,20 @@
 								</select>
 												</div>
                                                      
+                                                     
+                                                     <!--  <div class="col-sm-4" ng-show="impugnedOrder.io_court_type==1">
+													<label class="control-label">Establisment </label> <select
+									           class="form-control" id="dt_id" name="dt_id"
+									          ng-model="impugnedOrder.io_establishment"
+									      ng-options="establishment.est_id as establishment.est_name for establishment in establishmentList | filter: filterEstablishment">
+									<option value="">Select Establisment</option>
+								</select>
+												</div> -->
+                                                     
                                                 <div class="col-sm-4" ng-show="impugnedOrder.io_court_type==1">
 													<label class="control-label">Subordinate Court Name</label> <select class="form-control" id="caseDetail"
 														name="caseDetail" ng-model="impugnedOrder.io_lct_mid"
-														ng-options="court.lct_id as court.lct_name for court in lowerCourtList">
+														ng-options="court.lct_id as court.lct_name for court in lowerCourtList | filter: filterLct">
 														<option value=""></option>
 													</select>
 
@@ -73,14 +85,14 @@
 									</select>
 								</div>
 							
-												<div class="col-sm-3">
+												<div class="col-sm-3" ng-hide="impugnedOrder.io_court_type==4">
 													<label class="control-label">Case No. <span class="text-danger"> * </span>
-													</label> <input numbers-only type="text" class="form-control"
+													</label> <input  numbers-only class="form-control"
 														ng-model="impugnedOrder.io_case_no">
 												</div>
 												
 												
-												<div class="col-sm-3">
+												<div class="col-sm-3" ng-hide="impugnedOrder.io_court_type==4">
 
 													<label class="control-label">Year <span class="text-danger"> * </span>
 													</label> <input numbers-only  maxlength=4 type="text" class="form-control"
@@ -90,34 +102,79 @@
                                           <div class="form-group pull-in clearfix">
 												
 												
-												 <div class="col-sm-3">
+												 <div class="col-sm-3" ng-hide="impugnedOrder.io_court_type==4">
 													<label class="control-label">Judge Name
 													</label> <input type="text"  max-length=60 class="form-control"
 														ng-model="impugnedOrder.io_judge_name">
 												</div>
-											<div class="col-sm-3">
+											<div class="col-sm-3" ng-hide="impugnedOrder.io_court_type==4">
 													<label class="control-label">CNR No.
 													</label> <input type="text" maxlength=16 class="form-control"
 														ng-model="impugnedOrder.io_cnr_no">
 												</div>
 
                                                 
-											    <div class="col-sm-4">
-													<label class="control-label">Date of Decision:</label>
-													<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="impugnedOrder.io_decision_date" is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" ng-disabled="true" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
-				            			          <span class="input-group-addon" ng-click="open1($event,'fromDate1')"><i class="glyphicon glyphicon-calendar"></i></span>
+											    <div class="col-sm-4" ng-hide="impugnedOrder.io_court_type==4">
+													<label class="control-label">Date of Decision:</label>  <!-- <span class="text-danger"> * </span> -->
+													<input type="text" class="form-control" datepicker-popup="{{format}}" name="fromDate" ng-model="impugnedOrder.io_decision_date" is-open="fromDate" max-date="maxDate"  datepicker-options="dateOptions" ng-disabled="true" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" required/>
+				            			          <span class="input-group-addon" ng-click="open($event,'fromDate')"><i class="glyphicon glyphicon-calendar"></i></span>
 												</div>
 
 											</div>
-											<div class="row pull-right">
+											<div class="row pull-right" ng-show="impugnedOrder.io_court_type==1">
                                                       <div class="col-sm-12">
                                                            <!-- <div class="col-sm-6" style="float:right"> -->
-						                  <button class="btn btn-success" ng-disabled="!impugnedOrder.io_case_year || !impugnedOrder.io_case_no" ng-click="addImpugnedOrder()">Save</button>
+						                  <button class="btn btn-success" ng-disabled="!impugnedOrder.io_lc_case_type || !impugnedOrder.io_case_year || !impugnedOrder.io_case_no " ng-click="addImpugnedOrder()">Save</button>
 						                     </div>
                                                            
                                              </div>
+                                             
+                                             <div class="row pull-right" ng-show="impugnedOrder.io_court_type==2">
+                                                      <div class="col-sm-12">
+                                                           <!-- <div class="col-sm-6" style="float:right"> -->
+						                  <button class="btn btn-success" ng-disabled="!impugnedOrder.io_hc_case_type || !impugnedOrder.io_case_year || !impugnedOrder.io_case_no" ng-click="addImpugnedOrder()">Save</button>
+						                     </div>
+                                                           
+                                             </div>
+                                             
+                                             
 
-										
+										 <div class="form-group pull-in clearfix" ng-show ="impugnedOrder.io_court_type==4">
+
+                                              <div class="col-sm-3" >
+													<label class="control-label">Order No. <span class="text-danger"> * </span>
+													</label> <input   type="text" class="form-control"
+														ng-model="caseAuthority.cau_order_no">
+												</div>
+												
+												
+												<div class="col-sm-3">
+
+													<label class="control-label">Order Year <span class="text-danger"> * </span>
+													</label> <input numbers-only maxlength=4 type="text" class="form-control"
+														ng-model="caseAuthority.cau_order_year">
+												</div>
+												
+												<div class="col-sm-4">
+													<label class="control-label">Date of Order<span class="text-danger"> * </span> </label>
+											<input type="text" class="form-control" datepicker-popup="{{format1}}" name="fromDate1" ng-model="caseAuthority.cau_order_date" required is-open="fromDate1" max-date="maxDate"  datepicker-options="dateOptions" ng-disabled="true" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" show-button-bar="false" />
+				            			          <span class="input-group-addon" ng-click="open1($event,'fromDate1')"><i class="glyphicon glyphicon-calendar"></i></span>
+												</div>
+											</div>
+											<div class="form-group pull-in clearfix" ng-show ="impugnedOrder.io_court_type==4">
+												
+										<div class="col-sm-6">
+													<label class="control-label">Details Of Authority
+													</label> <input type="text" max-length=60 class="form-control"
+														ng-model="caseAuthority.cau_authority_name">
+												</div>
+												</div>
+												
+												
+												
+													<div class="col-sm-12" ng-show="impugnedOrder.io_court_type==4">
+						                 			 <button class="btn btn-success" ng-disabled="!caseAuthority.cau_order_no || !caseAuthority.cau_order_year || !caseAuthority.cau_order_date || !caseAuthority.cau_authority_name" ng-click="addCaveatAuthority()">Save</button>
+						                     	</div>
                                                 
 										</div>
 								</div>
@@ -158,16 +215,30 @@
                                                             </thead>
                                                             <tbody>
                                                                   <tr ng-repeat="row in impugnedDataList" class="odd gradeX">
-                                                                        <td>{{row.courtType.lct_name}}</td>
+                                                                        <td><span ng-if="row.io_hc_case_type!=null">High Court</span><span ng-if="row.io_lc_case_type!=null">{{row.courtType.lct_name}}</span></td>
                                                                         <td>{{row.io_cnr_no}}</td>
                                                                         <td><span ng-if="row.io_hc_case_type!=null">{{row.hcCaseType.ct_name}}</span><span ng-if="row.io_lc_case_type!=null">{{row.lcCaseType.ct_name}}</span></td>
                                                                         <td>{{row.io_judge_name}}</td>   
                                                                         <td>{{row.io_case_no}}</td>
                                                                         <td>{{row.io_case_year}}</td>
-                                                                        <td>{{row.io_decision_date | date:"MM/dd/yyyy"}}</td> 
+                                                                        <td>{{row.io_decision_date | date:"dd/MM/yyyy"}}</td> 
                                                                         <td class="text-center">
                                                                         	<a  ng-click="editImp(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
                                                                           	<a  ng-click="deleteImpugnedOrder(row.io_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
+                                                                        </td>
+                                                                  </tr>
+                                                                  
+                                                                     <tr ng-repeat="row in authorityList" class="odd gradeX">
+                                                                        <td>Authority</td>
+                                                                        <td></td>
+                                                                        <td></td>
+                                                                        <td>{{row.cau_authority_name}}</td>   
+                                                                        <td>{{row.cau_order_no}}</td>
+                                                                        <td>{{row.cau_order_year}}</td>
+                                                                        <td>{{row.cau_order_date | date:"MM/dd/yyyy"}}</td> 
+                                                                        <td class="text-center">
+                                                                        	<a  ng-click="editExtraAuth(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
+                                                                          	<a  ng-click="deleteExtraImpugnedOrder(row.ec_io_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
                                                                         </td>
                                                                   </tr>
                                                             </tbody>

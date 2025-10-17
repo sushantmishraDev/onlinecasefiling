@@ -10,24 +10,35 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dms.model.ActDetails;
 import com.dms.model.ActMaster;
+import com.dms.model.ActsectionMaster;
 import com.dms.model.CaseCheckListMapping;
+import com.dms.model.CaseNoticeMaster;
 import com.dms.model.CaseType;
 import com.dms.model.Caveat;
 import com.dms.model.CaveatCheckListMapping;
 import com.dms.model.CaveatOld;
 import com.dms.model.CourtFee;
+import com.dms.model.CrimeDetails;
 import com.dms.model.District;
+import com.dms.model.Establishment;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.LowerCourtCaseType;
 import com.dms.model.LowerCourtTypes;
+import com.dms.model.Notice;
+import com.dms.model.NoticeDepartmentMaster;
 import com.dms.model.PetitionerDetails;
+import com.dms.model.PoliceStation2024;
 import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.RespondentDetails;
+import com.dms.model.ScrutionRemark;
+import com.dms.model.StNoDetails;
+import com.dms.model.StampReporterData;
 import com.dms.model.State;
 import com.dms.model.TrialCourt;
 import com.dms.model.User;
@@ -35,7 +46,10 @@ import com.dms.model.User;
 @Service
 public class EcourtHomeService {
 
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 
 	// Session session=em.unwrap(Session.class);
@@ -125,11 +139,46 @@ public class EcourtHomeService {
 
 		return rDetails;
 	}
-
+	
 	@Transactional
 	public List<RegisteredCaseDetails> getDraftDetails(Long um_id) {
+		
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -16);
+		System.out.println("Date = "+ cal);
+		SimpleDateFormat s=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		String nDate=s.format(cal.getTime());
 	List<RegisteredCaseDetails> rcdDetails=null;
-		rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_cr_by ="+um_id+" order by rcd.rcd_id ").getResultList();
+		
+	rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_cr_by ="+um_id+" and rcd.rcd_stage_lid !=1000049L"
+				+ " and rcd.rcd_id not in(\r\n" + 
+				"select cm_rcd_mid from CaseCheckListMapping  where cm_cr_date  < '"+ nDate+"' and cm_rec_status=1) order by rcd.rcd_id ").getResultList();
+/*	rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_cr_by ="+um_id+" "
+			+ "and rcd.rcd_stage_lid in (1000042L,1000065L,1000036L,1000066L,1000067L)"
+			+ " order by rcd.rcd_id ").getResultList();	*/
+	
+	return rcdDetails;
+	}
+	
+	@Transactional
+	public List<RegisteredCaseDetails> getDefectedDraftDetails(Long um_id) {
+		
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -16);
+		System.out.println("Date = "+ cal);
+		SimpleDateFormat s=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		String nDate=s.format(cal.getTime());
+	List<RegisteredCaseDetails> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_cr_by ="+um_id+" and rcd.rcd_stage_lid =1000041L"
+				+ " and rcd.rcd_id in(\r\n" + 
+				"select cm_rcd_mid from CaseCheckListMapping  where cm_cr_date  < '"+ nDate+"' and cm_rec_status=1) order by rcd.rcd_id ").getResultList();
+		return rcdDetails;
+	}
+	
+	@Transactional
+	public List<RegisteredCaseDetails> getPassedDraftDetails(Long um_id) {
+	List<RegisteredCaseDetails> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_cr_by ="+um_id+" and rcd.rcd_stage_lid =1000049L  order by rcd.rcd_id ").getResultList();
 		return rcdDetails;
 	}
 
@@ -140,6 +189,16 @@ public class EcourtHomeService {
 		List<PetitionerDetails> result=null;
 		Query query=null;
 		query = em.createQuery(" SELECT pt from PetitionerDetails pt where pt.pt_rec_status=1 and pt.pt_rcd_mid=:id order by pt.pt_sequence asc").setParameter("id", id);
+		result=query.getResultList();
+		return result;
+	}
+	
+	@Transactional
+	public List<Notice> getNotice(Long id) {
+		
+		List<Notice> result=null;
+		Query query=null;
+		query = em.createQuery(" SELECT nt from Notice nt where nt.nt_rcd_mid=:id").setParameter("id", id);
 		result=query.getResultList();
 		return result;
 	}
@@ -161,6 +220,34 @@ public class EcourtHomeService {
 		result=query.getResultList();
 		return result;
 	}
+       
+       
+       @Transactional
+   	public List<CaseNoticeMaster> getCaseNoticeMasterList(String caseFlag) {
+   		List<CaseNoticeMaster> result=null;
+   		Query query=null;
+   		query = em.createQuery(" SELECT cnm from CaseNoticeMaster cnm where cnm.cnm_flag in ('"+caseFlag+"','O')");
+   		result=query.getResultList();
+   		return result;
+   	}
+       
+       @Transactional
+      	public List<NoticeDepartmentMaster> getNoticeDeptMasterList() {
+      		List<NoticeDepartmentMaster> result=null;
+      		Query query=null;
+      		query = em.createQuery(" SELECT cnm from NoticeDepartmentMaster cnm");
+      		result=query.getResultList();
+      		return result;
+      	}
+       
+       @Transactional
+   	public List<Establishment> getEstablishmentList() {
+   		List<Establishment> result=null;
+   		Query query=null;
+   		query = em.createQuery(" SELECT dt from Establishment dt");
+   		result=query.getResultList();
+   		return result;
+   	}
 
       @Transactional
 	public List<State> getStateList() {
@@ -178,6 +265,22 @@ public class EcourtHomeService {
 		result=query.getResultList();
 		return result;
 	}
+	
+	@Transactional
+	public StampReporterData getStampReporterData(Long id) {
+
+		StampReporterData result=null;
+	    Query query=null;
+		query = em.createQuery("SELECT srd from StampReporterData srd where srd.srd_rcd_mid=:id  ORDER BY srd.srd_id DESC").setParameter("id", id).setMaxResults(1);
+		try {
+			result=(StampReporterData) query.getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
      @Transactional
 	public PetitionerDetails getFirstPetitioner(Long id) {
 		PetitionerDetails result=new PetitionerDetails();
@@ -191,6 +294,20 @@ public class EcourtHomeService {
 		return result;
 
 	}
+     
+     @Transactional
+ 	public PoliceStation2024 getPoliceStn(Long id) {
+ 		PoliceStation2024 result=new PoliceStation2024();
+ 		try{
+ 		Query query=null;
+ 		query = em.createQuery("SELECT pt from PoliceStation2024 pt where  pt.pst_id=:id").setParameter("id", id);
+ 		result=(PoliceStation2024)query.getSingleResult();
+ 		}catch(Exception e){
+ 			e.printStackTrace();
+ 		}
+ 		return result;
+
+ 	}
        @Transactional
 	public RespondentDetails getFirstRespondent(Long id) {
 		RespondentDetails result=new RespondentDetails();
@@ -220,6 +337,24 @@ public class EcourtHomeService {
 		result=query.getResultList();
 		return result;
 }
+
+@Transactional
+public List<CrimeDetails> getCrimeDetails(Long id) {
+	List<CrimeDetails> result=null;
+	Query query=null;
+	query = em.createQuery(" SELECT io from CrimeDetails io where io.cd_rec_status=1 and io.cd_rcd_mid=:id").setParameter("id", id);
+	result=query.getResultList();
+	return result;
+}
+
+@Transactional
+public List<StNoDetails> getSessionTrack(Long id) {
+	List<StNoDetails> result=null;
+	Query query=null;
+	query = em.createQuery(" SELECT io from StNoDetails io where io.snd_rec_status=1 and io.snd_rcd_mid=:id").setParameter("id", id);
+	result=query.getResultList();
+	return result;
+}
 @Transactional
 	public List<TrialCourt> getTrialCourt(Long id) {
 		List<TrialCourt> result=null;
@@ -234,7 +369,12 @@ public class EcourtHomeService {
 		List<CourtFee> result=null;
 		Query query=null;
 		query = em.createQuery(" SELECT cf from CourtFee cf where cf.cf_rec_status=1 and cf.cf_rcd_mid=:id").setParameter("id", id);
+		try {
 		result=query.getResultList();
+		}
+		catch(Exception e) {
+			
+		}
 		return result;
 	}
    
@@ -247,6 +387,28 @@ public class EcourtHomeService {
 		result=query.getResultList();
 		return result;
    }
+   
+   public List<ActsectionMaster> getActMasterNew(String type) {
+		// TODO Auto-generated method stub
+			List<ActsectionMaster> result=null;
+			Query query=null;
+			query = em.createQuery("SELECT distinct a.act_name_eng,act_code from ActsectionMaster a where a.old_new='"+type+"'");
+			result=query.getResultList();
+			return result;
+	   }
+   
+   
+   public List<ActsectionMaster> getSecMasterNew(Integer type) {
+ 		// TODO Auto-generated method stub
+ 			List<ActsectionMaster> result=null;
+ 			Query query=null;
+ 			query = em.createQuery("SELECT a from ActsectionMaster a where a.act_code="+type);
+ 			result=query.getResultList();
+ 			return result;
+ 	   }
+   
+   
+   
    public Integer getDraftsByUserId(Long um_id) {
 		// TODO Auto-generated method stub
 		Integer result=0;
@@ -338,6 +500,38 @@ public class EcourtHomeService {
 	
 		return result;
 	}
+	
+	@Transactional
+	public List<Caveat> searchCaveat2(Long ct_type, String caseNo, Integer caseYear,String dates) {
+		// TODO Auto-generated method stub
+			List<Caveat> result = new ArrayList<Caveat>() ;
+			
+			Date d = new Date();//intialize your date to any date 
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(d);
+			cal.add(Calendar.DATE, -90);
+			Date dateBefore30Days = cal.getTime();
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String format = formatter.format(dateBefore30Days);	
+			
+			try
+			{
+	
+				Query query = em.createQuery(" SELECT c from Caveat c where c.cav_lc_case_type=:cav_lc_case_type and c.cav_lc_case_no=:cav_lc_case_no "
+						+ "and c.cav_lc_case_year=:cav_lc_case_year and c.cav_cr_date > '"+format+"' and c.cav_judgmnt_date In ("+dates+") ")
+				.setParameter("cav_lc_case_type", ct_type).setParameter("cav_lc_case_no", caseNo).setParameter("cav_lc_case_year", caseYear);
+				
+				result=	query.getResultList();	
+			
+			}
+			catch(Exception e)
+			{
+			 	e.printStackTrace();
+			}
+			return result;
+		
+	}
+	
 	@Transactional
 	public List<Caveat> searchCaveat(Long ct_type, Long dist_id, String dates) {
 		// TODO Auto-generated method stub
@@ -415,5 +609,17 @@ public class EcourtHomeService {
 		result = (District) em.createQuery(" SELECT dt from District dt where dt.dt_id=:id").setParameter("id", id).getSingleResult();
 	   return result;
 	}
+	  @Transactional 
+	  public ScrutionRemark getRemark(Long id)
+	  {
+		  ScrutionRemark result=null;
+		  try{
+			  //Query query=null;
+			  result =(ScrutionRemark) em.createQuery(" SELECT rt from ScrutionRemark rt where  rt.sr_rcd_mid=:id").setParameter("id", id).getSingleResult();
+		  }
+		  catch(Exception e){
+	 
+	  } return result;
+	  }
 	
 }

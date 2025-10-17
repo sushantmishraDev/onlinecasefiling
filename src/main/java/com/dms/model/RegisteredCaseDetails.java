@@ -6,14 +6,18 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "registered_case_details")
@@ -111,6 +115,9 @@ public class RegisteredCaseDetails {
 	@Column(name="rcd_case_no")
 	private Integer rcd_case_no;
 	
+	@Column(name = "rcd_case_type")
+	private String rcd_case_type;
+	
 	/*@OneToOne
 	@JoinColumn(name="rcd_ct_id",referencedColumnName="_id",insertable=false,updatable=false)
 	private CaseType caseType;
@@ -121,6 +128,55 @@ public class RegisteredCaseDetails {
 	 @OneToMany(cascade=CascadeType.ALL)
 	    @JoinColumn(name="rcd_id")*/
 	
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval=true)
+	@JoinColumn(name = "act_rcd_mid",referencedColumnName="rcd_id",insertable = false, updatable = false)	
+	@Where(clause="act_rec_status=1")
+	private List<ActDetails> actDetails; 
+	
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval=true)
+	@JoinColumn(name = "cd_rcd_mid",referencedColumnName="rcd_id",insertable = false, updatable = false)	
+	@Where(clause="cd_rec_status=1")
+	private List<CrimeDetails> crimeDetails; 
+	
+	
+	
+	@Column(name = "rcd_notice_no")
+	private String rcd_notice_no;
+	
+	
+	
+	public String getRcd_notice_no() {
+		return rcd_notice_no;
+	}
+
+	public void setRcd_notice_no(String rcd_notice_no) {
+		this.rcd_notice_no = rcd_notice_no;
+	}
+
+	public List<CrimeDetails> getCrimeDetails() {
+		return crimeDetails;
+	}
+
+	public void setCrimeDetails(List<CrimeDetails> crimeDetails) {
+		this.crimeDetails = crimeDetails;
+	}
+
+	public List<ActDetails> getActDetails() {
+		return actDetails;
+	}
+
+	public void setActDetails(List<ActDetails> actDetails) {
+		this.actDetails = actDetails;
+	}
+
+	public String getRcd_case_type() {
+		return rcd_case_type;
+	}
+
+	public void setRcd_case_type(String rcd_case_type) {
+		this.rcd_case_type = rcd_case_type;
+	}
+
 	private transient PetitionerDetails petitionerDetails; 
 
 	/*
@@ -128,13 +184,47 @@ public class RegisteredCaseDetails {
 	  @JoinColumn(name="rcd_id")*/
 	private  transient RespondentDetails  respondentDetails; 
 	
+	private  transient Integer  code; 
 	
+	private  transient String  ptName;
+	
+	
+	public String getPtName() {
+		return ptName;
+	}
+
+	public void setPtName(String ptName) {
+		this.ptName = ptName;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
 	private transient List<CheckList> checkList;
 	
 	@OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "rcd_stage_lid",insertable = false, updatable = false)
 	private Lookup caseStage;
 	
+	@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "rcd_cr_by",insertable = false, updatable = false)
+	private User userFiled;
+	
+	 private transient ScrutionRemark scrutionRemark;
+
+	public User getUserFiled() {
+		return userFiled;
+	}
+
+	public void setUserFiled(User userFiled) {
+		this.userFiled = userFiled;
+	}
+
 	@OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "rcd_ct_id",insertable = false, updatable = false)
 	private CaseType caseType;
@@ -407,6 +497,14 @@ public class RegisteredCaseDetails {
 
 	public void setRcd_case_no(Integer rcd_case_no) {
 		this.rcd_case_no = rcd_case_no;
+	}
+
+	public ScrutionRemark getScrutionRemark() {
+		return scrutionRemark;
+	}
+
+	public void setScrutionRemark(ScrutionRemark scrutionRemark) {
+		this.scrutionRemark = scrutionRemark;
 	}
 	
 	

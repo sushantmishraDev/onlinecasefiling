@@ -29,12 +29,38 @@ public class CaseType {
 	
 	@Column(name="ct_status")
 	 private Integer ct_status;
+	
+	@Column(name="ct_type")
+	private String ct_type;
+	
+	
+	@Column(name="ct_flag")
+	private String ct_flag;
 
     /* @OneToOne
 	@JoinColumn(name="ct_id")
 	private RegisteredCaseDetails registeredCaseDetails;
 	*/
 	
+	
+	
+	
+	public String getCt_type() {
+		return ct_type;
+	}
+
+	public String getCt_flag() {
+		return ct_flag;
+	}
+
+	public void setCt_flag(String ct_flag) {
+		this.ct_flag = ct_flag;
+	}
+
+	public void setCt_type(String ct_type) {
+		this.ct_type = ct_type;
+	}
+
 	public Long getCt_id() {
 		return ct_id;
 	}

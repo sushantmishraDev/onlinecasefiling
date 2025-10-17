@@ -7,16 +7,20 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dms.model.Application;
 import com.dms.model.ApplicationCheckListMapping;
+import com.dms.model.ApplicationUploaded;
 import com.dms.model.CaseCheckListMapping;
 import com.dms.model.Caveat;
 import com.dms.model.CaveatCheckListMapping;
+import com.dms.model.CaveatDocuments;
 import com.dms.model.CheckList;
 import com.dms.model.IndexField;
+import com.dms.model.PetitionUploaded;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.RespondentDetails;
@@ -25,7 +29,11 @@ import com.dms.model.StampReporterData;
 @Service
 public class ScrutinyService 
 {
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 	
 	@Transactional
@@ -104,6 +112,47 @@ public class ScrutinyService
 		}
 		return master;
 	}
+	
+	@Transactional
+	public PetitionUploaded getPetitionUploaded(String pu_id) 
+	{
+		PetitionUploaded result=new PetitionUploaded();
+		
+		try{
+			result = (PetitionUploaded) em.createQuery("SELECT pu FROM PetitionUploaded pu  where pu.pu_document_name='"+pu_id+"'").getSingleResult();
+		}catch(Exception e)	{
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@Transactional
+	public ApplicationUploaded getApplicationUploaded(String pu_id) 
+	{
+		ApplicationUploaded result=new ApplicationUploaded();
+		
+		try{
+			result = (ApplicationUploaded) em.createQuery("SELECT pu FROM ApplicationUploaded pu  where pu.au_document_name='"+pu_id+"'").getSingleResult();
+		}catch(Exception e)	{
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	
+	@Transactional
+	public CaveatDocuments getCaveatUploaded(String pu_id) 
+	{
+		CaveatDocuments result=new CaveatDocuments();
+		
+		try{
+			result = (CaveatDocuments) em.createQuery("SELECT pu FROM CaveatDocuments pu  where pu.cd_document_name='"+pu_id+"'").getSingleResult();
+		}catch(Exception e)	{
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	@Transactional
 	public List<RegisteredCaseDetails> getCaseDetails(Long um_id) {
 	List<RegisteredCaseDetails> rcdDetails=null;
@@ -123,6 +172,13 @@ public class ScrutinyService
 	public List<Caveat> getCaveatDetails(Long um_id) {
 		List<Caveat> rcdDetails=null;
 		rcdDetails= em.createQuery("SELECT cav FROM Caveat cav where cav.cav_assign_to ="+um_id+" order by cav.cav_id ").getResultList();
+		return rcdDetails;
+	}
+	
+	@Transactional
+	public Caveat getCaveatById(Long id) {
+		Caveat rcdDetails=null;
+		rcdDetails= (Caveat) em.createQuery("SELECT cav FROM Caveat cav where cav.cav_id ="+id+" order by cav.cav_id ").getSingleResult();
 		return rcdDetails;
 	}
 	

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+ <!-- Enable annotation-based Spring MVC controllers (eg: @Controller annotation) -->
+ <mvc:annotation-driven/>
+ <mvc:default-servlet-handler/>
+    <mvc:annotation-driven />
+ <mvc:default-servlet-handler/>
+ <tx:annotation-driven proxy-target-class="true"/>
+ <tx:annotation-driven transaction-manager="transactionManager" />
+   <context:annotation-config/>
+    <context:component-scan base-package="com.dms." />
+       <context:annotation-config/>
+    <bean
+        class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+   
+    
+    <!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+     	<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
+      	<property name="username" value="dms"/> 
+        <property name="password" value="dms"/>
+	</bean>  -->
+	
+	 <!-- <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+     	<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
+      	<property name="username" value="efiling"/> 
+        <property name="password" value="efiling"/>
+	</bean> -->
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+     	<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
+      	<property name="username" value="postgres"/> 
+        <property name="password" value="system"/>
+	</bean>
+   
+	
+   
+      <!-- EntityManagerFactory -->
+  <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
+    <property name="persistenceUnitName" value="persistenceUnit"/>
+    <property name="dataSource" ref="dataSource"/>
+     <property name="jpaProperties">
+        <props>
+            <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        </props>
+    </property> 
+  </bean>
+ 
+ 
+ 
+  <bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- max upload size in bytes -->
+<!--         <property name="maxUploadSize" value="20971520" /> 20MB -->
+         
+<!--         max size of file in memory (in bytes) -->
+<!--         <property name="maxInMemorySize" value="1048576" /> 1MB -->
+ 
+    </bean>
+    
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+</bean>
+
+    <!-- Enable @Transactional annotation -->
+  <tx:annotation-driven/>
+  
+  <mvc:interceptors>
+       <mvc:interceptor> 
+            <mvc:mapping path="/dms/index" /> 
+             <mvc:mapping path="/**"/>
+            <bean class="com.dms.controller.RequestProcessingTimeInterceptor"></bean> 
+        </mvc:interceptor>
+   </mvc:interceptors>
+   
+</beans>

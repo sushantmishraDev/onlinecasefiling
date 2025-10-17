@@ -11,9 +11,13 @@ String role=user.getUserroles().get(0).getLk().getLk_longname();
 %>
 	<div id="content" class="content">
 	<% System.out.println("Rolename="+role); %>
-	<% if(role.equals("Advocate") || role.equals("InPerson")){ %>
+	<% if(role.equals("Advocate") || role.equals("InPerson")){ %>	
 		<div class="container-fluid" ng-controller="TabsDemoCtrl" >
 		<div class="row">
+		<% if(user.getUsername()=="test"){ %>
+	 <button class="btn btn-success"  ng-click="addRegisterCase(registerCase)">Save</button>
+           
+	<%} %>
 				<!-- begin col-3 -->
 				<div class="col-md-3 col-sm-6">
 					<div class="widget widget-stats bg-green">
@@ -93,6 +97,14 @@ String role=user.getUserroles().get(0).getLk().getLk_longname();
 					</div>
 				</div>
 				</div>
+				
+				 <div style="position: absolute; bottom: 5px;">
+    <font size="2"
+          face="verdana"
+          color="red"> 
+          * The defects shall have to be rectified / removed within 15 days,where after e-file will be locked and will have to be uploaded afresh , as a fresh case / caveat / application.
+        </font> 
+    </div>
 				<div class="row">
 <!-- 				<div class="col-md-3 col-sm-6"> -->
 <!-- 					<div class="widget widget-stats bg-blue"> -->
@@ -202,7 +214,7 @@ String role=user.getUserroles().get(0).getLk().getLk_longname();
 	</body>
 	<% //if(role.equals("Advocate") || role.equals("InPerson")){ %>
 		<script type="text/javascript"
-			src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtHomeController.js"></script>
+			src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtHomeController.js?v=3"></script>
 	<% //}else{ %>
 <!-- 	<script type="text/javascript" -->
 <%-- 	src="${pageContext.request.contextPath}/js/scripts/controllers/scrutinyHomeController.js"></script> --%>

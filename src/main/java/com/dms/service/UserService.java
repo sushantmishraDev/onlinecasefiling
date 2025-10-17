@@ -9,22 +9,36 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.TransactionScoped;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dms.model.AdvocateEfiling;
+import com.dms.model.AdvocateEfiling;
 import com.dms.model.Folder;
 import com.dms.model.LoginLog;
+import com.dms.model.Notice;
 import com.dms.model.ObjectMaster;
 import com.dms.model.Permission;
 import com.dms.model.Repository;
+import com.dms.model.SmsLog;
 import com.dms.model.User;
 import com.dms.utility.GlobalFunction;
 
 @Service
 public class UserService {
 	
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
+	
+
+	/*@PersistenceContext(unitName="persistenceUnitDMS")
+	@Qualifier(value = "entityManagerFactoryDMS")
+	private EntityManager em2;*/
 	
 	GlobalFunction globalfunction=new GlobalFunction();
 	
@@ -49,14 +63,86 @@ public class UserService {
 		}
 		return master;
 	}
+	
+	@Transactional
+	public Notice saveNotice(Notice s) {
+
+		Notice master = null;
+		try {
+			master = em.merge(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	@Transactional
+	public AdvocateEfiling getAdvocateByRollNo(String enroll) {
+		
+		AdvocateEfiling a= new AdvocateEfiling();
+		try {
+			Query query  =  em.createQuery("SELECT a from AdvocateEfiling a WHERE a.rollNo =:rollNo");
+			query.setParameter("rollNo", enroll);
+			a= (AdvocateEfiling) query.getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return a;
+	}
+	
+	@Transactional
+	public AdvocateEfiling saveAdvocate(AdvocateEfiling s) {
+
+		AdvocateEfiling master = null;
+		try {
+			master = em.merge(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	@Transactional
+	public Notice validateNotice(Long username, Integer password) {
+		Notice nt=null;
+		
+		
+		
+		
+		
+		
+		
+		
+		try {
+			Query query = em
+					.createQuery("SELECT u FROM Notice u WHERE u.nt_id =:username AND u.nt_otp=:password");
+			query.setParameter("username", username);
+			query.setParameter("password", password);
+			nt = (Notice) query.getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new EntityNotFoundException("Entity does not exist.");
+		} finally {
+			return nt;
+		}
+	}
+	
 	@Transactional
 	public User validateLogin(String username, String password) {
 		User user = new User();
+		
+		
+		
 		String pwd = globalfunction.md5encryption(password);
 		System.out.println("Password="+pwd);
+		
+		
+		
+		
 		try {
 			Query query = em
-					.createQuery("SELECT u FROM User u WHERE (username =:username AND password=:password)");
+					.createQuery("SELECT u FROM User u WHERE (username =:username AND password=:password) and u.um_rec_status=1");
 			query.setParameter("username", username);
 			query.setParameter("password", pwd);
 			user = (User) query.getSingleResult();
@@ -108,6 +194,17 @@ public class UserService {
 	    	e.printStackTrace();
 		}
     	return master;
+	}
+	
+	@Transactional
+	public SmsLog saveSMSlog(SmsLog smslog) {
+		SmsLog sms = null;
+    	try {	
+    		sms= em.merge(smslog);	    	
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return sms;
 	}
 	
 	@Transactional
@@ -165,6 +262,40 @@ public class UserService {
 		User result = new User();
 		
 		String query = "select um from User um where um.username=:username";
+		
+		try {
+			result = (User) em.createQuery(query).setParameter("username", username).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		return result;
+	}
+	
+	@Transactional
+	public Notice getNoticeById(Long id) {
+		// TODO Auto-generated method stub
+		Notice result = null;
+		
+		String query = "select nt from Notice nt where nt.nt_id=:nt_id";
+		
+		try {
+			result = (Notice) em.createQuery(query).setParameter("nt_id", id).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		
+		return result;
+	}
+	
+	@Transactional
+	public User getUserByMobile(String username) {
+		// TODO Auto-generated method stub
+		User result = new User();
+		
+		String query = "select um from User um where um.um_mobile=:username";
 		
 		try {
 			result = (User) em.createQuery(query).setParameter("username", username).getSingleResult();

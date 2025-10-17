@@ -15,7 +15,7 @@
 											<div class="form-group pull-in clearfix">
 												<div class="col-sm-6">
 													<label>Name <span class="text-danger">
-															* </span></label> <input type="text" maxlength=60 class="form-control" id="caseDetail" name="name"
+															* </span></label> <input type="text" maxlength=60 class="form-control" id="caseDetail" name="name" oninput="this.value = this.value.toUpperCase()"
 														ng-model="respondentDetails.crt_name" required>
 														<!-- <span class="text-danger" ng-show="respondent.name.$touched && respondent.name.$invalid">The name is required.</span> -->
 
@@ -128,9 +128,10 @@
                                                                                         <td>{{row.crt_address}}</td>   
                                                                                           <td>{{row.crt_mobile}}</td> 
                                                                                           <td class="text-center">
-                                                                                    <a  ng-click="editResp(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
-                                                                          <a  ng-click="deleteRespondent(row.crt_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
-                                                                            
+                                                                       	  <a  ng-click="editResp(row)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-pencil-square-o" ></i></a>
+                                                                         <span ng-show=row.crt_sequence!=1>
+                                                                     	   <a  ng-click="deleteRespondent(row.crt_id)"> <i  style="cursor:pointer; font-size: 16px;" class="fa fa-trash-o"></i> </a>
+                                                                         </span>
                                                                              
                                                                              
                                                                         </td>

@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +27,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.dms.model.ActionResponse;
 import com.dms.model.Amendment;
+import com.dms.model.CaseType;
 import com.dms.model.Lookup;
 import com.dms.model.User;
 import com.dms.service.AmendmentService;
@@ -33,106 +37,203 @@ import com.dms.utility.GlobalFunction;
 
 @Controller
 @RequestMapping("/amendmenthistory")
-public class AmendmentHistoryController 
-{
+public class AmendmentHistoryController {
 	private GlobalFunction cm;
 	@Autowired
 	ServletContext context;
 	@Autowired
 	private AmendmentService amendmentService;
-	
+
 	@Autowired
 	private LookupService lookupService;
-	
+
 	@Autowired
 	private UserService userService;
-	
-	public AmendmentHistoryController()
-	{
+
+	public AmendmentHistoryController() {
 		cm = new GlobalFunction();
 	}
+
 	@RequestMapping(value = "/manage", method = RequestMethod.GET)
-	public String mylist(HttpSession session,Model model) {
-		User u=(User) session.getAttribute("USER");
-		model.addAttribute("user_id",u.getUm_id());
+	public String mylist(HttpSession session, Model model) {
+		User u = (User) session.getAttribute("USER");
+		model.addAttribute("user_id", u.getUm_id());
 		return "/amendmenthistory/manage";
 	}
+
 	@RequestMapping(value = "/getamendments/{id}", method = RequestMethod.GET)
-	public @ResponseBody String getAmendmentUserWise(@PathVariable Long id,HttpSession session) {
-		String jsonData=null;
-		
-		ActionResponse<Amendment> response= new ActionResponse<Amendment>();
-		Lookup lkCreated=lookupService.getLookup("AMENDMENT_STATUS", "Amendment created");
-		List<Amendment> amendments=amendmentService.getAmendmentsByUser(id,lkCreated.getLk_id());
-		
-		if(amendments.size()>0){
+	public @ResponseBody String getAmendmentUserWise(@PathVariable Long id, HttpSession session) {
+		String jsonData = null;
+
+		ActionResponse<Amendment> response = new ActionResponse<Amendment>();
+		Lookup lkCreated = lookupService.getLookup("AMENDMENT_STATUS", "Amendment created");
+		List<Amendment> amendments = amendmentService.getAmendmentsByUser(id, lkCreated.getLk_id());
+
+		if (amendments.size() > 0) {
 			response.setModelList(amendments);
 			response.setResponse("TRUE");
-		}else{
+		} else {
 			response.setResponse("FALSE");
 			response.setData("No Records found");
-		}	
-		jsonData=cm.convert_to_json(response);
+		}
+		jsonData = cm.convert_to_json(response);
 		return jsonData;
 	}
+
 	@RequestMapping(value = "/gethistory/{id}", method = RequestMethod.GET)
-	public @ResponseBody String getHistory(@PathVariable Long id,HttpSession session) {
-		String jsonData=null;
-		
-		ActionResponse<Amendment> response= new ActionResponse<Amendment>();
-		Lookup lkCreated=lookupService.getLookup("AMENDMENT_STATUS", "Amendment uploaded");
-		List<Amendment> amendments=amendmentService.getAmendmentsByUser(id,lkCreated.getLk_id());
-		
-		if(amendments.size()>0){
+	public @ResponseBody String getHistory(@PathVariable Long id, HttpSession session) {
+		String jsonData = null;
+
+		ActionResponse<Amendment> response = new ActionResponse<Amendment>();
+		Lookup lkCreated = lookupService.getLookup("AMENDMENT_STATUS", "Amendment uploaded");
+		List<Amendment> amendments = amendmentService.getAmendmentsByUserId(id, lkCreated.getLk_id());
+
+		if (amendments.size() > 0) {
 			response.setModelList(amendments);
 			response.setResponse("TRUE");
-		}else{
+		} else {
 			response.setResponse("FALSE");
 			response.setData("No Records found");
-		}	
-		jsonData=cm.convert_to_json(response);
+		}
+		jsonData = cm.convert_to_json(response);
 		return jsonData;
 	}
+
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public @ResponseBody String upload(MultipartHttpServletRequest request,HttpSession session) {
-		String jsonData=null;
-		ActionResponse<Amendment> response = new ActionResponse();
-		User u=(User) session.getAttribute("USER");
-		Lookup lookup=lookupService.getLookUpObject("AMENDMENT_PATH");
-		Lookup lkUploaded=lookupService.getLookup("AMENDMENT_STATUS", "Amendment uploaded");
+	public @ResponseBody String upload(MultipartHttpServletRequest request, HttpSession session)
+			throws PersistenceException, ValidationException {
+		String jsonData = null;
+		ActionResponse<Amendment> response = new ActionResponse<Amendment>();
+		User u = (User) session.getAttribute("USER");
+		//Lookup lookup = lookupService.getLookUpDMSObject("REPOSITORYPATH");
+		Lookup lkUploaded = lookupService.getLookup("AMENDMENT_STATUS", "Amendment uploaded");
 		Integer am_document_no = Integer.parseInt(request.getParameter("am_document_no"));
 		Integer am_document_year = Integer.parseInt(request.getParameter("am_document_year"));
-		Long am_id=Long.parseLong(request.getParameter("am_id"), 10);
+		Long am_id = Long.parseLong(request.getParameter("am_id"), 10);
 		MultipartFile mpf = null;
-    	Iterator<String> itr = request.getFileNames();
-    	Amendment amendment=amendmentService.getAmendment(am_id);
-    	if(amendment.getAm_status().longValue()!=lkUploaded.getLk_id().longValue()){
-    	while (itr.hasNext()) 
-		{
-			mpf = request.getFile(itr.next());
-			String filepath=lookup.getLk_longname()+File.separator+amendment.getAm_id()+".pdf";
-			try {
-				FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(filepath));
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			amendment.setAm_document_no(am_document_no);
-			amendment.setAm_document_year(am_document_year);
-			amendment.setAm_status(lkUploaded.getLk_id());
-			amendment.setAm_uploaded_date(new Date());
-			amendment=amendmentService.saveAmendment(amendment);			
+		Iterator<String> itr = request.getFileNames();
+		Amendment amendment = amendmentService.getAmendment(am_id);
+		String fileName = null;
+		BigInteger fileCount=null;
+
+		if (amendment.getAm_document_no() != null && amendment.getAm_document_year() != null) {
+			/*fileName = amendmentService.getFileName(amendment.getAm_at_mid(), amendment.getAm_document_no(),
+					amendment.getAm_document_year(), amendment.getAm_fd_mid());*/
+			
+			fileCount=amendmentService.getFileCount(amendment.getAm_at_mid(), amendment.getAm_document_no(),
+					amendment.getAm_document_year(), amendment.getAm_fd_mid());
+		} else {
+			amendment.setAm_document_no(0);
+			amendment.setAm_document_year(0);
+			/*fileName = amendmentService.getFileName(amendment.getAm_at_mid(), amendment.getAm_document_no(),
+					amendment.getAm_document_year(), amendment.getAm_fd_mid());*/
+			
+			fileCount=amendmentService.getFileCount(amendment.getAm_at_mid(), amendment.getAm_document_no(),
+					amendment.getAm_document_year(), amendment.getAm_fd_mid());
 		}
-    	response.setResponse("TRUE");
-    	response.setData("Amendment uploaded successfully");
-    	}else{
-    		response.setResponse("FALSE");
-    		response.setData("Amendment not found");
-    	}
-    	jsonData=cm.convert_to_json(response);
+
+		String label = amendmentService.getLabel(amendment.getAm_fd_mid());
+		//String path = lookup.getLk_longname() + File.separator + label;
+
+		/*if (amendment.getAm_at_mid() == null) {
+			path += File.separator + "petition";
+		} else {
+			path += File.separator + "application";
+		}*/
+		if (amendment.getAm_status().longValue() != lkUploaded.getLk_id().longValue()) {
+			while (itr.hasNext()) {
+			/*	mpf = request.getFile(itr.next());
+				String filepath = path + File.separator + fileName + ".pdf";
+				// String
+				// filepath=lookup.getLk_longname()+File.separator+amendment.getAm_id()+".pdf";
+				File file = new File(path + File.separator + fileName + ".pdf");
+				File newFile = new File(path + File.separator + fileName + "_old_"+fileCount+".pdf");
+				if (file.renameTo(newFile)) {
+					System.out.println("File rename success");
+					;
+				} else {
+					System.out.println("File rename failed");
+				}
+				try {
+					FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(filepath));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
+				amendment.setAm_document_no(am_document_no);
+				amendment.setAm_document_year(am_document_year);
+				amendment.setAm_status(lkUploaded.getLk_id());
+				amendment.setAm_uploaded_date(new Date());
+				amendment = amendmentService.saveAmendment(amendment);
+				//amendmentService.updateSubDocument(amendment.getAm_fd_mid(), fileName);
+				
+				
+			}
+			response.setResponse("TRUE");
+			response.setData("Amendment uploaded successfully");
+		} else {
+			response.setResponse("FALSE");
+			response.setData("Amendment not found");
+		}
+		jsonData = cm.convert_to_json(response);
 		return jsonData;
 	}
+	
+	// created by afnan
+	
+	@RequestMapping(value = "/uploadAmendment", method = RequestMethod.POST)
+	public @ResponseBody String uploadAmendment(MultipartHttpServletRequest request, HttpSession session) 
+			throws PersistenceException, ValidationException 
+	{
+		String jsonData = null;
+		ActionResponse<Amendment> response = new ActionResponse<Amendment>();
+		User u = (User) session.getAttribute("USER");
+		Lookup lookup = lookupService.getLookUpObject("AMENDMENT_PATH");
+		Lookup lkUploaded = lookupService.getLookup("AMENDMENT_STATUS", "Amendment uploaded");
+		Lookup lkAmdCreatedStatus = lookupService.getLookup("AMENDMENT_STATUS", "Amendment created");
+		Integer am_document_no = Integer.parseInt(request.getParameter("am_document_no"));
+		Integer am_document_year = Integer.parseInt(request.getParameter("am_document_year"));
+		Long am_id = Long.parseLong(request.getParameter("am_id"), 10);
+		MultipartFile mpf = null;
+		Iterator<String> itr = request.getFileNames();
+		Amendment amendment = amendmentService.getAmendment(am_id);
+		String amendBasepath =lookup.getLk_longname();
+
+		if (amendment.getAm_status().longValue() == lkAmdCreatedStatus.getLk_id().longValue()) 
+		{
+			while (itr.hasNext()) 
+			{
+				mpf = request.getFile(itr.next());
+				File file = new File(amendBasepath + File.separator + amendment.getAm_id()+".pdf");
+				
+				try {
+					FileCopyUtils.copy(mpf.getBytes(), new FileOutputStream(file));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				amendment.setAm_document_no(am_document_no);
+				amendment.setAm_document_year(am_document_year);
+				amendment.setAm_status(lkUploaded.getLk_id());
+				amendment.setAm_uploaded_date(new Date());
+				amendment = amendmentService.saveAmendment(amendment);
+			}
+				response.setResponse("TRUE");
+				response.setData("Amendment uploaded successfully");
+		} 
+		else 
+		{
+			response.setResponse("FALSE");
+			response.setData("Amendment not found");
+		}
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+	
 }

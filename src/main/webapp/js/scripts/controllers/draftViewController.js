@@ -41,14 +41,31 @@ EDMSApp.controller('draftViewController',['$scope','$http',function ($scope, $ht
   $scope.trialDataList=[];
   $scope.impugnedDataList=[];
   $scope.draftList=[];
+  $scope.actDataList=[];
  
  
   $scope.caseId= $('#caseId').val();
  
               getDraftDetails();
+              
+            
   
       $scope.submitForm=function(registerCase)
       {
+    	  $http.get(urlBase+ 'ecourt/getActDetails', {
+				params : {
+					'docId' : registerCase.rcd_id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.actDataList = data.modelList;
+		               
+		
+    	  
+    	  if($scope.actDataList.length==0){
+    		  alert("Please Fill Act Details First");
+    	  }
+    	  else{
     	 var confirmbox = confirm("Do you really want to submit this file");
      	 if (confirmbox) 
      	 {
@@ -63,7 +80,59 @@ EDMSApp.controller('draftViewController',['$scope','$http',function ($scope, $ht
 				   }			
 			});	 
      	 }
+    	  }
+    	  
+			}).error(function(data, status, headers, config) {
+			});
 	  }
+      
+      function getActDetails(id){
+		    $http.get(urlBase+ 'ecourt/getActDetails', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.actDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}    
+      
+      $scope.changeCase=function(selected){
+    	  console.log(selected);
+    	  $scope.draftList=[];
+    	  if(selected=="passed"){
+    			$http.get(urlBase+'ecourt/getPassedCaseDetails').
+    		      success(function (data) {
+    		    	  
+    		    	  $scope.count=data.data;
+    		        	$scope.draftList=data.modelList;
+    		      	console.log($scope.applicationList);
+    		    	  
+    		      }).
+    		      error(function(data, status, headers, config) {
+    		      	console.log("Error in getting tree data");
+    		      });
+    	  }
+    	  else if(selected=="defect"){
+  			$http.get(urlBase+'ecourt/getExpierdCaseDetails').
+		      success(function (data) {
+		    	  
+		    	  $scope.count=data.data;
+		        	$scope.draftList=data.modelList;
+		      	console.log($scope.applicationList);
+		    	  
+		      }).
+		      error(function(data, status, headers, config) {
+		      	console.log("Error in getting tree data");
+		      });
+	  }
+    	  else{
+    		  getDraftDetails();
+    	  }
+      }
   
   function getDraftDetails(){
 	  	$http.get(urlBase+'ecourt/getDraftDetails').

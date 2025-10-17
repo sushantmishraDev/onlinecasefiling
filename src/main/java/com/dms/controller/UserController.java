@@ -582,8 +582,8 @@ public class UserController {
 		  System.out.println("last "+response.getResponse());
 		  System.out.println("***********User password change sucessfully*********");
 		  return jsonData;
-		}	
-*/
+		}	*/
+
 	
 
 		@RequestMapping(value = "user/changePassword", method = RequestMethod.POST)

@@ -1,7 +1,9 @@
 package com.dms.controller;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,20 +21,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.dms.model.ActDetails;
 import com.dms.model.ActMaster;
 import com.dms.model.ActionResponse;
+import com.dms.model.ActsectionMaster;
 import com.dms.model.CaseCheckListMapping;
+import com.dms.model.CaseNoticeMaster;
 import com.dms.model.CaseType;
 import com.dms.model.Caveat;
 import com.dms.model.CaveatOld;
 import com.dms.model.CourtFee;
+import com.dms.model.CrimeDetails;
 import com.dms.model.DailyActivityReport;
 import com.dms.model.District;
+import com.dms.model.Establishment;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.Lookup;
 import com.dms.model.LowerCourtCaseType;
 import com.dms.model.LowerCourtTypes;
+import com.dms.model.Notice;
+import com.dms.model.NoticeDepartmentMaster;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.RespondentDetails;
+import com.dms.model.ScrutionRemark;
+import com.dms.model.StNoDetails;
 import com.dms.model.State;
 import com.dms.model.TrialCourt;
 import com.dms.model.User;
@@ -68,6 +79,13 @@ public class EcourtHomeController {
 		return "/ecourt/ecourtHome";
 
 	}
+	
+	@RequestMapping(value = "/help", method = RequestMethod.GET)
+	public String ecourtHelp() {
+		
+		return "/content/help";
+
+	}
 
 	@RequestMapping(value = "/ecourtHome2", method = RequestMethod.GET)
 	public String ecourtHome2() {
@@ -83,6 +101,18 @@ public class EcourtHomeController {
 
 	@RequestMapping(value = "/addCase", method = RequestMethod.GET)
 	public String addCaseDetail() {
+
+		return "/ecourt/allowCase";
+	}
+	
+	@RequestMapping(value = "/addApplication", method = RequestMethod.GET)
+	public String addApplication() {
+
+		return "/ecourt/allowApplication";
+	}
+	
+	@RequestMapping(value = "/addNewCase", method = RequestMethod.GET)
+	public String addCaseDetails() {
 
 		return "/ecourt/addCase";
 	}
@@ -246,6 +276,125 @@ public class EcourtHomeController {
 		
 		return result;
 	}
+	
+	@RequestMapping(value = "/getExpierdCaseDetails", method = RequestMethod.GET)
+	@ResponseBody
+	public String getExpierdCaseDetails(HttpSession session) {
+		String jsonData = null;
+		
+		User user=(User) session.getAttribute("USER");
+
+		List<RegisteredCaseDetails> newDraftList = new ArrayList<RegisteredCaseDetails>();
+
+		List<RegisteredCaseDetails> draftDetails = ecourtHomeService.getDefectedDraftDetails(user.getUm_id());
+		ActionResponse<RegisteredCaseDetails> response = new ActionResponse<RegisteredCaseDetails>();
+
+		PetitionerDetails pDetails =null;
+
+		RespondentDetails rDetails = null;
+		ScrutionRemark rremark=null;
+		
+
+		for (RegisteredCaseDetails rcd : draftDetails) {
+			pDetails= new PetitionerDetails();
+			rDetails= new RespondentDetails();
+			pDetails =ecourtHomeService.getFirstPetitioner(rcd.getRcd_id());
+			rDetails=ecourtHomeService.getFirstRespondent(rcd.getRcd_id());
+			rremark=ecourtHomeService.getRemark(rcd.getRcd_id());
+			//System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+rremark.getSr_remrk());
+			if(rremark != null) {
+				rcd.setScrutionRemark(rremark);
+			}
+			        if(pDetails.getPt_id()!=null){
+			         rcd.setPetitionerDetails(pDetails);
+			        }
+			        if(rDetails.getRt_id()!=null) {
+			          rcd.setRespondentDetails(rDetails);
+			        }
+		
+			newDraftList.add(rcd);
+		}
+
+		int draftcount = 0;
+		draftcount = draftDetails.size();
+
+		System.out.println(draftcount);
+
+		if (newDraftList != null && newDraftList.size() != 0)
+			response.setResponse("TRUE");
+		response.setData(draftcount);
+		response.setModelList(newDraftList);
+
+		jsonData = cm.convert_to_json(response);
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/getPassedCaseDetails", method = RequestMethod.GET)
+	@ResponseBody
+	public String getPassedCaseDetails(HttpSession session) throws ParseException {
+		String jsonData = null;
+		
+		User user=(User) session.getAttribute("USER");
+
+		List<RegisteredCaseDetails> newDraftList = new ArrayList<RegisteredCaseDetails>();
+
+		List<RegisteredCaseDetails> draftDetails = ecourtHomeService.getPassedDraftDetails(user.getUm_id());
+		ActionResponse<RegisteredCaseDetails> response = new ActionResponse<RegisteredCaseDetails>();
+
+		PetitionerDetails pDetails =null;
+
+		RespondentDetails rDetails = null;
+		ScrutionRemark rremark=null;
+		
+
+		for (RegisteredCaseDetails rcd : draftDetails) {
+			pDetails= new PetitionerDetails();
+			rDetails= new RespondentDetails();
+			pDetails =ecourtHomeService.getFirstPetitioner(rcd.getRcd_id());
+			rDetails=ecourtHomeService.getFirstRespondent(rcd.getRcd_id());
+			rremark=ecourtHomeService.getRemark(rcd.getRcd_id());
+			//System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+rremark.getSr_remrk());
+			
+			if(rcd.getCrimeDetails() !=null) {
+				for(CrimeDetails cd : rcd.getCrimeDetails()) {
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				Date date = formatter.parse("2024-01-05 00:00:00");
+					if(cd.getCd_cr_date().after(date)) {
+						cd.setPoliceStation(ecourtHomeService.getPoliceStn(cd.getCd_police_stn()));
+					}
+					
+				}
+			}
+			
+			if(rremark != null) {
+				rcd.setScrutionRemark(rremark);
+			}
+			        if(pDetails.getPt_id()!=null){
+			         rcd.setPetitionerDetails(pDetails);
+			        }
+			        if(rDetails.getRt_id()!=null) {
+			          rcd.setRespondentDetails(rDetails);
+			        }
+		
+			newDraftList.add(rcd);
+		}
+
+		int draftcount = 0;
+		draftcount = draftDetails.size();
+
+		System.out.println(draftcount);
+
+		if (newDraftList != null && newDraftList.size() != 0)
+			response.setResponse("TRUE");
+		response.setData(draftcount);
+		response.setModelList(newDraftList);
+
+		jsonData = cm.convert_to_json(response);
+
+		return jsonData;
+	}
+	
 	@RequestMapping(value = "/getDraftDetails", method = RequestMethod.GET)
 	@ResponseBody
 	public String getDraftDetails(HttpSession session) {
@@ -261,7 +410,7 @@ public class EcourtHomeController {
 		PetitionerDetails pDetails =null;
 
 		RespondentDetails rDetails = null;
-
+		ScrutionRemark rremark=null;
 		
 
 		for (RegisteredCaseDetails rcd : draftDetails) {
@@ -269,6 +418,11 @@ public class EcourtHomeController {
 			rDetails= new RespondentDetails();
 			pDetails =ecourtHomeService.getFirstPetitioner(rcd.getRcd_id());
 			rDetails=ecourtHomeService.getFirstRespondent(rcd.getRcd_id());
+			rremark=ecourtHomeService.getRemark(rcd.getRcd_id());
+			//System.out.println("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"+rremark.getSr_remrk());
+			if(rremark != null) {
+				rcd.setScrutionRemark(rremark);
+			}
 			        if(pDetails.getPt_id()!=null){
 			         rcd.setPetitionerDetails(pDetails);
 			        }
@@ -306,6 +460,29 @@ public class EcourtHomeController {
 		String jsonData = null;
 
 		response = ecourtHomeService.getPetitioner(doc);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/getAdvanceNotice", method = RequestMethod.GET)
+	@ResponseBody
+	public String getAdvanceNotice(HttpServletRequest request) {
+
+		String id = request.getParameter("docId");
+		List<Notice> response = null;
+
+		Long doc = new Long(id);
+		ActionResponse<Notice> pd = new ActionResponse<Notice>();
+		String jsonData = null;
+
+		response = ecourtHomeService.getNotice(doc);
 
 		if (response != null) {
 			pd.setResponse("TRUE");
@@ -365,6 +542,24 @@ public class EcourtHomeController {
 
 	}
 	
+	@RequestMapping(value = "/getCrimeDetail", method = RequestMethod.GET)
+	@ResponseBody
+	public String getCrimeDetail(HttpServletRequest request) {
+		String jsonData = "";
+		String id = request.getParameter("docId");
+		Long doc = new Long(id);
+		List<CrimeDetails> impugnedOrderList = ecourtHomeService.getCrimeDetails(doc);
+		ActionResponse<CrimeDetails> response = new ActionResponse<CrimeDetails>();
+		List<CrimeDetails> newImpugnedOrderList = new ArrayList<CrimeDetails>();
+		if (impugnedOrderList != null) {
+			response.setResponse("TRUE");
+			response.setModelList(impugnedOrderList);
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+	}
+	
 	@RequestMapping(value = "/getImpugnedOrder", method = RequestMethod.GET)
 	@ResponseBody
 	public String getImpugnedOrder(HttpServletRequest request) {
@@ -387,6 +582,42 @@ public class EcourtHomeController {
 			}
 			if(io.getIo_district()!=null){
 				District dt=ecourtHomeService.getDistrictById(temp.getIo_district());
+				temp.setDistrict(dt);
+			}
+			newImpugnedOrderList.add(temp);
+		}
+		if (impugnedOrderList != null) {
+			response.setResponse("TRUE");
+			response.setModelList(newImpugnedOrderList);
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/getSessionTrack", method = RequestMethod.GET)
+	@ResponseBody
+	public String getSessionTrack(HttpServletRequest request) {
+		String jsonData = "";
+		String id = request.getParameter("docId");
+		Long doc = new Long(id);
+		List<StNoDetails> impugnedOrderList = ecourtHomeService.getSessionTrack(doc);
+		ActionResponse<StNoDetails> response = new ActionResponse<StNoDetails>();
+		List<StNoDetails> newImpugnedOrderList = new ArrayList<StNoDetails>();
+		for(StNoDetails io:impugnedOrderList){
+			StNoDetails temp=new StNoDetails();
+			temp=io;
+			if(io.getsnd_hc_case_type()!=null){
+				CaseType ct=ecourtAddCaseService.getCaseTypeById(temp.getsnd_hc_case_type());
+				temp.setHcCaseType(ct);
+			}
+			if(io.getsnd_lc_case_type()!=null){
+				LowerCourtCaseType lc=ecourtAddCaseService.getLCCaseTypeById(temp.getsnd_lc_case_type());
+				temp.setLcCaseType(lc);
+			}
+			if(io.getsnd_district()!=null){
+				District dt=ecourtHomeService.getDistrictById(temp.getsnd_district());
 				temp.setDistrict(dt);
 			}
 			newImpugnedOrderList.add(temp);
@@ -470,6 +701,69 @@ System.out.println("");
 		return jsonData;
 
 	}
+	
+	@RequestMapping(value = "/getCNMList", method = RequestMethod.POST)
+	@ResponseBody
+	public String getCNMList(@RequestBody CaseType caseType) {
+
+		List<CaseNoticeMaster> response = null;
+
+		ActionResponse<CaseNoticeMaster> pd = new ActionResponse<CaseNoticeMaster>();
+		String jsonData = null;
+        System.out.println("");
+		response = ecourtHomeService.getCaseNoticeMasterList(caseType.getCt_flag());
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/getNDMList", method = RequestMethod.GET)
+	@ResponseBody
+	public String getNDMList() {
+
+		List<NoticeDepartmentMaster> response = null;
+
+		ActionResponse<NoticeDepartmentMaster> pd = new ActionResponse<NoticeDepartmentMaster>();
+		String jsonData = null;
+System.out.println("");
+		response = ecourtHomeService.getNoticeDeptMasterList();
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/getEstablishmentList", method = RequestMethod.GET)
+	@ResponseBody
+	public String getEstablishmentList() {
+
+		List<Establishment> response = null;
+
+		ActionResponse<Establishment> pd = new ActionResponse<Establishment>();
+		String jsonData = null;
+System.out.println("");
+		response = ecourtHomeService.getEstablishmentList();
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
 	@RequestMapping(value = "/getActMasterList", method = RequestMethod.GET)
 	@ResponseBody
 	public String getActMasterList() {
@@ -480,6 +774,68 @@ System.out.println("");
 		String jsonData = null;
 
 		response = ecourtHomeService.getActMaster();
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	
+	@RequestMapping(value = "/getActMasterList2024/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public String getActMasterList2024(@PathVariable Integer id) {
+
+		List<ActsectionMaster> response = null;
+
+		ActionResponse<ActsectionMaster> pd = new ActionResponse<ActsectionMaster>();
+		String jsonData = null;
+		String type=null;
+		
+		if(id==1) {
+			type="O";
+		}
+		else {
+			type="N";
+		}
+		
+
+		response = ecourtHomeService.getActMasterNew(type);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	
+	@RequestMapping(value = "/getSecMasterList2024/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public String getSecMasterList2024(@PathVariable Integer id) {
+
+		List<ActsectionMaster> response = null;
+
+		ActionResponse<ActsectionMaster> pd = new ActionResponse<ActsectionMaster>();
+		String jsonData = null;
+		String type=null;
+		
+		if(id==1) {
+			type="O";
+		}
+		else {
+			type="N";
+		}
+		
+
+		response = ecourtHomeService.getSecMasterNew(id);
 
 		if (response != null) {
 			pd.setResponse("TRUE");
@@ -598,13 +954,22 @@ System.out.println("");
 		Long dist_id=caseDetail.getRcd_dt_id();
 		String dates="";
 		List<Caveat> caveatList = new ArrayList<Caveat>() ;
-		
+		String lc_caseNo="";
+		Long lc_caseType =0l;
+		Long lc_caseYear2;
+		Integer lc_caseYear=0;
+		String date;
 		for(ImpugnedOrder im:impungedOrders){
 			if(im.getIo_decision_date()!=null){
 				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-				String date = formatter.format(im.getIo_decision_date());
+				date = formatter.format(im.getIo_decision_date());
 				date="'"+date+"'";
 				dates+=date+",";
+				
+				lc_caseNo =im.getIo_case_no();
+				lc_caseType=im.getIo_lc_case_type();
+				lc_caseYear2=im.getIo_case_year();
+				lc_caseYear =lc_caseYear2.intValue();
 			}
 		}
 		
@@ -612,6 +977,12 @@ System.out.println("");
 			dates=dates.substring(0, dates.length() - 1);
 		}
 		caveatList=ecourtHomeService.searchCaveat(ct_type,dist_id,dates);
+		
+		//creterby afnan start
+				
+		//caveatList=ecourtHomeService.searchCaveat2(lc_caseType,lc_caseNo,lc_caseYear,dates);
+		
+		// creterby afnan end
 		
 		
 		List<Caveat> newCaveatList=new ArrayList<Caveat>();

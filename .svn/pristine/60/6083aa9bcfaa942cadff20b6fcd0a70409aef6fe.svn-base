@@ -1,0 +1,120 @@
+package com.dms.model;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name="caveat_documents")
+public class CaveatDocuments {
+	
+	@Id 
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="caveat_documents_seq")
+	@SequenceGenerator(name="caveat_documents_seq", sequenceName="caveat_documents_seq", allocationSize=1)
+	@Column(name = "cd_id") 
+	private Long cd_id;
+	
+	@Column(name = "cd_cav_mid")
+	private Long cd_cav_mid;
+	
+	@Column (name="cd_document_name")
+	private String cd_document_name;
+	
+	@Column (name = "cd_no_of_pages")
+	private Integer cd_no_of_pages;
+	
+	@Column (name = "cd_uploaded_date")
+	private Date cd_uploaded_date;
+	
+	@Column (name = "cd_uploaded_by")
+	private Long cd_uploaded_by;
+	
+	@Column (name= "cd_rec_status")
+	private Integer cd_rec_status;
+	
+	@Column (name= "cd_sequence")
+	private Integer cd_sequence;
+
+	public Long getCd_id() {
+		return cd_id;
+	}
+
+	public void setCd_id(Long cd_id) {
+		this.cd_id = cd_id;
+	}
+
+	public Long getCd_cav_mid() {
+		return cd_cav_mid;
+	}
+
+	public void setCd_cav_mid(Long cd_cav_mid) {
+		this.cd_cav_mid = cd_cav_mid;
+	}
+
+	public String getCd_document_name() {
+		return cd_document_name;
+	}
+
+	public void setCd_document_name(String cd_document_name) {
+		this.cd_document_name = cd_document_name;
+	}
+
+	public Integer getCd_no_of_pages() {
+		return cd_no_of_pages;
+	}
+
+	public void setCd_no_of_pages(Integer cd_no_of_pages) {
+		this.cd_no_of_pages = cd_no_of_pages;
+	}
+
+	public Date getCd_uploaded_date() {
+		return cd_uploaded_date;
+	}
+
+	public void setCd_uploaded_date(Date cd_uploaded_date) {
+		this.cd_uploaded_date = cd_uploaded_date;
+	}
+
+	public Long getCd_uploaded_by() {
+		return cd_uploaded_by;
+	}
+
+	public void setCd_uploaded_by(Long cd_uploaded_by) {
+		this.cd_uploaded_by = cd_uploaded_by;
+	}
+
+	public Integer getCd_rec_status() {
+		return cd_rec_status;
+	}
+
+	public void setCd_rec_status(Integer cd_rec_status) {
+		this.cd_rec_status = cd_rec_status;
+	}
+
+	public Integer getCd_sequence() {
+		return cd_sequence;
+	}
+
+	public void setCd_sequence(Integer cd_sequence) {
+		this.cd_sequence = cd_sequence;
+	}
+
+	
+
+
+
+	
+}

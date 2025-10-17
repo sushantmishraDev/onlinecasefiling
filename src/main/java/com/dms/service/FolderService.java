@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,10 @@ import com.dms.model.Lookup;
 @Service
 public class FolderService {
 	
-	@PersistenceContext
+//	@PersistenceContext
+//	private EntityManager em;
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 	
 	private DataSource datasource;

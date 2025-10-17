@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +19,15 @@ import com.dms.model.PoliceStation;
 @Service
 public class LookupService {
 
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
+	
+	/*@PersistenceContext(unitName="persistenceUnitDMS")
+	@Qualifier(value = "entityManagerFactoryDMS")
+	private EntityManager emDMS;*/
 
 
 
@@ -173,8 +181,20 @@ public class LookupService {
 			result = (Lookup) em.createQuery(sql).setParameter("setname", setname).getSingleResult();
 		}catch(Exception e){
 			e.printStackTrace();
-		}return result;
+		}
+		return result;
 	}
+	
+	/*@Transactional
+	public Lookup getLookUpDMSObject(String setname) {
+		Lookup result = new Lookup() ;
+		try{			
+			String sql = "SELECT l FROM Lookup l WHERE l.lk_setname= :setname  AND l.lk_rec_status=1";
+			result = (Lookup) emDMS.createQuery(sql).setParameter("setname", setname).getSingleResult();
+		}catch(Exception e){
+			e.printStackTrace();
+		}return result;
+	}*/
 
 	
 	@Transactional

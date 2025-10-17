@@ -43,6 +43,17 @@ public class CaseFileDetail {
 	@Column(name="fd_rec_status")
 	private int fd_rec_status;
 	
+	@Column(name="fd_cr_by")
+	private Long fd_cr_by;
+	
+	public Long getFd_cr_by() {
+		return fd_cr_by;
+	}
+
+	public void setFd_cr_by(Long fd_cr_by) {
+		this.fd_cr_by = fd_cr_by;
+	}
+
 	@OneToOne
 	@JoinColumn(name="fd_case_type",referencedColumnName="ct_id",insertable=false,updatable=false)
 	private CaseType caseType;

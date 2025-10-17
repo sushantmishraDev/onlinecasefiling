@@ -1,5 +1,6 @@
 package com.dms.service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,14 +11,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dms.model.ActDetails;
 import com.dms.model.ActMaster;
+import com.dms.model.CaseAuthority;
 import com.dms.model.CaseCheckListMapping;
 import com.dms.model.CaseType;
 import com.dms.model.Caveat;
+import com.dms.model.CaveatAuthority;
 import com.dms.model.CaveatCheckListMapping;
 import com.dms.model.CaveatOld;
 import com.dms.model.CourtFee;
@@ -25,6 +29,7 @@ import com.dms.model.District;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.LowerCourtCaseType;
 import com.dms.model.LowerCourtTypes;
+import com.dms.model.NoticeValidation;
 import com.dms.model.PetitionUploaded;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RegisteredCaseDetails;
@@ -36,7 +41,11 @@ import com.dms.model.User;
 @Service
 public class CaseFileService {
 
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 
 	// Session session=em.unwrap(Session.class);
@@ -451,6 +460,16 @@ public class CaseFileService {
 		
 		return result;
 	}
+	
+	@Transactional
+	public NoticeValidation save(NoticeValidation r) {
+		NoticeValidation result=null;
+	    
+		  result=em.merge(r);
+		
+		return result;
+	}
+	
 	@Transactional
 	public District getDistrictById(Long id) {
 		District result=null;
@@ -467,15 +486,105 @@ public class CaseFileService {
 	}
 	
 	@Transactional
-	public boolean checkDateValidity(Long id)
-	{
+	public Date getDateValidty(Long id) {
+
+		Date rDate=null;
 		boolean flag=false;
+		Date d1=null;
 		
 		Date scrutinydate= (Date) em.createQuery("SELECT cm_cr_date from CaseCheckListMapping  where cm_rcd_mid =:id order by cm_id desc").setParameter("id", id).setMaxResults(1).getSingleResult();
 		
 		long difference = (scrutinydate.getTime()-new Date().getTime())/86400000; 
+	
+		SimpleDateFormat s=new SimpleDateFormat("yyyy-MM-dd");
+		String nDate=s.format(new Date());
+		try {
+			d1= s.parse(nDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long difference2 = (d1.getTime()-new Date().getTime())/86400000; 
+		long days2= Math.abs(difference2); 
 		long days= Math.abs(difference); 
-		if(days<=15)flag=true;
+		
+		long difDays=15-days2;
+		
+		System.out.println("diffdays"+difDays);
+		
+		
+			difDays=7;
+		
+		
+		
+		if(days<=difDays ) {
+			
+			flag=true;
+		}
+		
+		return rDate;
+	
+	}
+	
+	@Transactional
+	public List<CaseAuthority> getAuthorityDetails(Long id) {
+		List<CaseAuthority> result=null;
+		Query query=null;
+		query = em.createQuery("SELECT io from CaseAuthority io where io.cau_rec_status=1 and io.cau_rcd_mid=:id order by io.cau_id").setParameter("id", id);
+		result=query.getResultList();
+		return result;
+	}
+	
+	
+	@Transactional
+	public CaseAuthority addCaseAuthority(CaseAuthority imOrder) {
+		CaseAuthority io=null;
+		 try {
+			
+			io=em.merge(imOrder);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return io;
+	}
+	
+	@Transactional
+	public boolean checkDateValidity(Long id)
+	{
+		boolean flag=false;
+		Date d1=null;
+		
+		Date scrutinydate= (Date) em.createQuery("SELECT cm_cr_date from CaseCheckListMapping  where cm_rcd_mid =:id and cm_rec_status=1 order by cm_id desc").setParameter("id", id).setMaxResults(1).getSingleResult();
+		
+		long difference = (scrutinydate.getTime()-new Date().getTime())/86400000; 
+	
+		SimpleDateFormat s=new SimpleDateFormat("yyyy-MM-dd");
+		String nDate=s.format(new Date());
+		try {
+			d1= s.parse(nDate);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		long difference2 = (d1.getTime()-new Date().getTime())/86400000; 
+		long days2= Math.abs(difference2); 
+		long days= Math.abs(difference); 
+		
+		long difDays=15-days2;
+		
+		System.out.println("diffdays"+difDays);
+		
+		
+			//difDays=7;
+		
+		
+		
+		if(days<=difDays ) {
+			
+			flag=true;
+		}
 		
 		return flag;
 	}

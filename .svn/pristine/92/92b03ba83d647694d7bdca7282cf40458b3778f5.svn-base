@@ -1,0 +1,429 @@
+<jsp:include page="../../content/header.jsp"></jsp:include>
+<style>
+.form-horizontal.form-bordered .form-group>.control-label {
+  padding: 10px 15px 15px;
+}
+.form-horizontal.form-bordered .form-group>div {
+  padding: 5px;
+}
+  .form-control {
+    padding: 5px 8px;
+      height: 30px;
+  }
+    .add{
+    background-image: "/images/add.png";
+    }
+    .remove{
+    background-image: "/images/remove.png";
+    }
+</style>
+
+<div id="content" class="content" ng-controller="dataEntryCtrl" style="margin-left: 0px;">
+	<!-- begin row -->
+	<div class="row">
+		<!-- begin col-10 -->
+		<div class="col-md-11" style="float: none; margin: auto;">
+			<!-- begin panel -->
+			<div class="panel panel-inverse">
+				<div class="panel-heading">
+					<div class="panel-heading-btn">
+							
+					</div>
+
+					<h4 class="panel-title">Data Entry</h4>
+				</div>
+
+				<div class="panel-body">
+					<div class="col-md-6" >
+					
+					
+				 <jsp:include page="../../views/pdms/viewer.jsp"></jsp:include>
+					
+					</div>
+					
+					<div class="col-md-6" style="border-left: 1px solid #eee;">
+					<form class="form-horizontal form-bordered"	name="dataEntryForm" novalidate>
+					<div ng-show="errorList.length>0" class="alert alert-block alert-danger">
+						<ul>
+							<span ng-repeat="errors in errorList">
+									<li>{{errors.msg}}</li>
+							</span>
+						</ul>
+					</div>	
+					<div style="max-height: 450px; overflow-y: scroll;">
+							<input type="hidden" class="form-control"  value=${fd_id} id="fd_id" name="fd_id"  >	
+							<input type="hidden" class="form-control"  value=${fd_file_bar_code} id="fd_file_bar_code" name="fd_file_bar_code"  >	
+							
+							<div class="form-group" >
+								<label class="control-label col-md-5 col-sm-5">Case File No :</label>
+								<div class="col-md-6 col-sm-6" >	
+										<input class="form-control" type="text" disabled ng-model="caseFile.fd_case_no">			
+										</div>
+							</div>	
+							<div class="form-group" >
+								<label class="control-label col-md-5 col-sm-5">Case Year :</label>
+								<div class="col-md-6 col-sm-6" >	
+											<input class="form-control" type="text" ng-model="caseFile.fd_case_year" disabled>			
+										</div>
+							</div>	
+										
+							<div class="form-group" ng-repeat="data in metaDataList">													
+								<label class="control-label col-md-5 col-sm-5">{{data.metaField.mf_lable}} <span ng-if="data.metaField.mf_required_status">*</span> :</label>
+								<div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_type=='text'">													
+										<input class="form-control" type="text" placeholder="{{data.metaField.mf_lable}}" ng-model="data.md_value">
+								</div>
+								<div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='12'">
+								
+								<div class="input-group">
+									     <input type="text" class="form-control" datepicker-popup="{{format}}" 
+									            name="dt" ng-model="data.md_value" is-open="datepickers.dt" 
+									            datepicker-options="dateOptions" ng-required="true" 
+									            close-text="Close" />
+									      <span class="input-group-btn">
+									        <button class="btn btn-default" ng-click="open($event,'dt')">
+									            <i class="glyphicon glyphicon-calendar"></i></button>
+									      </span>
+									    </div>    
+								</div>    
+								<div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='24'">  
+									    <div class="input-group">
+									     <input type="text" class="form-control" datepicker-popup="{{format}}" 
+									            name="dtSecond" ng-model="data.md_value" 
+									            is-open="datepickers.dtSecond" datepicker-options="dateOptions" 
+									            ng-required="true" close-text="Close" />
+									      <span class="input-group-btn">
+									        <button class="btn btn-default" ng-click="open($event,'dtSecond')">
+									            <i class="glyphicon glyphicon-calendar"></i></button>
+									      </span>
+									    </div>    
+								 </div>
+								 <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='30'">  
+									    <div class="input-group">
+									     <input type="text" class="form-control" datepicker-popup="{{format}}" 
+									            name="dtthird" ng-model="data.md_value" 
+									            is-open="datepickers.dtthird" datepicker-options="dateOptions" 
+									            ng-required="true" close-text="Close" />
+									      <span class="input-group-btn">
+									        <button class="btn btn-default" ng-click="open($event,'dtthird')">
+									            <i class="glyphicon glyphicon-calendar"></i></button>
+									      </span>
+									    </div>    
+								 </div>
+								  <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='10'|| data.metaField.mf_id=='17'|| data.metaField.mf_id=='32'|| data.metaField.mf_id=='26'|| data.metaField.mf_id=='20'">
+								  		<select
+											ng-options="item.lk_id as item.lk_longname for item in districtList"
+											class="form-control" number-converter
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>
+								 <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='27'|| data.metaField.mf_id=='21'">
+								  		<select
+											ng-options="item.lk_id as item.lk_longname for item in lookUpMaster | filter: {lk_setname: 'CASE_TYPE'}"
+											class="form-control" number-converter
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>
+								  
+								  <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='11'">								
+								     <select  id="md_value" class="form-control" name="md_value" ng-model="data.md_value"
+										ng-options="data.jg_id as data.jg_name  for data in judgeList | filter: {jg_type: 1}" number-converter
+										ng-selected="1" required>  
+										</select>												             				
+								 </div>
+								 <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='5'">								
+								     <select  id="md_value" class="form-control" name="md_value" ng-model="data.md_value"
+										ng-options="data.cc_id as data.cc_description+' '+data.cc_code  for data in categoryCodeList | orderBy:'data.cc_description'" number-converter
+										ng-selected="1" required>  
+										</select>												             				
+								 </div>
+								   <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='25'">
+								  		<select
+											ng-options="item.jg_id as item.jg_name for item in judgeList | filter: {jg_type: 2}" number-converter
+											class="form-control"
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>
+								  <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='31'">
+								  		<select
+											ng-options="item.jg_id as item.jg_name for item in judgeList | filter: {jg_type: 3}"
+											class="form-control" number-converter
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>
+								  <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='19'">
+								  		<select 
+											ng-options="item.ps_id as item.ps_name for item in policestaitonList"
+											class="form-control" number-converter
+											 ng-model="data.md_value" required>
+										</select>
+																		
+								 </div>
+								 <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='1'">
+								  		<select
+											ng-options="benchCode.lk_id as benchCode.lk_longname for benchCode in benchCodeList"
+											class="form-control"
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>
+								  <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='2'">
+								  		<select
+											ng-options="caseType.lk_id as caseType.lk_longname for caseType in caseTypeList" number-converter	class="form-control"
+											 ng-model="data.md_value" required>
+										</select>																
+								 </div>
+								 <div class="col-md-6 col-sm-6" ng-if="data.metaField.mf_id=='4'">
+								  		<select
+											ng-options="year.lk_id as year.lk_longname for year in yearList" class="form-control"
+											 ng-model="data.md_value" required>
+										</select>									
+								 </div>	
+							 	 <img src="${pageContext.request.contextPath}/images/plus.png" style="width: 25px;" ng-click="addRow(data.metaField.mf_id,$index);" ng-show="data.metaField.mf_add_multiple && data.flag==0 " />						 
+								 <img src="${pageContext.request.contextPath}/images/minus.png" style="width: 25px;" ng-click="removeRow(data.metaField.mf_id,$index);" ng-show="data.metaField.mf_add_multiple && data.flag==1" />						 
+								 
+								<!--  <div class="col-md-1 col-sm-1 add" ng-show="data.metaField.mf_add_multiple && data.flag==0 " ng-click="addRow(data.metaField.mf_id,$index);">ADD						</div>
+								 <div class="col-md-1 col-sm-1 remove" ng-show="data.metaField.mf_add_multiple && data.flag==1" ng-click="removeRow(data.metaField.mf_id,$index);">REMOVE								</div>
+							 -->
+							</div>
+							<div class="form-group">	
+								<label class="control-label col-md-6 col-sm-6"></label>					
+								<div class="col-md-12 col-sm-12">
+									<button type="submit" class="btn btn-danger" ng-click="metaDataSave(metaFieldList)">Save</button>
+								
+									<button type="submit" class="btn btn-danger" ng-click="metaDataSubmit(metaFieldList)">Submit</button>
+								
+									<a class="btn btn-danger" href="${pageContext.request.contextPath}/casefile/index">Cancel</a>
+								</div>
+							</div>						
+					</form>					
+					</div>
+				</div>
+			</div>
+			<!-- end panel -->
+		</div>
+		<!-- end col-10 -->
+	</div>
+	<!-- end row -->
+	<div class="modal fade" id="receipt_Modal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog ">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: black;">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<strong style="color: #FBFCFD;">Inward Receipt</strong>
+					</h4>
+				</div>
+				<div class="modal-body">
+					<div class="panel-body">
+
+						<table id="data-table"
+							class="table table-striped table-bordered nowrap table-hover"
+							width="100%">
+							<thead>
+							</thead>
+							<tbody>
+							
+							<tr>
+
+									<td>Inward No</td>
+									<td>{{masterentity.ib_inward_number}}</td>
+								</tr>
+								
+								<tr>
+
+									<td>Bench Code</td>
+									<td>{{masterentity.ib_branch}}</td>
+								</tr>
+								<tr>
+
+									<td>Bundle Number</td>
+									<td>{{masterentity.ib_bundle_number}}</td>
+								</tr>
+								<tr>
+									<td>Case Type</td>
+									<td>{{masterentity.ib_case_type}}</td>
+								</tr>
+								<tr>
+
+									<td>Case File Count</td>
+									<td>{{masterentity.ib_case_file_count}}</td>
+								</tr>
+								<tr>
+
+									<td>AHC User</td>
+									<td>{{masterentity.ib_in_ahc_user}}</td>
+								</tr>
+								<tr>
+
+									<td>SCHIL User</td>
+									<td>${username}</td>
+								</tr>
+								<tr>
+
+									<td>Date</td>
+									<td>{{masterentity.ib_inward_date}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-md-4 col-sm-4"></label>
+						<div class="col-md-6 col-sm-6">
+							<a href="javascript:;"
+								class="btn btn-success
+									 data-dismiss="modal" >Print</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="ib_Modal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog ">
+			<div class="modal-content">
+				<div class="modal-header" style="background-color: black;">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">
+						<strong style="color: #FBFCFD;"> Bundle Creation </strong>
+					</h4>
+				</div>
+				<%@ include file="inward_bundle_form.jsp"%>
+			</div>
+		</div>
+	</div>
+
+
+
+
+</div>
+
+<!-- begin theme-panel -->
+<div class="theme-panel">
+	<a href="javascript:;" data-click="theme-panel-expand"
+		class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
+	<div class="theme-panel-content">
+		<h5 class="m-t-0">Color Theme</h5>
+		<ul class="theme-list clearfix">
+			<li class="active"><a href="javascript:;" class="bg-green"
+				data-theme="default" data-click="theme-selector"
+				data-toggle="tooltip" data-trigger="hover" data-container="body"
+				data-title="Default">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-red" data-theme="red"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Red">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-blue" data-theme="blue"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Blue">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-purple" data-theme="purple"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Purple">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-orange" data-theme="orange"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Orange">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-black" data-theme="black"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Black">&nbsp;</a></li>
+		</ul>
+		<div class="divider"></div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Header Styling</div>
+			<div class="col-md-7">
+				<select name="header-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">inverse</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label">Header</div>
+			<div class="col-md-7">
+				<select name="header-fixed" class="form-control input-sm">
+					<option value="1">fixed</option>
+					<option value="2">default</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Sidebar Styling</div>
+			<div class="col-md-7">
+				<select name="sidebar-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">grid</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label">Sidebar</div>
+			<div class="col-md-7">
+				<select name="sidebar-fixed" class="form-control input-sm">
+					<option value="1">fixed</option>
+					<option value="2">default</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Sidebar
+				Gradient</div>
+			<div class="col-md-7">
+				<select name="content-gradient" class="form-control input-sm">
+					<option value="1">disabled</option>
+					<option value="2">enabled</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Content Styling</div>
+			<div class="col-md-7">
+				<select name="content-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">black</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-12">
+				<a href="#" class="btn btn-inverse btn-block btn-sm"
+					data-click="reset-local-storage"><i class="fa fa-refresh m-r-3"></i>
+					Reset Local Storage</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end theme-panel -->
+
+<!-- begin scroll to top btn -->
+<a href="javascript:;"
+	class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+	data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+<!-- end scroll to top btn -->
+
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/scripts/controllers/dataEntryController.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>
+
+<script> 
+	$(function() {
+		$(".btn").click(function() {
+			$(this).button('loading').delay(1000).queue(function() {
+				$(this).button('reset');
+				$(this).dequeue();
+			});
+		});
+	});
+
+	$(document).ready(function() {
+		App.init();
+
+	});
+</script>
+</body>
+</html>

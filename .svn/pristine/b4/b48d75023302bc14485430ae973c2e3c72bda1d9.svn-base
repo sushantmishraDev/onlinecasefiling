@@ -1,0 +1,189 @@
+package com.dms.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.Application;
+import com.dms.model.ApplicationCheckListMapping;
+import com.dms.model.CaseCheckListMapping;
+import com.dms.model.Caveat;
+import com.dms.model.CaveatCheckListMapping;
+import com.dms.model.CheckList;
+import com.dms.model.IndexField;
+import com.dms.model.PetitionerDetails;
+import com.dms.model.RegisteredCaseDetails;
+import com.dms.model.RespondentDetails;
+import com.dms.model.StampReporterData;
+
+@Service
+public class ScrutinyService 
+{
+	@PersistenceContext
+	private EntityManager em;
+	
+	@Transactional
+	public IndexField getIndexField(Long if_id) 
+	{
+		IndexField result =new IndexField();
+		try {
+			result=(IndexField) em.createQuery("select ifd from IndexField ifd where ifd.if_id=:if_id ").setParameter("if_id", if_id).getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@Transactional
+	public List<CheckList> getCheckList(String type)
+	{
+		List<CheckList> result=null;
+		Query query = em.createQuery(" SELECT cl from CheckList cl where cl.type=:type");
+		query.setParameter("type", type);
+		result=query.getResultList();
+		return result;
+	}
+	
+	@Transactional
+	public CaseCheckListMapping saveCheckList(CaseCheckListMapping cclm) {
+
+		CaseCheckListMapping master = null;
+		try {
+			master = em.merge(cclm);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	@Transactional
+	public CaveatCheckListMapping saveCaveatCheckList(CaveatCheckListMapping mapping) {
+		// TODO Auto-generated method stub
+		CaveatCheckListMapping master = null;
+		try {
+			master = em.merge(mapping);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	/*@Transactional
+	public List<Object> getUserList(String rolename, Long stage) {
+		// TODO Auto-generated method stub
+		List<Object> result1=new ArrayList<Object>();
+		
+		
+			Query query=em.createNativeQuery("select count(*),d.rcd_assign_to from (select count(*),c.ib_mid,c.fd_assign_to from Case_File_Details c where c.fd_stage_lid="+stage+" and  c.fd_assign_to in("
+					+ "select u.um_id from User_master u where u.um_vendor_id ="+teamId+" and u.um_avilable_status='Y' and u.um_shift_lid="+shiftId+" and u.um_rec_status=1 and u.um_id In(select ur.ur_um_mid from User_Role ur where ur.ur_role_id =(select l.lk_id from Lookup l"
+					+ " where l.lk_longname='"+rolename+"'))) group by  c.ib_mid,c.fd_assign_to) d group by d.fd_assign_to");
+			
+			System.out.println("query2="+query);
+			try{
+			result1=query.getResultList();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+		return result1;
+	}*/
+	@Transactional
+	public ApplicationCheckListMapping saveApplicationCheckList(ApplicationCheckListMapping mapping) {
+		// TODO Auto-generated method stub
+		ApplicationCheckListMapping master = null;
+		try {
+			master = em.merge(mapping);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	@Transactional
+	public List<RegisteredCaseDetails> getCaseDetails(Long um_id) {
+	List<RegisteredCaseDetails> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT rcd FROM RegisteredCaseDetails rcd where rcd.rcd_assign_to ="+um_id+" order by rcd.rcd_id ").getResultList();
+		return rcdDetails;
+	}
+	
+	@Transactional
+	public List<Application> getApplicationDetails(Long um_id) {
+		// TODO Auto-generated method stub
+		List<Application> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT ap FROM Application ap where ap.ap_assign_to ="+um_id+" order by ap.ap_id ").getResultList();
+		return rcdDetails;
+	}
+
+	@Transactional
+	public List<Caveat> getCaveatDetails(Long um_id) {
+		List<Caveat> rcdDetails=null;
+		rcdDetails= em.createQuery("SELECT cav FROM Caveat cav where cav.cav_assign_to ="+um_id+" order by cav.cav_id ").getResultList();
+		return rcdDetails;
+	}
+	
+	@Transactional
+	public RegisteredCaseDetails getRegisterCase(Long id) {
+
+		RegisteredCaseDetails result=null;
+	    Query query=null;
+		query = em.createQuery(" SELECT rcd from RegisteredCaseDetails rcd where rcd.rcd_id=:id").setParameter("id", id);
+		result=(RegisteredCaseDetails) query.getSingleResult();
+		
+		return result;
+	}
+
+	 public List<CaseCheckListMapping> getCaseCheckList(Long doc) {
+		// TODO Auto-generated method stub
+		List<CaseCheckListMapping> result=null;
+		Query query=null;
+		query = em.createQuery("SELECT c from CaseCheckListMapping c where c.cm_rec_status=1 and c.cm_rcd_mid=:id").setParameter("id", doc);
+		result=query.getResultList();
+		return result;
+	}
+   public List<CaveatCheckListMapping> getCaveatCheckList(Long doc) {
+		// TODO Auto-generated method stub
+		List<CaveatCheckListMapping> result=null;
+		Query query=null;
+		query = em.createQuery("SELECT c from CaveatCheckListMapping c where c.cm_rec_status=1 and c.cm_cav_mid=:id").setParameter("id", doc);
+		result=query.getResultList();
+		return result;
+	}
+   public List<ApplicationCheckListMapping> getApplicationCheckList(Long doc) {
+		// TODO Auto-generated method stub
+		List<ApplicationCheckListMapping> result=null;
+		Query query=null;
+		query = em.createQuery("SELECT c from ApplicationCheckListMapping c where c.cm_rec_status=1 and c.cm_ap_mid=:id").setParameter("id", doc);
+		result=query.getResultList();
+		return result;
+	}
+   	
+   	@Transactional
+	public StampReporterData saveStampReporterData(StampReporterData srd) {
+		// TODO Auto-generated method stub
+		StampReporterData result=null;
+	    result=em.merge(srd);
+		
+	    return result;
+	}
+   	@Transactional
+	public StampReporterData getStampReporterData(Long id) {
+
+		StampReporterData result=null;
+	    Query query=null;
+		query = em.createQuery("SELECT srd from StampReporterData srd where srd.srd_rcd_mid=:id").setParameter("id", id);
+		try {
+			result=(StampReporterData) query.getSingleResult();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return result;
+	}
+
+}

@@ -1,4 +1,4 @@
-<jsp:include page="../../../content/header.jsp"></jsp:include>
+<%-- <jsp:include page="../../../content/header.jsp"></jsp:include> --%>
 
 <div id="content" class="content" ng-controller="userMstrCtrl">
 	<!-- begin row -->

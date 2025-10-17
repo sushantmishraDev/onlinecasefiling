@@ -33,6 +33,8 @@ EDMSApp.controller('applicationDraftViewController',['$scope','$http',function (
 
   $scope.count='';
  $scope.registerCase={};
+ 
+ $scope.radioSelect="draft";
 
   $scope.courtFeeList=[];
 
@@ -59,6 +61,40 @@ EDMSApp.controller('applicationDraftViewController',['$scope','$http',function (
 			});	
     	   }
 	  }
+      
+      $scope.changeCase=function(selected){
+    	  console.log(selected);
+    	  $scope.applicationList=[];
+    	  if(selected=="passed"){
+    			$http.get(urlBase+'application/getPassedApplicationDetails').
+    		      success(function (data) {
+    		    	  
+    		      	$scope.count=data.data;
+    		      	$scope.applicationList=data.modelList;
+    		      	console.log($scope.applicationList);
+    		    	  
+    		      }).
+    		      error(function(data, status, headers, config) {
+    		      	console.log("Error in getting tree data");
+    		      });
+    	  }
+    	  else if(selected=="defect"){
+    		  $http.get(urlBase+'application/getDefectedApplicationDetails').
+		      success(function (data) {
+		    	  
+		      	$scope.count=data.data;
+		      	$scope.applicationList=data.modelList;
+		      	console.log($scope.applicationList);
+		    	  
+		      }).
+		      error(function(data, status, headers, config) {
+		      	console.log("Error in getting tree data");
+		      });
+    	  }
+    	  else{
+    		  getApplicationDetails();
+    	  }
+      }
   
   function getApplicationDetails(){
 	  	$http.get(urlBase+'application/getApplicationDetails').
@@ -66,6 +102,7 @@ EDMSApp.controller('applicationDraftViewController',['$scope','$http',function (
     	  
       	$scope.count=data.data;
       	$scope.applicationList=data.modelList;
+      	console.log($scope.applicationList);
     	  
       }).
       error(function(data, status, headers, config) {
@@ -76,6 +113,7 @@ EDMSApp.controller('applicationDraftViewController',['$scope','$http',function (
   
   
   $scope.viewDetails=function(id){
+	  debugger
 		window.open(urlBase+"application/applicationDraftView/"+id,'_blank');
 	  
 }
@@ -254,7 +292,18 @@ $http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
 	};
 
 
-
+	$scope.getStages = function(application) {
+		$scope.application = application;
+		console.log("jhdbfjsbjf sj fjs",application.ap_id);
+		$http.get(urlBase + 'application/getApplicationStages', {
+			params : {
+				'docId' : application.ap_id
+			}
+		}).success(function(data, status, headers, config) {
+			$scope.applicationHistory = data.modelList;
+		}).error(function(data, status, headers, config) {
+		});
+	}
 
 
 

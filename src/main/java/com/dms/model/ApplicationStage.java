@@ -2,13 +2,15 @@ package com.dms.model;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -34,6 +36,17 @@ public class ApplicationStage
 	
 	@Column(name="as_cr_date")
 	private Date as_cr_date;
+	
+	
+	@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "as_stage_lid",insertable = false, updatable = false)
+	private Lookup lkStage;
+	
+	@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "as_cr_by",insertable = false, updatable = false)
+	private User userMaster;
+	
+	
 
 	public Long getAs_id() {
 		return as_id;
@@ -73,6 +86,22 @@ public class ApplicationStage
 
 	public void setAs_cr_date(Date as_cr_date) {
 		this.as_cr_date = as_cr_date;
+	}
+
+	public Lookup getLkStage() {
+		return lkStage;
+	}
+
+	public void setLkStage(Lookup lkStage) {
+		this.lkStage = lkStage;
+	}
+
+	public User getUserMaster() {
+		return userMaster;
+	}
+
+	public void setUserMaster(User userMaster) {
+		this.userMaster = userMaster;
 	}
 	
 	

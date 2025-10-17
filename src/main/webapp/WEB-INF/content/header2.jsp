@@ -10,6 +10,7 @@
 
 <link rel="icon" href="${pageContext.request.contextPath}/images/favicon.ico"/>
 <link rel='stylesheet' href='${pageContext.request.contextPath}/css/bootstrap/angular-datepicker.css'>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/editor.css'>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Allahabad High Court e-Filing</title>
 
@@ -33,6 +34,7 @@ String scrutinycaveat="";
 String scrutinyapplication="";
 String olreport="";
 String amendmenthistory="";
+String defectRemoveByOrder="";
 String uri=(String) request.getAttribute("javax.servlet.forward.request_uri");
 if(uri.equals("/onlinecasefiling/ecourt/ecourtHome"))
 	home="active";
@@ -52,6 +54,8 @@ if(uri.equals("/onlinecasefiling/olreport/manage"))
 	olreport="active";
 if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
 	amendmenthistory="active";
+if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
+	defectRemoveByOrder="active";
 
 %>
 <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
@@ -69,7 +73,7 @@ if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
 				<ul class="nav navbar-nav navbar-right">
 					<li class="dropdown navbar-user">
 						<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
-							<img src="${pageContext.request.contextPath}/assets/img/user-13.jpg" alt="" /> 
+							<img src="${pageContext.request.contextPath}/assets/img/ahc.jpg" alt="" /> 
 							<span class="hidden-xs"><%=user.getUm_fullname() %></span> <b class="caret"></b>
 						</a>
 						  <ul class="dropdown-menu animated fadeInLeft">
@@ -108,7 +112,7 @@ if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
 					<% } %>
 					<% if(role.equals("Advocate") || role.equals("InPerson")){ %>
 					<li class="has-sub <%=newcase %>">
-						<a href="${pageContext.request.contextPath}/ecourt/addCase">
+						<a href="${pageContext.request.contextPath}/ecourt_add_case/addCaseDetail">
 						<i class="fa fa-file-o"></i>
 							<span>Fresh Case</span>
 					    </a>
@@ -119,16 +123,28 @@ if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
 							<span>Caveat</span>
 							</a>
 					</li>
+					<%-- <li class="has-sub <%=newapplication %>">
+						<a href="${pageContext.request.contextPath}/ecourt/addApplication">
+						<i class="fa fa-file-o"></i>
+							<span>Pending Cases(Misc. Appl./Docs.)</span>
+							</a>
+					</li> --%>
 					<li class="has-sub <%=newapplication %>">
 						<a href="${pageContext.request.contextPath}/searchcasefile/search">
 						<i class="fa fa-file-o"></i>
-							<span>Pending Cases(Misc. Appl./Docs.)</span>
+							<span>Application/Document</span>
 							</a>
 					</li>
 					<li class="has-sub <%=amendmenthistory %>">
 						<a href="${pageContext.request.contextPath}/amendmenthistory/manage">
 						<i class="fa fa-file-o"></i>
 							<span>Amendments</span>
+					    </a>
+					</li>
+					<li class="has-sub <%=defectRemoveByOrder %>">
+						<a href="${pageContext.request.contextPath}/defectRemovalByOrder/manage">
+						<i class="fa fa-file-o"></i>
+							<span>Defect Removal By Court's Order</span>
 					    </a>
 					</li>
 					<% } %>
@@ -155,7 +171,7 @@ if(uri.equals("/onlinecasefiling/amendmenthistory/manage"))
 					</li>
 					<% }} %> --%>
 					<li class="has-sub ">
-						<a href="javascript:;">
+						<a href="${pageContext.request.contextPath}/ecourt/help">
 						<i class="fa fa-info-circle"></i>
 							<span>Help</span>
 					    </a>

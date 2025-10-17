@@ -1,8 +1,14 @@
 package com.dms.controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.dms.model.ActionResponse;
+import com.dms.model.AllowEfiling;
 import com.dms.model.Application;
 import com.dms.model.ApplicationCheckListMapping;
 import com.dms.model.ApplicationCourtFee;
@@ -36,18 +43,33 @@ import com.dms.model.ApplicationStage;
 import com.dms.model.ApplicationTypes;
 import com.dms.model.ApplicationUploaded;
 import com.dms.model.BSApplicationCheckListMapping;
-import com.dms.model.CaseFileStage;
+import com.dms.model.BindedEntity;
+import com.dms.model.CaseFileDetail;
 import com.dms.model.IndexField;
 import com.dms.model.Lookup;
+import com.dms.model.PetitionerDetails;
+import com.dms.model.SmsLog;
+import com.dms.model.SubApplication;
 import com.dms.model.User;
 import com.dms.model.UserRole;
 import com.dms.service.ApplicationService;
 import com.dms.service.CaseFileStageService;
+import com.dms.service.EcourtAddCaseService;
 import com.dms.service.LookupService;
+import com.dms.service.ScrutinyService;
 import com.dms.service.UserRoleService;
+import com.dms.service.UserService;
 import com.dms.utility.GlobalFunction;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 
 @Controller
 @RequestMapping("/application")
@@ -60,6 +82,9 @@ public class ApplicationController
 	private ApplicationService applicationService;
 	
 	@Autowired
+	private ScrutinyService scrutinyService;
+	
+	@Autowired
 	private LookupService lookupService;
 	
 	@Autowired
@@ -67,6 +92,12 @@ public class ApplicationController
 	
 	@Autowired
 	private CaseFileStageService caseFileStageService;
+	
+	@Autowired
+	private EcourtAddCaseService ecourtAddCaseService;
+	
+	@Autowired
+	private UserService userService;
 	
 	
 	public ApplicationController()
@@ -105,11 +136,14 @@ public class ApplicationController
 				{
 					viewname="/application/addApplication";					
 				}
-				else if(app.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
+				else if(app.getCaseStage().getLk_id().equals(1000041L))
 				{
-					 if(app.getAp_at_mid()==3L || app.getAp_at_mid()==25L || app.getAp_at_mid()==42L || app.getAp_at_mid()==46L){
+					/* if(app.getAp_at_mid()==3L || app.getAp_at_mid()==25L || app.getAp_at_mid()==42L || app.getAp_at_mid()==46L){
 					          flag=applicationService.checkBsDateValidity(app.getAp_id());
-					 }
+					 }*/
+					if (false) {
+						
+					}
 					 else{
 						   flag=applicationService.checkDateValidity(app.getAp_id());
 					 }
@@ -143,6 +177,58 @@ public class ApplicationController
 		return viewname;
 
 	}
+	
+	
+	@RequestMapping(value = "/getCaseDetails/{id}", method = RequestMethod.GET)
+	public @ResponseBody String getCaseDetails(@PathVariable("id") Long docId) {
+		ActionResponse<Object[]> response = new ActionResponse<Object[]>();
+		CaseFileDetail fd=applicationService.getCaseFile(docId);
+		String jsonData = "";
+		/*Object[] types = noticeService.getCaseDetails("WRIC", 1, 2022);*/
+		
+		Object[] types = applicationService.getCaseDetails(fd.getCaseType().getCt_label(),Integer.parseInt(fd.getFd_case_no()),fd.getFd_case_year());
+		
+		/*List<Object> jgNmae = noticeService.getJudgeName(types[8].toString());*/
+		
+		response.setData("TRUE");
+		response.setModelData(types);
+		/*response.setDataList(jgNmae);*/
+		
+		
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/getPet/{id}", method = RequestMethod.GET)
+	public @ResponseBody String getPet(@PathVariable("id") String cino) {
+		ActionResponse<List<Object[]>> response = new ActionResponse<List<Object[]>>();
+		String jsonData = "";
+		List<Object[]> types = applicationService.getPetCivic(cino);
+		
+		response.setData("TRUE");
+		response.setModelData(types);
+		
+		
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/getRes/{id}", method = RequestMethod.GET)
+	public @ResponseBody String getRes(@PathVariable("id") String cino) {
+		ActionResponse<List<Object[]>> response = new ActionResponse<List<Object[]>>();
+		String jsonData = "";
+		List<Object[]> types = applicationService.getResCivic(cino);
+		
+		response.setData("TRUE");
+		response.setModelData(types);
+		
+		
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+	
+	
 	@RequestMapping(value = "/previewList/{id}", method = RequestMethod.GET)
 	public String previewList(Model model, @PathVariable Integer id) {
 
@@ -174,44 +260,258 @@ public class ApplicationController
 
 	}
 	
+	public void createNoticePdf(Application officeRpt,String path ) throws IOException {
+		 Document doc=new Document();
+		 
+		 HTMLWorker htmlWorker = new HTMLWorker(doc);
+		 
+			Font underlin =new Font(Font.FontFamily.HELVETICA  , 16, Font.BOLDITALIC);
+			 
+			 PdfWriter writer;
+			try {
+				writer = PdfWriter.getInstance(doc, new FileOutputStream(path));
+			
+			 
+			 doc.open();
+			/* Paragraph title=new Paragraph(Font.BOLDITALIC,"Office Report");
+			 title.setFont(underlin);
+			
+			 title.setAlignment(Element.ALIGN_CENTER);*/
+			 
+			 Chunk title1=new Chunk("IN THE HIGH COURT OF JUDICATURE AT ALLAHABAD");
+	          
+			 //title1.setUnderline(0.1f, -2f);
+			 
+			 Paragraph title=new Paragraph(title1);
+			 title.setAlignment(Element.ALIGN_CENTER);
+			 
+			 
+			 
+			 Chunk title2=new Chunk("*******************");
+	          
+			 //title1.setUnderline(0.1f, -2f);
+			 
+			 Paragraph title3=new Paragraph(title2);
+			 title3.setAlignment(Element.ALIGN_CENTER);
+			 //title.setFont(underlin);
+			 
+			 
+			doc.add(title);		
+			doc.add(title3);	
+			 Paragraph pr=new Paragraph("LISTING APPLICATION NO ---- OF 2023");
+			 pr.setAlignment(Element.ALIGN_CENTER);
+			 title3.setAlignment(Element.ALIGN_CENTER);
+			doc.add(pr);
+			
+			/*doc.add(Chunk.NEWLINE);
+			doc.add(Chunk.NEWLINE);*/
+			
+			 Paragraph desc=new Paragraph("To,");
+			 desc.setAlignment(Element.ALIGN_LEFT);
+			 
+			 doc.add(desc);		
+			
+			htmlWorker.parse(new StringReader("<br><br>"+officeRpt.getAp_lstng_desc()));
+			
+			
+			 Chunk prayer=new Chunk("Prayer");
+	          
+			 //title1.setUnderline(0.1f, -2f);
+			 
+			 Paragraph prayer1=new Paragraph(prayer);
+			 prayer1.setAlignment(Element.ALIGN_CENTER);
+			 //title.setFont(underlin);
+			 
+			 
+			doc.add(prayer1);		
+			
+			htmlWorker.parse(new StringReader("<br><br>"+officeRpt.getAp_lstng_prayer()));
+			 
+			// doc.add(new Paragraph("\n\n"+officeRpt.getOrd_remark()));
+			 
+			 doc.add(Chunk.NEWLINE);
+			 doc.add(new Chunk().NEWLINE);
+			 doc.add(new Chunk().NEWLINE);
+/*				 Paragraph dated=new Paragraph(Font.BOLDITALIC,"Dated");
+			 dated.add("\n\n\n"+officeRpt.getOrd_created());
+			 dated.setAlignment(Element.ALIGN_LEFT);
+			 
+			 doc.add(dated);
+			 
+			
+			
+			 
+			 
+			 User createdUser=usermaster.getByuserid(officeRpt.getOrd_created_by());
+			 Paragraph createdBy=new Paragraph(Font.BOLDITALIC,"Author");
+			 createdBy.add("\n\n\n"+createdUser.getUm_fullname());
+			 createdBy.setAlignment(Element.ALIGN_RIGHT);
+			 
+			 doc.add(createdBy);*/
+			 
+			/* User createdUser=usermaster.getByuserid(officeRpt.getOrd_created_by());*/
+			 Chunk glue = new Chunk(new VerticalPositionMark());
+			 Paragraph p = new Paragraph(Font.BOLDITALIC,"Dated");
+			 //p.add("\n\n\n"+officeRpt.getOrd_created());
+			 
+			 
+			 
+			 
+			 p.add(new Chunk(glue));
+			 p.add("Submitted By");
+			 doc.add(p);
+			 //String createdDate=DateFormat.getDateInstance().format(officeRpt.getAp_lstng_desc());
+			 Paragraph p1 = new Paragraph("25-05-2023");
+			 p1.add(new Chunk(glue));
+			 p1.add("sushant");
+			
+			 doc.add(p1);
+			 
+			 
+			 
+			 doc.close();
+			 writer.close();
+			 
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (com.itextpdf.text.DocumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
 
 	
 	@RequestMapping(value = "/addApplication", method = RequestMethod.POST)
 	@ResponseBody
-	public String addRegisterCase(@RequestBody Application application,HttpSession session) 
+	/*public String addRegisterCase(@RequestBody Application application,HttpSession session) 
+	{*/
+	public String addRegisterApplication(@RequestBody Application bindedEntity,HttpSession session) 
 	{
 		User user = (User) session.getAttribute("USER");
 		ActionResponse<Application> rd = new ActionResponse<Application>();
 		String jsonData = null;
+		Application application;
 		
 		Lookup lkStage=lookupService.getLookup("ECOURT_STAGE", "DRAFT");
 		
-		if(application.getAp_id()==null)
+		if(bindedEntity.getAp_id()==null)
 		{			
-			application.setAp_cr_by(user.getUm_id());
-			application.setAp_assign_to(user.getUm_id());
-			application.setAp_cr_date(new Date());
-			application.setAp_stage_lid(lkStage.getLk_id());
+			bindedEntity.setAp_cr_by(user.getUm_id());
+			bindedEntity.setAp_assign_to(user.getUm_id());
+			bindedEntity.setAp_cr_date(new Date());
+			bindedEntity.setAp_stage_lid(lkStage.getLk_id());
 			
-			application=applicationService.addApplication(application);
+			/* application=applicationService.addApplication(bindedEntity);*/
+			 
+		/*	 for (int i = 0; i < bindedEntity.getOtherAppNos().size(); i++) 
+				{
+					if (bindedEntity.getOtherAppNos().get(i).getAt_id() != null) 
+					{
+						applicationService.saveSubApplication(application,
+								bindedEntity.getOtherAppNos().get(i));
+					}
+				}*/
+			application=applicationService.addApplication(bindedEntity);
+			 
+			 for (int i = 0; i < bindedEntity.getSubApplication().size(); i++) 
+				{
+					if (bindedEntity.getSubApplication().get(i).getSb_ap_at_mid()!= null) 
+					{
+						application.getSubApplication().get(i).setSb_ap_mid(application.getAp_id());
+						application.getSubApplication().get(i).setSb_ap_cr_date(new Date());
+						/*applicationService.saveSubApplication(application,
+								bindedEntity.getSubApplication().get(i))*/;
+					}
+				}
+			 
+			Application application1=applicationService.save(application);
+			
+			application1=applicationService.getRegisterApplication(application1.getAp_id());
+			
+           /* AllowEfiling allowEfiling =ecourtAddCaseService.codeValidation(bindedEntity.getCode(),bindedEntity.getAppno(),'A');
+            
+            allowEfiling.setAe_fd_mid(application1.getAp_fd_mid());
+			
+			allowEfiling.setAe_reference_mid(application1.getAp_id());
+			ecourtAddCaseService.addAllowEfiling(allowEfiling);*/
+			
+			rd.setResponse("ADD");	
+			rd.setModelData(application1);
 			
 			ApplicationStage as=new ApplicationStage();
 			as.setAs_ap_mid(application.getAp_id());
 			as.setAs_stage_lid(lkStage.getLk_id());
 			as.setAs_cr_by(user.getUm_id());
 			as.setAs_cr_date(new Date());
-			rd.setResponse("ADD");
+			
+			try {
+				createNoticePdf(application,"D://notice.pdf");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			applicationService.saveApplicationStage(as);
 		}else
 			{
 			rd.setResponse("UPDATE");
-				application=applicationService.save(application);				
+			 for (int i = 0; i < bindedEntity.getSubApplication().size(); i++) 
+				{
+					if (bindedEntity.getSubApplication().get(i).getSb_ap_at_mid()!= null) 
+					{
+						bindedEntity.getSubApplication().get(i).setSb_ap_cr_date(new Date());
+					/*	SubApplication subapp=new SubApplication();
+						
+						subapp.setSb_ap_mid(bindedEntity.getAp_id());
+						subapp.setSb_ap_cr_date(new Date());
+						subapp.setSb_ap_rec_status(1);
+						subapp.setSb_ap_at_mid(bindedEntity.getSubApplication().get(i).getSb_ap_at_mid());*/
+						//applicationService.saveSubApp(bindedEntity.getSubApplication().get(i));
+						/*applicationService.saveSubApplication(bindedEntity,
+								bindedEntity.getSubApplication().get(i));*/
+					}
+					
+				}
+			 
+				application=applicationService.save(bindedEntity);
+				applicationService.deleteNullSubApplication(application.getAp_id());
+				rd.setModelData(application);
+				try {
+					createNoticePdf(application,"D://notice.pdf");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		rd.setModelData(application);
+		
 		jsonData = cm.convert_to_json(rd);
 
 		return jsonData;
 	}
+	
+	
+	@RequestMapping(value = "/deleteSubApplication/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String deleteSubApplication(@PathVariable Long id, HttpSession session) 
+	{
+		ActionResponse<Application> response = new ActionResponse<>();
+		
+		boolean sb= applicationService.deleteSubApplication(id);
+		
+		String jsonData = null;
+
+		if (sb != false) {
+			
+			response.setResponse("TRUE");
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+
+	}
+	
+	
 	@RequestMapping(value = "/getApplicationDetails", method = RequestMethod.GET)
 	@ResponseBody
 	public String getApplicationDetails(HttpSession session) {
@@ -233,10 +533,51 @@ public class ApplicationController
 		return jsonData;
 	}
 	
+	@RequestMapping(value = "/getPassedApplicationDetails", method = RequestMethod.GET)
+	@ResponseBody
+	public String getPassedApplicationDetails(HttpSession session) {
+		String jsonData = null;
+		
+		User user=(User) session.getAttribute("USER");
+
+		List<Application> newApplicationList= applicationService.getPassedApplicationDetails(user.getUm_id());
+		ActionResponse<Application> response = new ActionResponse<Application>();
+
+
+		if (newApplicationList != null && newApplicationList.size() != 0)
+			response.setResponse("TRUE");
+		//response.setData(draftcount);
+		response.setModelList(newApplicationList);
+
+		jsonData = cm.convert_to_json(response);
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/getDefectedApplicationDetails", method = RequestMethod.GET)
+	@ResponseBody
+	public String getDefectedApplicationDetails(HttpSession session) {
+		String jsonData = null;
+		
+		User user=(User) session.getAttribute("USER");
+
+		List<Application> newApplicationList= applicationService.getDefectApplicationDetails(user.getUm_id());
+		ActionResponse<Application> response = new ActionResponse<Application>();
+
+
+		if (newApplicationList != null && newApplicationList.size() != 0)
+			response.setResponse("TRUE");
+		//response.setData(draftcount);
+		response.setModelList(newApplicationList);
+
+		jsonData = cm.convert_to_json(response);
+
+		return jsonData;
+	}
+	
 	@RequestMapping(value = "/addCourtFee", method = RequestMethod.POST)
 	@ResponseBody
-	public String addCourtFee(@RequestBody ApplicationCourtFee courtFee,
-			HttpSession session) {
+	public String addCourtFee(@RequestBody ApplicationCourtFee courtFee,HttpSession session) {
 
 		ApplicationCourtFee ccf = null;
 		String result = "false";
@@ -396,17 +737,19 @@ public class ApplicationController
 	}
 	@RequestMapping(value = "/submitApplication", method = RequestMethod.POST)
 	@ResponseBody
-	public String submitRegisterApplication(@RequestBody Application application,HttpSession session) {
+	public String submitRegisterApplication(@RequestBody Application application,HttpSession session,HttpServletRequest request) {
 		String jsonData="";
 		ActionResponse<Application> response=new ActionResponse<Application>();
 		User user = (User) session.getAttribute("USER");
 		boolean submit=true;
-		 boolean flag=false;
+		boolean flag=false;
 		UserRole ur=null;
+		Long appUser=null;
 		List<ApplicationCourtFee> courtFees = null;
 		courtFees = applicationService.getCourtFee(application.getAp_id());
 		List<ApplicationUploaded> applicationUploaded = null;
 		applicationUploaded = applicationService.getUploadedApplications(application.getAp_id());
+		
 		if(applicationUploaded.isEmpty())
 		{
 			submit=false;
@@ -421,15 +764,23 @@ public class ApplicationController
 			application.setAp_diary_no(diary+"_"+year);
 			}
 			
-			if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L){
-				 ur=userRoleService.getByUserRole("BSApplicationScrutiny");
+			 
+			if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L)
+			
+			{
+				  ur=userRoleService.getByUserRole("BSApplicationScrutiny");
+				  appUser=ur.getUr_um_mid();
 			  }
+			/*if (false) {
+				
+			}*/
 			else{
 				
-				 ur=userRoleService.getByUserRole("ApplicationScrutiny");
+				// ur=userRoleService.getByUserRole("ApplicationScrutiny");
+				appUser=440L;
 				
 			}
-			if(ur.getUr_id()!=null)
+			if(appUser!=null)
 			{
 				if(application.getCaseStage().getLk_longname().equals("DRAFT"))
 				 {
@@ -443,20 +794,95 @@ public class ApplicationController
 					
 					applicationService.saveApplicationStage(cs);
 					
-					application.setAp_assign_to(ur.getUr_um_mid());
+					application.setAp_assign_to(appUser);
 					application.setAp_stage_lid(lkStage.getLk_id());
 					application=applicationService.save(application);
+					
+					
+					InetAddress ip;
+					 String hostname;
+					 String  extraLko="";
+					 
+					 String otpTmpId="";
+					 
+				        try {
+				            ip = InetAddress.getLocalHost();
+				            hostname = ip.getHostAddress();
+				            System.out.println("Your current IP address : " + ip);
+				            System.out.println("Your current Hostname : " + hostname);
+				            
+				            if(hostname.equals("172.16.0.6")) {
+				            	otpTmpId ="1107163706957402432";
+				            }
+				            else if(hostname.equals("127.0.0.1")) {
+				            	/*otpTmpId ="1107160793982323688";
+				            	 extraLko="-Lko. Bench ";*/
+				            	otpTmpId ="1107163706957402432";
+					            }
+				            else {
+				            	System.out.println("In Local");
+				            	otpTmpId ="1107163706957402432";
+				            	/* extraLko="-Lko. Bench ";*/
+				            }
+				 
+				        } catch (UnknownHostException e) {
+				 
+				            e.printStackTrace();
+				        }
+				        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+				        if(user.getUm_id() != null)
+						{
+						/*	 Integer otp=cm.generateOTP();
+							 user.setUm_otp(otp);
+							 user=userService.save(user);*/
+							 Lookup urlLookup=lookupService.getLookUpObject("SMS_URL");
+							 String sms_url=urlLookup.getLk_longname();
+							 String mob_no=user.getUm_mobile();
+							 String smstext="Your e-Filed Application having Diary_No  "+application.getAp_diary_no()+", Applicant name - "
+							 +(application.getAp_applicant_name().length() >=30 ? application.getAp_applicant_name().substring(0,26)+"..." :application.getAp_applicant_name())+" "
+							 		+ "has been received on  "+formatter.format(cs.getAs_cr_date())+" ";
+							 smstext=smstext.replace("&", "and");
+							 String otpresponse=cm.sendBSNLSMS(sms_url, mob_no, smstext,otpTmpId);
+						     String otpresponse1=cm.sendSMS(sms_url, mob_no, smstext,otpTmpId);
+							// String otpresponse="1";
+							 if(otpresponse.equals("1"))
+							 {
+								 user.setUm_otp(null);
+								 
+								
+								 
+								 SmsLog smslog = new SmsLog();
+								 smslog.setSl_mobile_no(mob_no);
+								 smslog.setSl_um_mid(user.getUm_id());
+								 smslog.setSl_text(smstext+" BSNL");
+								 smslog.setSl_cr_date(new Date());
+								 smslog.setSl_status(1);
+								 smslog.setSl_ip_address(request.getRemoteAddr());
+								 userService.saveSMSlog(smslog);
+								 
+							 }else{
+									response.setResponse("FALSE");
+									response.setData("Unable to send OTP, please try again");
+								}
+									
+						}
+					
 					
 					response.setResponse("TRUE");
 					response.setModelData(application);
 					jsonData=cm.convert_to_json(response);
 				 }
-				 else if(application.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
+				 else if(application.getCaseStage().getLk_id().equals(1000041L))
 				 {
-					 if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L){
-					  flag=applicationService.checkBsDateValidity(application.getAp_id());
-					 }
-					 else{
+					 /*if(application.getAp_at_mid()==3L || application.getAp_at_mid()==25L || application.getAp_at_mid()==42L || application.getAp_at_mid()==46L)
+					 {
+						 flag=applicationService.checkBsDateValidity(application.getAp_id());
+					 }*/
+					 if (false) {
+						
+					}
+					 else
+					 {
 						 flag=applicationService.checkDateValidity(application.getAp_id()); 
 						 
 					 }
@@ -472,7 +898,7 @@ public class ApplicationController
 							
 							applicationService.saveApplicationStage(cs);
 							
-							application.setAp_assign_to(ur.getUr_um_mid());
+							application.setAp_assign_to(appUser);
 							application.setAp_stage_lid(lkStage.getLk_id());
 							application=applicationService.save(application);
 							
@@ -504,6 +930,11 @@ public class ApplicationController
 		}
 		return jsonData;
 	}
+	
+	
+	
+	
+	
 	
 	@RequestMapping(value ="/deleteDocument/{id}/", method = RequestMethod.DELETE)
 	@ResponseBody
@@ -627,20 +1058,27 @@ public class ApplicationController
 	}
 	@RequestMapping(value="/copyApplicationFile",method=RequestMethod.GET)
 	@ResponseBody
-	public String copyApplicationFile(HttpServletRequest request)
+	public String copyApplicationFile(HttpServletRequest request) throws ParseException
 	{
-		String jsonData = null;
+		/*String jsonData = null;
 		
 		String doc_name=request.getParameter("au_document_name");
 		
 		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
 		
 	
-		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");
+		
+		
 		String draft_path=lookUp.getLk_longname();
-
-		File source = new File(draft_path+File.separator+doc_name);	
+		System.out.println("pppppppppppppppppppppp--"+draft_path);
+		
+		File source = new File(draft_path+File.separator+doc_name);
+		
+		
 		String uploadPath = context.getRealPath("");
+		
+		
 		
 		doc_name="appl_"+doc_name;
 		File dest = new File(uploadPath+"/uploads/"+doc_name);
@@ -655,7 +1093,76 @@ public class ApplicationController
 			    response.setResponse("FALSE");
 			}
 		jsonData = cm.convert_to_json(response);
+		return jsonData;*/
+		
+
+		String jsonData = null;
+		
+		String doc_name=request.getParameter("au_document_name");
+		
+		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
+		
+		ApplicationUploaded au=scrutinyService.getApplicationUploaded(doc_name);
+	
+		/*Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		String draft_path=lookUp.getLk_longname();
+
+		File source = new File(draft_path+File.separator+doc_name);	*/
+		String uploadPath = context.getRealPath("");
+		
+		
+		
+		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		String draft_path=lookUp.getLk_longname();	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("APPLICATION_BCKUP_PATH");	
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
+
+		File source =null;
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		//	 String bef=sdf.format("2020-01-01 00:00:00");
+		        
+		        Date dateBef = sdf.parse("2020-07-01 00:00:00");
+			
+			if(au.getAu_uploaded_date().before(dateBef)) {
+				source = new File(draft_path_bck+File.separator+doc_name);	
+			}
+			else {
+				source = new File(draft_path+File.separator+doc_name);	
+			}
+		
+			doc_name="appl_"+doc_name;
+		File dest = new File(uploadPath+"/uploads/"+doc_name);
+
+		try {
+			    FileUtils.copyFile(source, dest);
+			    response.setResponse("TRUE");
+			    response.setData(doc_name);
+			} 
+			catch (IOException e) {
+			    e.printStackTrace();
+			    response.setResponse("FALSE");
+			}
+		jsonData = cm.convert_to_json(response);
 		return jsonData;
+	
+	}
+	
+	@RequestMapping(value = "/getApplicationStages", method = RequestMethod.GET)
+	public @ResponseBody String getCaseStages(HttpServletRequest request) {
+		String jsonData="";
+		String id = request.getParameter("docId");
+		Long docId = new Long(id);
+		ActionResponse<ApplicationStage> response=new ActionResponse<ApplicationStage>();
+		List<ApplicationStage> stages=applicationService.getStages(docId);
+		response.setData("TRUE");
+		response.setModelList(stages);
+		jsonData=cm.convert_to_json(response);
+		return jsonData;	
 	}
 
 }

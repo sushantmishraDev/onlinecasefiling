@@ -6,7 +6,7 @@
 					<div class="panel panel-default" style="margin-left: 140px;">
 						<div class="panel-heading font-bold">Act Details</div>
 						<div class="panel-body">
-							<div class="form-group pull-in clearfix">
+							<div class="form-group pull-in clearfix" ng-show ="registerCase.caseType.ct_type=='civil' && registerCase.caseType.ct_label !== 'CRLP'">
 								<div class="col-sm-6">
                                   <div ng-init="actDetails.act_type=1">
 									<label>Belongs To:&emsp; 
@@ -19,15 +19,169 @@
 								</div>
 
 							</div>
-							<div class="form-group pull-in clearfix" ng-show="centralShow">
+							
+							
+							<div class="form-group pull-in clearfix" ng-show ="registerCase.caseType.ct_type=='criminal' && registerCase.caseType.ct_label !== 'CRLP'">
+								<div class="col-sm-6">
+                                  <div ng-init="newAct_type=1">
+									<label>Belongs To:&emsp; 
+									<input type="radio"  id="central" data-ng-click="changeAct($event)"  ng-model="newAct_type"
+										name="actType" value="1">CRPC&emsp; 
+										<input type="radio"  id="state"  name="actType"  data-ng-click="changeAct($event)"
+										ng-model="newAct_type" value="2">BNS
+									</label>
+								</div>
+								</div>
+
+							</div>
+							
+							
+							<div class="form-group pull-in clearfix" ng-show ="registerCase.caseType.ct_label === 'CRLP'">
+								<div class="col-sm-6">
+                                  <div ng-init="newAct_type=1">
+									<label>Belongs To:&emsp; 
+									<input type="radio"  id="central" data-ng-click="changeAct($event)"  ng-model="newAct_type"
+										name="actType" value="1">CRPC&emsp; 
+										<input type="radio"  id="state"  name="actType"  data-ng-click="changeAct($event)"
+										ng-model="newAct_type" value="2">BNS
+									</label>
+								</div>
+								</div>
+
+							</div>
+							
+							
+								<div class="form-group pull-in clearfix" >
+							<div class="col-sm-6" ng-hide="registerCase.caseType.ct_type==='civil'">
+									<label> Act (Title)</label> 
+									<select   select2=""
+										class="js-example-basic-single"  style="width: 332px;"
+										ng-model="actDetails.act_code"  ng-change="getSecMasters(actDetails.act_code)"
+										ng-options="actMaster[1] as actMaster[0] for actMaster in actDetailsList ">
+										<option value="">Select Act Title</option>
+										</select>
+										
+										
+										
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
+								</div>
+								
+								<div class="col-sm-6" ng-show ="registerCase.caseType.ct_label === 'CRLP'">
+									<label> Act (Title)</label> 
+									<!-- <select  
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="actDetails.act_code"   ng-change="getSecMasters(actDetails.act_code)"
+										ng-options="actMaster.act_code as actMaster.act_name_eng for actMaster in actDetailsList | unique:'act_name_eng'">
+										<option value="">Select Act Title</option>
+										</select> -->
+										<select  
+										class="js-example-basic-single" select2="" style="width: 332px;"
+										ng-model="actDetails.act_code"  ng-change="getSecMasters(actDetails.act_code)"
+										ng-options="actMaster[1] as actMaster[0] for actMaster in actDetailsList ">
+										<option value="">Select Act Title</option>
+										</select>
+										
+										
+										
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
+								</div>
+								
+								<div class="col-sm-6"  ng-show ="registerCase.caseType.ct_type=='civil' && registerCase.caseType.ct_label !== 'CRLP'">
+									<label> Act (Title)</label> 
+									 <select
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="act_code2" 
+										ng-options="actMaster.act_id as actMaster.act_name for actMaster in actDetailsList1 ">
+										<option value="">Select Act Title</option>
+										</select>
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
+								</div>
+
+
+								<div class="col-sm-6" ng-hide="registerCase.caseType.ct_type==='civil'">
+									<label> Section (Title)</label> <select
+										class="js-example-basic-single"  select2=""   style="width: 332px;"
+										ng-model="actDetails.act_section"
+										ng-options="secMaster.section as secMaster.section for secMaster in sectionList ">
+										<option value="">Select Section</option>
+										</select>
+										
+										 <!-- <select
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="actDetails.act_section"
+										ng-options="secMaster.section as secMaster.section for secMaster in actDetailsList ">
+										<option value="">Select Section</option>
+										</select> -->
+										
+									
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
+								</div>
+								
+								<div class="col-sm-6" ng-show ="registerCase.caseType.ct_label === 'CRLP'">
+									<label> Section (Title)</label> <select
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="actDetails.act_section"
+										ng-options="secMaster.section as secMaster.section for secMaster in sectionList">
+										<option value="">Select Section</option>
+										</select>
+										
+									
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
+								</div>
+								
+								
+									<div class="col-sm-6"  ng-show ="registerCase.caseType.ct_type=='civil' && registerCase.caseType.ct_label !== 'CRLP'">
+									<label> Section (Title)</label>
+										
+										<input type="text" class="form-control"  maxlength=100
+										ng-model="act_section2">
+										
+									
+
+								</div>
+								
+							
+								</div>
+							
+							
+							<!-- <div class="form-group pull-in clearfix" ng-show="centralShow"> -->
+							
+							
+							
+							<div class="form-group pull-in clearfix" ng-show="false">
+							
 								<div class="col-sm-6">
 									<label>Central Act (Title)</label> <select
-										class="form-control" 
-										ng-model="actDetails.act_code"
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="actDetails.act_code1"
 										ng-options="actMaster.act_id as actMaster.act_name for actMaster in centralActList">
 										<option value="">Select Act Title</option>
 										</select>
-
+										
+										<!-- <select  class="js-example-basic-single" select2=""  ng-model="cavApi.caseDist" ng-options="district.dt_id as district.dt_name for district in districtList">
+                                                        <option value="">Select District</option>
+                                                    </select>
+ -->
 								</div>
 
 								<div class="col-sm-6">
@@ -40,7 +194,7 @@
 							
 								<div class="col-sm-6">
 									<label>Section</label> 
-									<input type="text" class="form-control"
+									<input type="text" class="form-control"  maxlength=100
 										ng-model="actDetails.act_section">
 									</div>
 
@@ -53,7 +207,8 @@
 								
 								
 								
-								<div ng-show="stateShow">
+								<!-- <div ng-show="stateShow"> -->
+								<div ng-show="false">
 								
 								<div class="col-sm-6">
 									<label>State</label>  <select
@@ -72,10 +227,17 @@
 								</div>
 								
 								<div class="col-sm-6">
-									<label>State Act(Title)</label> <select
+									<label>State Act(Title)</label> <!-- <select
 										class="form-control" 
 										ng-model="actDetails.act_code"
-										ng-options="actMaster.act_id as actMaster.act_name for actMaster in stateActList"></select>
+										ng-options="actMaster.act_id as actMaster.act_name for actMaster in stateActList"></select> -->
+										
+										 <select
+										class="js-example-basic-single" select2=""  style="width: 332px;"
+										ng-model="act_code21" ng-change="stateAct(act_code21)"
+										ng-options="actMaster.act_id as actMaster.act_name for actMaster in stateActList">
+										<option value="">Select Act Title</option>
+										</select>
 								</div>
 								
 								<div class="col-sm-6">
@@ -88,7 +250,7 @@
 								<div class="col-sm-6">
 									<label>Section</label>
 									<input type="text"
-										class="form-control" id="caseDetail" name="caseDetail"
+										class="form-control" id="caseDetail" name="caseDetail" maxlength=100
 										ng-model="actDetails.act_section">
 
 							</div>
@@ -112,17 +274,34 @@
 						
 						 <div class="row pull-right">
                                                       <div class="col-sm-12">
-						                  <button class="btn btn-success"  ng-disabled="!actDetails.act_code" ng-click="addActDetails(actDetails)">Add ActDetails</button>
+						                  <button ng-show="centralShow" class="btn btn-success"   ng-click="addActDetails(actDetails)">Add ActDetails</button>
+						                   <button ng-show="stateShow" class="btn btn-success"  ng-disabled="!act_code2" ng-click="addActDetails(actDetails)">Add ActDetails</button>
 						                     </div>
                                                            
                                              </div>
+                                             
+                                             <!-- <div class="form-group pull-in clearfix">
+                           <font size="2"
+          face="verdana"
+          color="red"> 
+          * Please fed exact Act Details as per memo of petition.
+        </font>           
+        </div>    -->     
 
 
 						
 						
 						
 					</div>
-				</div>
+				
+				 <div class="form-group pull-in clearfix">
+                           <font size="2"
+          face="verdana"
+          color="red"> 
+          * Please fed exact Act Details as per memo of petition.
+        </font>           
+        </div> 
+        </div>
 				</div>
 			</fieldset>
 		</form>

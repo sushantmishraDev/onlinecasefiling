@@ -7,24 +7,44 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dms.model.MetaData;
 import com.dms.model.PoliceStation;
+import com.dms.model.PoliceStation2024;
+import com.dms.model.PoliceStationNew;
 
 
 
 @Service
 public class PoliceStationService {
-	
+	/*
 	@PersistenceContext
+	private EntityManager em;*/
+	
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 	
 
 	@Transactional
 	public List<PoliceStation> getAll() {
 		List<PoliceStation> result = em.createQuery("Select p from PoliceStation p  order by p.ps_name").getResultList();
+		return result;
+	}
+	
+	@Transactional
+	public List<PoliceStationNew> getAllNew() {
+		List<PoliceStationNew> result = em.createQuery("Select p from PoliceStationNew p  order by p.pt_name").getResultList();
+		return result;
+	}
+	
+	
+	@Transactional
+	public List<PoliceStation2024> getAllNew2024() {
+		List<PoliceStation2024> result = em.createQuery("Select p from PoliceStation2024 p  order by p.police_st_name").getResultList();
 		return result;
 	}
 	

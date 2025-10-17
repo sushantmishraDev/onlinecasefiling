@@ -17,6 +17,8 @@ import com.dms.model.ActionResponse;
 import com.dms.model.Judge;
 import com.dms.model.Lookup;
 import com.dms.model.PoliceStation;
+import com.dms.model.PoliceStation2024;
+import com.dms.model.PoliceStationNew;
 import com.dms.model.User;
 import com.dms.service.LookupService;
 import com.dms.service.PoliceStationService;
@@ -74,6 +76,36 @@ public class PoliceStationController {
 		return jsonData;
 
 	}
+	
+	
+	@RequestMapping(value="police_station_master/getpoliceStationNewDetails",method=RequestMethod.GET)
+	public @ResponseBody String getPoliceStationNewData(Model model)
+	{
+		String jsonData=null;
+		List<PoliceStationNew> getDetails=policeStationService.getAllNew();
+		if(getDetails!=null)
+		{
+			jsonData=commonMethods.convert_to_json(getDetails);
+		}
+		System.out.println(jsonData);
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value="police_station_master/getpoliceStationNewDetails2024",method=RequestMethod.GET)
+	public @ResponseBody String getPoliceStation2024(Model model)
+	{
+		String jsonData=null;
+		List<PoliceStation2024> getDetails=policeStationService.getAllNew2024();
+		if(getDetails!=null)
+		{
+			jsonData=commonMethods.convert_to_json(getDetails);
+		}
+		System.out.println(jsonData);
+		return jsonData;
+
+	}
+	
 	// [END]To JSON GET Method List of bundle_Alloction Model  
 
 	@RequestMapping(value="police_station_master/getpoliceStationLocationList",method=RequestMethod.GET)

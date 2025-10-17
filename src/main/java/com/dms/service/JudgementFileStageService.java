@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +15,10 @@ import com.dms.model.JudgementFileStage;
 @Service
 public class JudgementFileStageService {
 	
-	@PersistenceContext
+	/*@PersistenceContext
+	private EntityManager em;*/
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
 	private EntityManager em;
 	
 	@Transactional

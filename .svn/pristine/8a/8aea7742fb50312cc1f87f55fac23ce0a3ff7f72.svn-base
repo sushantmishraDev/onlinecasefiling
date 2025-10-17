@@ -1,0 +1,54 @@
+package com.dms.service;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.CaseFileStage;
+import com.dms.model.DocumentFileStage;
+
+@Service
+public class DocumentFileStageService {
+	
+	@PersistenceContext
+	private EntityManager em;
+	
+	@Transactional
+	public CaseFileStage save(CaseFileStage s) {
+
+		CaseFileStage master = null;
+		try {
+			master = em.merge(s);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+	
+	@Transactional
+	public DocumentFileStage save(DocumentFileStage dfs) {
+		// TODO Auto-generated method stub
+		DocumentFileStage master = null;
+		try {
+			master = em.merge(dfs);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return master;
+	}
+
+	public DocumentFileStage getUserEntry(Long dfs_fd_mid, Long dfs_stage_lid) {
+		// TODO Auto-generated method stub
+		DocumentFileStage dfs= new DocumentFileStage();
+	 		
+		Query query = em.createQuery("select t from DocumentFileStage t where dfs_fd_mid =:dfs_fd_mid  and dfs_stage_lid = :dfs_stage_lid order by dfs_id desc");
+		query.setParameter("dfs_fd_mid", dfs_fd_mid).setParameter("dfs_stage_lid", dfs_stage_lid).setMaxResults(1);
+		dfs =  (DocumentFileStage) query.getSingleResult();
+		
+		return dfs;
+	}
+
+} 

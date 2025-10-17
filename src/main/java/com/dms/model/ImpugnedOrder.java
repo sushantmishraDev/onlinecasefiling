@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -83,6 +84,9 @@ public class ImpugnedOrder {
 	
 	@Column(name = "io_rec_status") 
 	private  Integer io_rec_status;
+	
+	/*@Column(name="io_establishment")
+	private Long io_establishment;*/
   
 	@Transient
 	private District district;
@@ -94,9 +98,24 @@ public class ImpugnedOrder {
 	private LowerCourtCaseType  lcCaseType;
 	  
 	@OneToOne(cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "io_lct_mid",insertable = false, updatable = false)
+	@JoinColumns({
+	    @JoinColumn(name="io_lct_mid", referencedColumnName = "lct_id", insertable = false, updatable = false ),
+	    @JoinColumn(name="io_district", referencedColumnName = "lct_dt_mid", insertable = false, updatable = false)
+	})
+/*	@JoinColumn(name = "io_lct_mid",name="io_district",insertable = false, updatable = false)*/
 	private LowerCourtTypes courtType;
 	  
+	
+	
+	
+	/*public Long getIo_establishment() {
+		return io_establishment;
+	}
+
+	public void setIo_establishment(Long io_establishment) {
+		this.io_establishment = io_establishment;
+	}*/
+
 	public Long getIo_id() {
 		return io_id;
 	}

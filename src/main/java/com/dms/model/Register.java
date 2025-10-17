@@ -13,7 +13,14 @@ public class Register {
 	private String rollNo;
 	private Long enrollNo;
 	private Integer enrollYear;
+	private Long adhar;
 	
+	public Long getAdhar() {
+		return adhar;
+	}
+	public void setAdhar(Long adhar) {
+		this.adhar = adhar;
+	}
 	public String getType() {
 		return type;
 	}

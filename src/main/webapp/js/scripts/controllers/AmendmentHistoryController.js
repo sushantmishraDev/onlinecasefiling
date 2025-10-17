@@ -1,7 +1,7 @@
 
 var EDMSApp = angular.module('EDMSApp', ['ngFileUpload','ngMask','ui.bootstrap']);
 
-EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',function ($scope, $http,Upload) {
+EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',function ($scope,$http,Upload) {
 	var urlBase="/onlinecasefiling/";
 	$scope.users=[];
 	$scope.searchedusers=[];
@@ -16,6 +16,7 @@ EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',funct
 		   if(data.response=="TRUE"){
 					$scope.amendments=data.modelList;
 		   }
+		   console.log($scope.amendments);
 	  });	  			
 	}
 	
@@ -28,9 +29,20 @@ EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',funct
 	  });	  
 	 }
 	$scope.setModel=function(amendment){
-		$scope.am_id=amendment.am_id;
-		$scope.am_type=amendment.am_type;
-	}
+		
+		if (amendment.am_type == 'P') {
+			$scope.am_id=amendment.am_id;
+			$scope.am_type=amendment.am_type;
+			$scope.am_document_no=amendment.caseFileDetail.fd_case_no;
+			$scope.am_document_year=amendment.caseFileDetail.fd_case_year;
+		}else{
+			$scope.am_id=amendment.am_id;
+			$scope.am_type=amendment.am_type;
+			$scope.am_document_no=amendment.am_document_no;
+			$scope.am_document_year=amendment.am_document_year;
+		}
+		
+}
 	$scope.save=function(){
 		$scope.amendment={'am_id':$scope.am_id,'am_document_no':$scope.am_document_no,'am_document_year':$scope.am_document_year};
 		var file=$scope.picFile;
@@ -40,7 +52,9 @@ EDMSApp.controller('AmendmentHistoryController',['$scope','$http','Upload',funct
 			  if(file!="")
 			  {				  
 			    file.upload = Upload.upload({
-			      url: urlBase + 'amendmenthistory/upload',
+			      /*url: urlBase + 'amendmenthistory/upload',*/
+			    	
+			      url: urlBase + 'amendmenthistory/uploadAmendment',
 			      headers: {
 			    	  'optional-header': 'header-value'
 			        },

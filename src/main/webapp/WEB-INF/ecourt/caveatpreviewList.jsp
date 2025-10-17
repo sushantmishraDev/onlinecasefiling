@@ -19,20 +19,20 @@
                                 <table id="data-table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            <th>Caveat Draft No</th>
-                                             <th>Diary No</th>
+                                            <th>Draft No</th>
+                                            <th>Diary No</th>
+                                            <th>Caveat Type</th>
+                                            <th>Caveat No/Year</th>
                                             <th>Caveator Name</th>
-                                            <th>Case Type</th>
-                                            <th>Case Year</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr class="odd gradeX">
                                              <td>{{caveat.cav_draft_no}}</td>
                                              <td>{{caveat.cav_diary_no}}</td>
-                                             <td>{{caveat.cav_caveator_name}}</td>
                                               <td>{{caveat.caseType.ct_name}}</td>
-                                                  <td>{{caveat.cav_year}}</td>                             
+                                              <td>{{caveat.cav_no}}/{{caveat.cav_year}}</td>
+                                              <td>{{caveat.cav_caveator_name}}</td>                             
                                     
                                           </tr>
                                     </tbody>
@@ -183,7 +183,7 @@
 							</div>
 						</div>
 						
-					<div class="panel panel-inverse overflow-hidden" ng-show="caveat.caseStage.lk_longname=='SUPERVISIOR_DEFECTS'">
+					<div class="panel panel-inverse overflow-hidden" ng-show="caveat.caseStage.lk_id==1000041">
                     <div class="panel-heading">
                         <h3 class="panel-title">
                             <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">

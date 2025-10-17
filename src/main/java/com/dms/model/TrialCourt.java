@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -90,7 +91,11 @@ public class TrialCourt {
 		private LowerCourtCaseType caseType;
 	  
 	  @OneToOne(cascade = CascadeType.PERSIST)
-	    @JoinColumn(name = "tr_lct_mid",insertable = false, updatable = false)
+	  @JoinColumns({
+		    @JoinColumn(name="tr_lct_mid", referencedColumnName = "lct_id", insertable = false, updatable = false ),
+		    @JoinColumn(name="tr_district", referencedColumnName = "lct_dt_mid", insertable = false, updatable = false)
+		})
+	  /*  @JoinColumn(name = "tr_lct_mid",insertable = false, updatable = false)*/
 		private LowerCourtTypes courtType;
 	  
 	  

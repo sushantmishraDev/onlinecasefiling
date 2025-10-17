@@ -12,9 +12,13 @@
     <mvc:annotation-driven />
  <mvc:default-servlet-handler/>
  <tx:annotation-driven proxy-target-class="true"/>
- <tx:annotation-driven transaction-manager="transactionManager" />
+ <tx:annotation-driven transaction-manager="transactionManagerCIS" />
+ <tx:annotation-driven transaction-manager="transactionManagerCMS" />
+<tx:annotation-driven transaction-manager="transactionManager" />
    <context:annotation-config/>
-    <context:component-scan base-package="com.dms." />
+    <context:component-scan base-package="com.dms.*" />
+     <context:component-scan base-package="com.cms.*" />
+    <context:component-scan base-package="com.efiling.*" />
        <context:annotation-config/>
     <bean
         class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -25,44 +29,175 @@
             <value>.jsp</value>
         </property>
     </bean>
-   
-    
-    <!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
-     	<property name="driverClassName" value="org.postgresql.Driver"/>
-      	<property name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
-      	<property name="username" value="dms"/> 
-        <property name="password" value="dms"/>
-	</bean>  -->
+	<!-- <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource"> 
+		<property name="driverClassName" value="org.postgresql.Driver"/> <property 
+		name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
+		<property name="username" value="dms"/> <property name="password" value="dms"/> 
+		</bean> -->
+
+	<!-- <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource"> 
+		<property name="driverClassName" value="org.postgresql.Driver"/> <property 
+		name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
+		<property name="username" value="efiling"/> <property name="password" value="efiling"/> 
+		</bean> -->
+
+	<!-- <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource"> 
+		<property name="driverClassName" value="org.postgresql.Driver"/> <property 
+		name="url" value="jdbc:postgresql://localhost:5432/Efiling?charSet=LATIN1"/> 
+		<property name="username" value="postgres"/> <property name="password" value="postgres"/> 
+		</bean> -->
+
+
+
+	<!-- **********Live connection************  -->
+ 	  
 	
-	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
-     	<property name="driverClassName" value="org.postgresql.Driver"/>
-      	<property name="url" value="jdbc:postgresql://localhost:5432/efiling?charSet=LATIN1"/> 
-      	<property name="username" value="efiling"/> 
-        <property name="password" value="efiling"/>
-	</bean>
+	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCIS"
+		destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://192.168.0.36:5433/cisdb_16012018?charSet=LATIN1"/> 
+      	<property name="username" value="ahccisdata"/> 
+        <property name="password" value="aldhc@321"/>
+	</bean>    
 	
-	<!-- <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+	
+	<!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING"
+		destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url"
+			value="jdbc:postgresql://localhost:5433/efilingTest?charSet=LATIN1" />
+		<property name="username" value="postgres" />
+		<property name="password" value="postgres" />
+		<property name ="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name ="minEvictableIdleTimeMillis" value="30000"/>
+        <property name ="removeAbandoned" value="true"/>
+       <property name ="removeAbandonedTimeout" value="150"/>
+	</bean> -->
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING">
      	<property name="driverClassName" value="org.postgresql.Driver"/>
       	<property name="url" value="jdbc:postgresql://192.168.0.160:5432/efiling?charSet=LATIN1"/> 
       	<property name="username" value="dms"/> 
         <property name="password" value="dms"/>
-	</bean>
-    -->
+	</bean>   
 	
-   
-      <!-- EntityManagerFactory -->
-  <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
-    <property name="persistenceUnitName" value="persistenceUnit"/>
-    <property name="dataSource" ref="dataSource"/>
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCMS"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://192.168.0.222:3306/adv_roll?charSet=LATIN1" />
+		<property name="username" value="cms" />
+		<property name="password" value="cms1234" />
+	</bean>  
+
+	<!-- **********Lko Live connection************  -->
+	<!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceDMS">
+     	<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://192.168.52.11:5444/edms?charSet=LATIN1"/> 
+      	<property name="username" value="edms"/> 
+        <property name="password" value="edms"/>
+	</bean>
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING">
+     	<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://10.111.7.12:5432/efiling?charSet=LATIN1"/> 
+      	<property name="username" value="dms"/> 
+        <property name="password" value="dms"/>
+	</bean> -->
+
+
+	<!-- Local System Connection -->
+	
+	
+	 
+  	<!--   <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING"
+		destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url"
+			value="jdbc:postgresql://localhost:5432/New_Efiling2021?charSet=LATIN1" />
+		<property name="username" value="postgres" />
+		<property name="password" value="postgres" />
+		<property name ="timeBetweenEvictionRunsMillis" value="30000"/>
+        <property name ="minEvictableIdleTimeMillis" value="30000"/>
+        <property name ="removeAbandoned" value="true"/>
+       <property name ="removeAbandonedTimeout" value="150"/>
+	</bean>
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCIS"
+		destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://192.168.0.36:5433/cisdb_16012018?charSet=LATIN1"/> 
+      	<property name="username" value="ahccisdata"/> 
+        <property name="password" value="aldhc@321"/>
+	</bean>    
+	
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCMS"
+		destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url"
+			value="jdbc:mysql://192.168.0.80:3306/adv_roll?charSet=LATIN1" />
+		<property name="username" value="cms" />
+		<property name="password" value="cms1234" />
+	</bean>   -->
+ 
+ 
+
+
+	<!-- EntityManagerFactory -->
+	<!-- <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" 
+		id="entityManagerFactory"> <property name="persistenceUnitName" value="persistenceUnit"/> 
+		<property name="dataSource" ref="dataSource"/> <property name="jpaProperties"> 
+		<props> <prop key="hibernate.enable_lazy_load_no_trans">true</prop> </props> 
+		</property> </bean> -->
+		
+		
+		      <!-- EntityManagerFactory -->
+  <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactoryCIS">
+    <property name="persistenceUnitName" value="persistenceUnitCIS"/>
+    <property name="dataSource" ref="dataSourceCIS"/>
      <property name="jpaProperties">
         <props>
             <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
         </props>
     </property> 
   </bean>
- 
- 
- 
+  
+    <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactoryCMS">
+    <property name="persistenceUnitName" value="persistenceUnitCMS"/>
+    <property name="dataSource" ref="dataSourceCMS"/>
+     <property name="jpaProperties">
+        <props>
+            <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        </props>
+    </property> 
+  </bean>
+ <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactoryEfiling">
+    <property name="persistenceUnitName" value="persistenceUnitEfiling"/>
+    <property name="dataSource" ref="dataSourceEFILING"/>
+     <property name="jpaProperties">
+        <props>
+            <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+        </props>
+    </property> 
+  </bean>
+
+<!-- 	<bean id="entityManagerFactoryDMS"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="persistenceUnitDMS" />
+		<property name="dataSource" ref="dataSourceDMS" />
+	</bean>
+
+	<bean id="entityManagerFactoryEfiling"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceUnitName" value="persistenceUnitEfiling" />
+		<property name="dataSource" ref="dataSourceEFILING" />
+	</bean>
+ -->
+
+
+
+
+
   <bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <!-- max upload size in bytes -->
@@ -70,22 +205,33 @@
          
 <!--         max size of file in memory (in bytes) -->
 <!--         <property name="maxInMemorySize" value="1048576" /> 1MB -->
- 
+	<property name="maxUploadSize" value="268435456"/> 
     </bean>
     
-  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
-</bean>
+    
+	<!-- <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"> 
+		<property name="entityManagerFactory" ref="entityManagerFactory" /> </bean> -->
 
-    <!-- Enable @Transactional annotation -->
-  <tx:annotation-driven/>
-  
-  <mvc:interceptors>
-       <mvc:interceptor> 
-            <mvc:mapping path="/dms/index" /> 
-             <mvc:mapping path="/**"/>
-            <bean class="com.dms.controller.RequestProcessingTimeInterceptor"></bean> 
-        </mvc:interceptor>
-   </mvc:interceptors>
-   
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryEfiling" />
+	</bean>
+
+	<bean id="transactionManagerCIS" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryCIS" />
+	</bean>
+	
+	<bean id="transactionManagerCMS" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactoryCMS" />
+	</bean>
+	<!-- Enable @Transactional annotation -->
+	<tx:annotation-driven />
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/dms/index" />
+			<mvc:mapping path="/**" />
+			<bean class="com.dms.controller.RequestProcessingTimeInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
 </beans>

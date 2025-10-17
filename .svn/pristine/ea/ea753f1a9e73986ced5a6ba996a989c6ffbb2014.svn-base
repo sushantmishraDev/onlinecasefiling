@@ -1,0 +1,41 @@
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<html>
+<head>
+	<title>Spring 3 MVC Multipe Row Submit</title>
+<style>
+table {
+	border: 1px solid;
+	border-collapse: collapse;
+}
+td {
+	border: 1px solid;
+}
+th {
+	background: #ffbb00 solid;
+}
+</style>
+</head>
+<body>
+<h2>Show Customers</h2>
+<table width="50%">
+	<tr>
+		<th>metafield</th>
+		<th>operator</th>
+		<th>searchtext</th>
+		<th>criteria</th>
+	</tr>
+	<c:forEach items="${searchForm.searchlist}" var="searchlist" varStatus="status">
+		<tr>
+			<td>${searchlist.metafield}</td>
+			<td>${searchlist.operator}</td>
+			<td>${searchlist.searchtext}</td>
+			<td>${searchlist.criteria}</td>
+		</tr>
+	</c:forEach>
+</table>	
+<br/>
+<input type="button" value="Back" onclick="javascript:history.back()"/>
+</body>
+</html>

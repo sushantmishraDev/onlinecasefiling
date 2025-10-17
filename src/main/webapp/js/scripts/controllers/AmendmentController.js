@@ -91,6 +91,7 @@ EDMSApp.controller('AmendmentController',['$scope','$http',function ($scope, $ht
 		 	$http.post(urlBase+'amendment/addamendment',$scope.amendment).success(function (data) {
 		    	if(data.response=="TRUE"){
 		    		$scope.amendments.push(data.modelData);
+		    		
 		    	}
 		    	alert(data.data);
 		      }).

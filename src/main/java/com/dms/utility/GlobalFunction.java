@@ -279,4 +279,37 @@ public class GlobalFunction {
 	    result=restTemplate.getForObject(url+"?validmob="+mob_no+"&validmsg="+smstext, String.class);
 	    return result;
 	}
+	
+	public String sendSMS(String url,String mob_no,String smstext,String tmpid)
+	{
+		String result=null;
+	    RestTemplate restTemplate=new RestTemplate();
+	    String text=url+"?validmob="+mob_no+"&validmsg="+smstext+"&tmpid="+tmpid;
+	    
+	    System.out.println("url :"+text);
+	    result=restTemplate.getForObject(url+"?validmob="+mob_no+"&validmsg="+smstext+"&tmpid="+tmpid, String.class);
+	    return result;
+	}
+	
+	
+	public String sendBSNLSMS(String url,String mob_no,String smstext,String tmpid)
+	{
+		String result=null;
+	    RestTemplate restTemplate=new RestTemplate();
+	    /*String text=url+"?validmob="+mob_no+"&validmsg="+smstext+"&tmpid="+tmpid;*/
+	   /* String text="https://vsms.minavo.in/api/singlesms.php?auth_key=92faefae-ae33-4921-a161-5c9bb103a7db&mobilenumber="+mob_no+"&message="+smstext+"- Allahabad High Court&sid=HCALLD&mtype=N&template_id="+tmpid;*/
+	    String text="http://103.234.185.173/api/swsendnk.asp?username=HCALLD&pass=4yFqGgEwjbzC&sender=HCALLD&sendto="+mob_no+"&templateID="+tmpid+"&message="+smstext;
+	    
+	    System.out.println("url :"+text);
+	    /*result=restTemplate.getForObject(url+"?validmob="+mob_no+"&validmsg="+smstext+"&tmpid="+tmpid, String.class);*/
+	   /* result=restTemplate.getForObject("https://vsms.minavo.in/api/singlesms.php?auth_key=92faefae-ae33-4921-a161-5c9bb103a7db&mobilenumber="+mob_no+"&message="+smstext+"- Allahabad High Court&sid=HCALLD&mtype=N&template_id="+tmpid, String.class);
+	   */  result=restTemplate.getForObject("http://103.234.185.173/api/swsendnk.asp?username=HCALLD&pass=4yFqGgEwjbzC&sender=HCALLD&sendto="+mob_no+"&templateID="+tmpid+"&message="+smstext, String.class);
+	      if(result.contains("message sent successfully")) {
+	    	result="1";
+	    }
+	    else {
+	    	result="0";
+	    }
+	    return result;
+	}
 }

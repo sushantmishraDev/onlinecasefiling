@@ -18,7 +18,46 @@ EDMSApp.directive('loading', ['$http', function ($http) {
     };
 }]);
 
+EDMSApp.directive("select2", function($timeout, $parse) {
+	  return {
+	    restrict: 'AC',
+	    require: 'ngModel',
+	    link: function(scope, element, attrs) {
+	      console.log(attrs);
+	      $timeout(function() {
+	        element.select2();
+	        element.select2Initialized = true;
+	      });
 
+	      var refreshSelect = function() {
+	        if (!element.select2Initialized) return;
+	        $timeout(function() {
+	          element.trigger('change');
+	        });
+	      };
+	      
+	      var recreateSelect = function () {
+	        if (!element.select2Initialized) return;
+	        $timeout(function() {
+	          element.select2('destroy');
+	          element.select2();
+	        });
+	      };
+
+	      scope.$watch(attrs.ngModel, refreshSelect);
+
+	      if (attrs.ngOptions) {
+	        var list = attrs.ngOptions.match(/ in ([^ ]*)/)[1];
+	        // watch for option list change
+	        scope.$watch(list, recreateSelect);
+	      }
+
+	      if (attrs.ngDisabled) {
+	        scope.$watch(attrs.ngDisabled, refreshSelect);
+	      }
+	    }
+	  };
+	});
 
 EDMSApp.directive('numbersOnly', function() {
 	return {
@@ -46,33 +85,21 @@ EDMSApp.directive('numbersOnly', function() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($scope, $http,Upload) {
 
 	var urlBase="/onlinecasefiling/";
 	
+	$scope.criminal={};
+	
+	$scope.extraCaveatImpugnedOrder={};
+	$scope.extraImpugnedDataList=[];
 	$scope.petitionerDataList=[];
 	$scope.respondentDataList=[];
+	$scope.extraCaveatorDataList=[];
 	$scope.courtFeeList=[];
 	$scope.formShow=true;
 	$scope.petitionerDetails={};
+	$scope.extraCaveatorDetails={};
 	$scope.registerCase={};
 	
 	$scope.caveat={};
@@ -84,20 +111,180 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 	$scope.tabShow4=false;
 	$scope.tabShow5=false;
 	$scope.tabShow6=false;
-
-	
-	
-	
-	
-	
+	$scope.tabShow8=false;
+	$scope.tabShow9=false;
+	$scope.tabShow10=false;
+	$scope.tabShow11=false;
+	$scope.tabShow12=false;
+	$scope.tabShow13=false;
 	
 	
 	$scope.stateList=[];
 	$scope.districtList=[];
 	
 	
-	getStateList();
+	$scope.centralShow=true;
+	$scope.stateShow=false;
+	$scope.changeAct=function(event){
+		if(event.target.id=="central"){
+			$scope.centralShow=true;
+			$scope.stateShow=false;
 	
+			
+		}
+		else{
+			$scope.stateShow=true;
+			$scope.centralShow=false;
+		}
+	};
+	
+	getPoliceStationList();
+	
+	 $scope.filterLct = function(court) {
+     	if(court.lct_id==151 && court.lct_dt_mid==81){
+     		/*console.log(court);*/
+     	}
+         return (court.lct_dt_mid === $scope.extraCaveatImpugnedOrder.ec_io_district);
+     };
+     
+     $scope.filterLctCav = function(court) {
+      	if(court.lct_id==151 && court.lct_dt_mid==81){
+      		/*console.log(court);*/
+      	}
+          return (court.lct_dt_mid === $scope.caveat.cav_ord_dist);
+      };
+	
+	 function getPoliceStationList()
+	 {
+			$http.get(urlBase+'police_station_master/getpoliceStationNewDetails').
+	        success(function (data) {
+	        	$scope.policeStationList=data;
+	        	
+	        }).
+	        error(function(data, status, headers, config) {
+	        	console.log("Error in getting tree data");
+	        });
+		};
+		
+		$scope.editAct=function(data){
+			$scope.actDetails=data;
+			
+		}
+		
+		
+		$scope.deleteActDetails=function(id){
+			  var result=confirm("Are you really want to Remove");
+				if (result) {
+			   $http({
+				method : 'DELETE',
+				url : urlBase + 'caveat/deleteActDetails/' + id + '/'
+			}).success(function(res) {
+				   if(res.response=="TRUE"){
+					alert("  actDetails Deleted Successfully!");
+					if($scope.draftId!=null && $scope.draftId!=undefined){
+						getActDetails($scope.draftId);	
+					}
+					else{
+						getActDetails($scope.registerCase.rcd_id);
+					}
+					
+				 	
+				   }
+		
+				
+			});	
+		}
+		
+		}
+	
+	$scope.defaultDist=function(){
+		$scope.caveat.cav_ord_dist=$scope.caveat.cav_dist_mid;
+		$scope.extraCaveatImpugnedOrder.ec_io_district=$scope.caveat.cav_dist_mid;
+	}
+	
+	$scope.deleteExtraImpugnedOrder=function(id){
+		  var result=confirm("Are you really want to Remove");
+			if (result) {
+		   $http({
+			method : 'DELETE',
+			url : urlBase + 'caveat/deleteExtraImpugnedOrder/' + id + '/'
+		}).success(function(res) {
+			   if(res.response=="TRUE"){
+		     alert("  Extra ImpugnedOrder Deleted Successfully!");
+		     if($scope.draftId!=null && $scope.draftId!=undefined){
+		    	 getExtraCaveatImpugnedOrder($scope.draftId);	
+				}
+				else{
+					getImpugnedOrder($scope.registerCase.rcd_id);
+				}
+			   }
+	
+			
+		});	
+	}
+	
+	}
+	
+	$scope.editExtraImp=function(data){
+		$scope.extraCaveatImpugnedOrder=data;
+		
+	}
+	
+	$scope.editExtraAuth=function(data){
+		$scope.caveatAuthority=data;
+		
+	}
+	
+	function getExtraCaveatImpugnedOrder(id){
+	    $http.get(urlBase+ 'caveat/getExtraCaveatImpugnedOrder', {
+			params : {
+				'docId' : id
+			}
+		}).success(function(data, status, headers, config) {
+	              $scope.extraImpugnedDataList = data.modelList;
+	               
+	}).error(function(data, status, headers, config) {
+		});
+
+	}
+
+	$scope.addExtraCaveatImpugnedOrder=function(extraCaveatImpugnedOrder){
+		if($scope.caveat.cav_id==null || angular.isUndefined($scope.caveat.cav_id))
+		{
+			alert("First add Caveat details");
+			return false;
+		}
+		$scope.extraCaveatImpugnedOrder.ec_io_cav_mid=$scope.caveat.cav_id;
+		var response =$http.post(urlBase+'caveat/addExtraCaveatImpugnedOrder',$scope.extraCaveatImpugnedOrder);
+		response.success(function(data, status, headers, config){
+			   if(data.response=="TRUE"){
+				alert("Extra ImpugnedOrder Added Successfully!");
+				$scope.impugnedOrder="";
+				if($scope.draftId!=null && $scope.draftId!=undefined){
+					getExtraCaveatImpugnedOrder($scope.draftId);	
+				}
+				else{
+					getExtraCaveatImpugnedOrder($scope.caveat.cav_id);
+				}
+			   }
+      		 // $scope.lookupdataList.unshift(data);
+			   else if(data.data=="Update"){
+					  alert(" impugnedOrder Updated Successfully!");
+						$scope.extraCaveatImpugnedOrder="";
+						if($scope.draftId!=null && $scope.draftId!=undefined){
+							getExtraCaveatImpugnedOrder($scope.draftId);	
+						}
+						else{
+							getExtraCaveatImpugnedOrder($scope.caveat.cav_id);
+						}
+						
+			   }
+	
+			
+		});	
+	}
+	
+	getStateList();
 	 function getStateList()
 	 {
 			$http.get(urlBase+'ecourt/getStateList').
@@ -110,9 +297,21 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 	        });
 		};
 		
+		$scope.getAvocateDetails=function(adv){
+			 $http.get(urlBase+ 'caveat/getAdvocate', {
+					params : {
+						'docId' : adv
+					}
+				}).success(function(data, status, headers, config) {
+			                
+			                $scope.extraAdovate = data.modelData;
+			               
+			}).error(function(data, status, headers, config) {
+				});
+		}
+		
 		
 		getDistrictList();
-		
 		 function getDistrictList()
 		 {
 				$http.get(urlBase+'ecourt/getDistrictList').
@@ -125,6 +324,8 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 		        });
 			};
 			getActMasters();
+			
+			$scope.caveatCrimeDetails={};
 			$scope.stateActList=[];
 			$scope.centralActList=[];
 			function getActMasters()
@@ -248,7 +449,100 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 	
 	
 	
-	
+				$scope.filterExpression = function(station) {
+		            return (station.pt_dist_mid === $scope.caveatCrimeDetails.ccd_district);
+		        };	
+		        
+		        $scope.crimeDetail={};
+		        
+		        $scope.addCrimeDetails=function(crimedetils){
+					if($scope.caveat.cav_id==null || angular.isUndefined($scope.caveat.cav_id))
+					{
+						alert("First add Caveat details");
+						return false;
+					}
+					$scope.crimeDetail=crimedetils;
+					$scope.crimeDetail.ccd_cav_mid=$scope.caveat.cav_id;
+					var response =$http.post(urlBase+'caveat/addCrimeDetail',$scope.crimeDetail);
+					response.success(function(data, status, headers, config){
+						   if(data.response=="TRUE"){
+							alert("Crime details Added Successfully!");
+							$scope.crimeDetail={};
+							if($scope.draftId!=null && $scope.draftId!=undefined){
+								getCrimeDetail($scope.caveat.cav_id);	
+							}
+							else{
+								getCrimeDetail($scope.caveat.cav_id);
+							}
+						   }
+			      		 // $scope.lookupdataList.unshift(data);
+						   else if(data.data=="Update"){
+								  alert(" Crime details Updated Successfully!");
+									$scope.crimeDetail="";
+									if($scope.draftId!=null && $scope.draftId!=undefined){
+										getCrimeDetail($scope.caveat.cav_id);	
+									}
+									else{
+										getCrimeDetail($scope.caveat.cav_id);
+									}
+									
+						   }
+				
+						
+					});	
+				}
+		        
+		    	$scope.deleteCrimeDetails=function(id){
+					  var result=confirm("Are you really want to Remove");
+						if (result) {
+					   $http({
+						method : 'DELETE',
+						url : urlBase + 'caveat/deleteCrimeDetail/' + id + '/'
+					}).success(function(res) {
+						   if(res.response=="TRUE"){
+					     alert("  Crime Details Deleted Successfully!");
+					     if($scope.draftId!=null && $scope.draftId!=undefined){
+					    	 getCrimeDetail($scope.caveat.cav_id);	
+							}
+							else{
+								getCrimeDetail($scope.caveat.cav_id);
+							}
+						   }
+				
+						
+					});	
+				}
+				
+				}
+		    	
+		    	function getCrimeDetail(id){
+				    $http.get(urlBase+ 'caveat/getCrimeDetail', {
+						params : {
+							'docId' : id
+						}
+					}).success(function(data, status, headers, config) {
+				              $scope.crimeDetailList = data.modelList;
+				               
+				}).error(function(data, status, headers, config) {
+					});
+
+				}
+		    	
+		    	function getAuthority(id){
+				    $http.get(urlBase+ 'caveat/getAuthority', {
+						params : {
+							'docId' : id
+						}
+					}).success(function(data, status, headers, config) {
+				              $scope.authorityList = data.modelList;
+				              console.log($scope.authorityList[0]);
+				              $scope.caveatAuthority1=$scope.authorityList[0];
+				              $scope.authorityList.splice(0,1);
+				               
+				}).error(function(data, status, headers, config) {
+					});
+
+				}
 	
 	
 	
@@ -274,6 +568,8 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 			}).success(function(data, status, headers, config) {
 		                
 		                $scope.caveat = data.modelData;
+		                $scope.caveat.cav_ord_dist=$scope.caveat.cav_dist_mid;
+		        		$scope.extraCaveatImpugnedOrder.ec_io_district=$scope.caveat.cav_dist_mid;
 		                getEditData();
 		}).error(function(data, status, headers, config) {
 			});
@@ -283,12 +579,34 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 			function getEditData(){
 			if($scope.draftId!=null && $scope.draftId!=undefined){
 			getCaveatPetitioner($scope.draftId);
+			getCrimeDetail($scope.draftId);
+			getAuthority($scope.draftId);
 			getCaveatRespondent($scope.draftId);
+			getCaveatExtraCaveator($scope.draftId);
+			getExtraCaveatImpugnedOrder($scope.draftId);
 			getCourtFee($scope.draftId);
 			getUploadedDocuments($scope.draftId);
+			getCaveatExtraAdvocate($scope.draftId);
+			getActDetails($scope.draftId);
 			}
 			}
 			
+			
+			function getActDetails(id){
+			    $http.get(urlBase+ 'caveat/getActDetails', {
+					params : {
+						'docId' : id
+					}
+				}).success(function(data, status, headers, config) {
+			                
+			              $scope.actDataList = data.modelList;
+			              
+			              cosnole.log("act "+$scope.actDataList);
+			               
+			}).error(function(data, status, headers, config) {
+				});
+
+			}
 			
 			function getCaveatPetitioner(id){
 				
@@ -304,6 +622,7 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 				});
 
 			}
+			
 				
 			
 				function getCaveatRespondent(id){
@@ -319,7 +638,7 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 					});
 
 				}
-
+				
 				
 				
 				function getActDetails(id){
@@ -355,19 +674,72 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 
 				
 				  
+	$scope.caveatAuthority={};	
+	$scope.caveatAuthority1={};
+	
+	$scope.addCaveatAuthority=function(caveatAuthority){
+		$scope.caveatAuthority.ca_cav_mid=$scope.draftId;
+		   var response =$http.post(urlBase+'caveat/addCaveatAuthority',$scope.caveatAuthority);
+			response.success(function(data, status, headers, config){
+				   if(data.response=="TRUE"){
+					   
+					   alert("Added Successfully!");
+					
+				   }
+				   else if(data.response=="UPDATE"){
+					   alert("Updated Successfully!");
+					   console.log("auth updated");
+				   }
 		
+				
+			});	
+	}
 	
 	$scope.addCaveat=function(caveat){
 		
 		var response =$http.post(urlBase+'caveat/addCaveat',caveat);
 		response.success(function(data, status, headers, config){
 			   if(data.response=="ADD"){
+				   $scope.caveat=data.modelData;
+				   $scope.caveatAuthority1.ca_cav_mid= $scope.caveat.cav_id;
+				   
+				   if($scope.caveat.cav_court==4){
+				   var response =$http.post(urlBase+'caveat/addCaveatAuthority',$scope.caveatAuthority1);
+					response.success(function(data, status, headers, config){
+						   if(data.response=="ADD"){
+							   
+							console.log("auth added");
+							
+						   }
+						   else if(data.response=="UPDATE"){
+							   
+							   console.log("auth updated");
+						   }
+				
+						
+					});	
+				   }
+				   
 				   
 				alert("Caveat Added Successfully!");
 				$scope.caveat=data.modelData;
 			   }
 			   else if(data.response=="UPDATE"){
-				   
+				  // $scope.caveatAuthority1.ca_cav_mid= $scope.caveat.cav_id;
+				   var response =$http.post(urlBase+'caveat/addCaveatAuthority',$scope.caveatAuthority1);
+					response.success(function(data, status, headers, config){
+						   if(data.response=="ADD"){
+							   
+							console.log("auth added");
+							
+						   }
+						   else if(data.response=="UPDATE"){
+							   
+							   console.log("auth updated");
+						   }
+				
+						
+					});	
 				alert("Caveat Updated Successfully!");
 			   }
 	
@@ -375,7 +747,7 @@ EDMSApp.controller('addCaveatlController',['$scope','$http','Upload',function ($
 		});	
 	}
 
-
+	$scope.rollno=null;
 
 $scope.ShowId = function(event)
 {
@@ -387,7 +759,13 @@ $scope.ShowId = function(event)
 	$scope.tabShow5=true;
 	$scope.tabShow6=true;
 	$scope.tabShow7=true;
+	$scope.tabShow8=true;
+	$scope.tabShow9=true;
+	$scope.tabShow10=true;
+	$scope.tabShow11=true;
 	$scope.tabShow=true;
+	$scope.tabShow12=true;
+	$scope.tabShow13=true;
 };
 	
 $scope.nextTab=function(event){
@@ -444,7 +822,51 @@ $scope.addShow=true;
 				
 			});	
 		}
+		$scope.actDetails={};
 		
+		$scope.addActDetails=function(actDetails){
+			
+			if($scope.act_code2!=null || !angular.isUndefined($scope.act_code2)){
+			$scope.actDetails.cact_code=$scope.act_code2;
+			}
+			if($scope.caveat.cav_id==null || angular.isUndefined($scope.caveat.cav_id))
+			{
+				alert("First add Caveat details");
+				return false;
+			}
+			if(actDetails.act_type==1)
+				actDetails.act_type='central';
+			actDetails.cact_cav_mid=$scope.caveat.cav_id;
+			var response =$http.post(urlBase+'caveat/addActDetails',actDetails);
+			response.success(function(data, status, headers, config){
+				   if(data.response=="TRUE"){
+					alert("ActDetails Added Successfully!");
+					$scope.actDetails="";
+					if($scope.draftId!=null && $scope.draftId!=undefined){
+						getActDetails($scope.draftId);	
+					}
+					else{
+						getActDetails($scope.registerCase.rcd_id);
+					}
+					
+					
+				   }
+	      		 // $scope.lookupdataList.unshift(data);
+				   else if(data.data=="Update"){
+					   alert(" actDetails Updated Successfully!");
+							$scope.actDetails="";
+							if($scope.draftId!=null && $scope.draftId!=undefined){
+								getActDetails($scope.draftId);	
+							}
+							else{
+								getActDetails($scope.registerCase.rcd_id);
+							}
+							
+				   }
+		
+				
+			});	
+		}
 		
 		$scope.deletePetitioner=function(id){
 			  var result=confirm("Are you really want to Remove");
@@ -494,7 +916,7 @@ $scope.addShow=true;
 		$scope.editResp=function(row){
 			$scope.respondentDetails=row;
 			
-		}
+		}		
 		
 
 		$scope.addRespondent=function(respondentDetails){
@@ -557,12 +979,207 @@ $scope.addShow=true;
 			 
 		}
 		
+		function getCaveatRespondent(id){
+		    $http.get(urlBase+ 'caveat/getCaveatRespondent', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.respondentDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+		
 		
 		
 		/**
 		 * ***********************RESPONDENT DETAILS ENDED
 		 * HERE******************
 		 */
+		
+		/*  ********Extra Advocate Details Start *****      */
+		
+		$scope.addAdvocate={};
+		$scope.extraAdovate={};
+		
+		/*$scope.editExtraAdvocate=function(row){
+			$scope.addAdvocate=row;
+			
+		}*/
+		
+		$scope.addExtraAdvocate=function(extraAdvocateDetails){
+			if($scope.caveat.cav_id==null || angular.isUndefined($scope.caveat.cav_id))
+			{
+				alert("First add Caveat details");
+				return false;
+			}
+			$scope.addAdvocate.cea_cav_mid=$scope.caveat.cav_id;
+			$scope.addAdvocate.cea_adv_mid=$scope.extraAdovate.adv_id;
+			$scope.addAdvocate.cea_rec_status=1;
+			
+			
+			var response =$http.post(urlBase+'caveat/addExtraAdvocate',$scope.addAdvocate);
+			response.success(function(data, status, headers, config){
+				
+				   if(data.response=="CREATE"){
+					alert("Extra Advocate Added Successfully!");
+					$scope.extraAdovate={};
+					
+					if($scope.draftId!=null && $scope.draftId!=undefined){
+						getCaveatExtraAdvocate($scope.draftId);	
+					}
+					else{
+						getCaveatExtraAdvocate($scope.caveat.cav_id);
+					}
+				   }
+	      		 // $scope.lookupdataList.unshift(data);
+				   else if(data.response=="UPDATE"){
+						 alert("Extra Advocate Updated Successfully!");		
+						 $scope.extraAdovate={};
+							if($scope.draftId!=null && $scope.draftId!=undefined){
+								getCaveatExtraAdvocate($scope.draftId);	
+							}
+							else{
+								getCaveatExtraAdvocate($scope.caveat.cav_id);
+							}
+							
+				   }
+		
+				
+			});	
+		}
+		
+		function getCaveatExtraAdvocate(id){
+		    $http.get(urlBase+ 'caveat/getCaveatExtraAdvocate', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.extraAdvocateDataList = data.modelList;
+		              console.log($scope.extraAdvocateDataList);
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+
+		
+	
+
+		$scope.deleteExtraAdvocate=function(id){
+			  var result=confirm("Are you really want to Remove");
+				if (result) {
+			   $http({
+				method : 'DELETE',
+				url : urlBase + 'caveat/deleteExtraAdvocate/' + id + '/'
+			}).success(function(res) {
+				   if(res.response=="TRUE"){
+					alert("Respondent Deleted Successfully!");
+					if($scope.draftId!=null && $scope.draftId!=undefined){
+						getCaveatExtraAdvocate($scope.draftId);	
+					}
+					else{
+						getCaveatExtraAdvocate($scope.caveat.cav_id);
+					}
+				 	
+				   }
+				
+			});	
+		}
+			 
+		}
+		
+
+		
+/*  ********Extra Caveator Details Start *****      */
+		
+		function getCaveatExtraCaveator(id){
+			
+		    $http.get(urlBase+ 'caveat/getCaveatExtraCaveator', {
+				params : {
+					'docId' : id
+				}
+			}).success(function(data, status, headers, config) {
+		                
+		              $scope.extraCaveatorDataList = data.modelList;
+		               
+		}).error(function(data, status, headers, config) {
+			});
+
+		}
+		
+		$scope.editEct=function(row){
+			$scope.extraCaveatorDetails=row;
+		}
+		
+		$scope.addExtraCaveator=function(ExtraCaveatorDetails){
+			if($scope.caveat.cav_id==null || angular.isUndefined($scope.caveat.cav_id))
+			{
+				alert("First add Extra Caveator details");
+				return false;
+			}
+			ExtraCaveatorDetails.ect_cav_mid=$scope.caveat.cav_id;
+			var response =$http.post(urlBase+'caveat/addExtraCaveatorDetails',ExtraCaveatorDetails);
+			response.success(function(data, status, headers, config){
+				
+				   if(data.response=="CREATE"){
+					alert("Extra Caveator Added Successfully!");
+					$scope.extraCaveatorDetails={};
+					 if($scope.draftId!=null && $scope.draftId!=undefined)
+				     {
+						 getCaveatExtraCaveator($scope.draftId);
+				     }
+					 else{
+						 getCaveatExtraCaveator($scope.caveat.cav_id);
+					 }
+					
+				   }
+	      		 // $scope.lookupdataList.unshift(data);
+				   else if(data.response=="UPDATE"){
+						  alert("Extra Caveator Updated Successfully!");
+						  $scope.extraCaveatorDetails={};
+							if($scope.draftId!=null && $scope.draftId!=undefined){
+								getCaveatExtraCaveator($scope.draftId);
+							}
+							else
+								{
+								getCaveatExtraCaveator($scope.caveat.cav_id);
+								}
+				   }
+		
+				
+			});	
+		}
+	
+		$scope.deleteExtraCvaeator=function(id){
+			  var result=confirm("Are you really want to Remove");
+				if (result) {
+			   $http({
+				method : 'DELETE',
+				url : urlBase + 'caveat/deleteExtraCvaeator/' + id + '/'
+			}).success(function(res) {
+				   if(res.response=="TRUE"){
+					alert("Extra Caveator Deleted Successfully!");
+					if($scope.draftId!=null && $scope.draftId!=undefined){
+						getCaveatExtraCaveator($scope.draftId);
+					}
+					else{
+						getCaveatExtraCaveator($scope.caveat.cav_id);
+				 	
+				   }
+				   }
+				
+			});	
+		}
+		
+		}
+
+/*    **********Extra Caveator details End************    /
+		
 		
 		
 		
@@ -618,19 +1235,47 @@ $scope.addShow=true;
 			});	
 		}
 		
-		
+		$scope.authorityShow=false;
 		$scope.lowerCourtShow=true;
 		$scope.highCourtShow=false;
 		$scope.changeCourt=function(event){
 			if(event.target.id=="lowerCourt"){
 				$scope.lowerCourtShow=true;
 				$scope.highCourtShow=false;
+				$scope.crimeDetailShow=false;
+				$scope.authorityShow=false;
 		
+				
+			}
+			else if(event.target.id=="crimeDetails"){
+				$scope.crimeDetailShow=true;
+				$scope.lowerCourtShow=false;
+				$scope.highCourtShow=false;
+				$scope.authorityShow=false;
+				
+			}
+			else if(event.target.id=="authority"){
+				$scope.authorityShow=true;
+				$scope.crimeDetailShow=false;
+				$scope.lowerCourtShow=false;
+				$scope.highCourtShow=false;
+				
+				
+			}
+			else if(event.target.id=="mandamus"){
+				$scope.authorityShow=false;
+				$scope.crimeDetailShow=false;
+				$scope.lowerCourtShow=false;
+				$scope.highCourtShow=false;
+				$scope.mandmusShow=true;
+				
 				
 			}
 			else{
 				$scope.highCourtShow=true;
 				$scope.lowerCourtShow=false;
+				$scope.crimeDetailShow=false;
+				$scope.authorityShow=false;
 			}
 		};
 		

@@ -1,0 +1,159 @@
+<jsp:include page="../content/header2.jsp"></jsp:include>
+	<div id="content" class="content">
+		<div class="container-fluid" ng-controller="TabsDemoCtrl" >
+		<div class="row">
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-check-circle"></i></div>
+						<div class="stats-info">
+							<h4>submitted</h4>
+							<p>3</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-blue">
+						<div class="stats-icon"><i class="fa fa-exclamation-triangle"></i></div>
+						<div class="stats-info">
+							<h4>Not Accepted</h4>
+							<p>2</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+				
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-purple">
+						<div class="stats-icon"><i class="fa fa-users"></i></div>
+						<div class="stats-info">
+							<h4>Defective</h4>
+							<p>1</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-red">
+						<div class="stats-icon"><i class="fa fa-floppy-o"></i></div>
+						<div class="stats-info">
+							<h4>Drafts</h4>
+							<p>{{count}}</p>	
+						</div>
+						<div class="stats-link">
+							<a href="draftForm">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<!-- end col-3 -->
+			</div>
+			
+			
+			<div class="row">
+				<!-- begin col-3 -->
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-question-circle"></i></div>
+						<div class="stats-info">
+							<h4>Pending Acceptance</h4>
+							<p>1</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-red">
+						<div class="stats-icon"><i class="fa fa-question-circle"></i></div>
+						<div class="stats-info">
+							<h4>Pending Scrutiny</h4>
+							<p>2</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				
+			
+						<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-purple">
+						<div class="stats-icon"><i class="fa fa-credit-card"></i></div>
+						<div class="stats-info">
+							<h4>Make Payment</h4>
+							<p>1</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+				
+				
+				
+		
+		          <div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-green">
+						<div class="stats-icon"><i class="fa fa-file"></i></div>
+						<div class="stats-info">
+							<h4>e-Filed Documents</h4>
+							<p>1</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+					<div class="col-md-3 col-sm-6">
+					<div class="widget widget-stats bg-purple">
+						<div class="stats-icon"><i class="fa fa-database"></i></div>
+						<div class="stats-info">
+							<h4>e-Filed Cases</h4>
+							<p>1</p>	
+						</div>
+						<div class="stats-link">
+							<a href="javascript:;">View Detail <i class="fa fa-arrow-circle-o-right"></i></a>
+						</div>
+					</div>
+				</div>
+		
+				
+			
+			
+			
+			
+			
+		</div>
+
+	</div>
+	
+	</div>
+	</body>
+	<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtHomeController.js"></script>
+	<!-- ================== END PAGE LEVEL JS ================== -->
+	<script src="${pageContext.request.contextPath}/assets/js/apps.min.js"></script>
+	<script>
+		$(document).ready(function() {
+			App.init();
+			
+		});
+	</script>
+</html>

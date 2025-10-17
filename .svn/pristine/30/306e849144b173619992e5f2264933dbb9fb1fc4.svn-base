@@ -1,0 +1,210 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+
+<jsp:include page="../content/header.jsp"></jsp:include>
+
+<div id="content" class="content" ng-controller="roleMapCtrl">
+
+	<!-- begin row -->
+	<div class="row">
+		<div class="col-md-11">
+			<!-- begin panel -->
+			<div class="panel panel-inverse">
+				<div class="panel-heading">
+					<!-- <div class="panel-heading-btn">
+						<select
+								ng-options="bcd.lk_id as bcd.lk_longname for bcd in branchDataList"
+								class="form-control" id="branchData" 
+								name="branchCode" ng-model="model.branchCode" required>
+						</select>
+					</div> -->
+					<h4 class="panel-title">Role Mapping</h4>
+				</div> 
+				<div class="panel-body">
+							<!-- <div class="col-md-2">
+								<select
+									ng-options="rolelist.lk_id as rolelist.lk_longname for rolelist in roleMapList"
+									class="form-control" 
+									name="ro_role_id"  id="ro_role_id" ng-model="model.ro_role_id" ng-change="getDataByRoleID()">
+								</select>
+							</div> -->
+							
+							
+							
+								<div class="col-md-6  m-20">
+										<div class="form-group">
+											<label class="control-label col-md-4 col-sm-4">DESIGNATION:</label>
+											<div class="col-md-6 col-sm-6">
+								<select
+									ng-options="rolelist.lk_id as rolelist.lk_longname for rolelist in roleMapList"
+									class="form-control" name="ro_role_id" id="ro_role_id"
+									ng-model="model.ro_role_id" ng-change="getDataByRoleID()">
+								</select>
+							</div>
+										</div>
+										</div>
+					
+	
+					<div class="col-md-8 col-sm-8 col-md-offset-2" >
+						<div class="form-group">
+<!-- 							<label class="control-label col-md-3 col-sm-3"></label> -->
+							<div class="col-md-6 col-sm-6"  style="border: thin solid Black">
+								<!-- 													{{selectedNodes}} 							 -->
+							<!-- 	<treecontrol class="tree-classic" tree-model="tree_data"
+									icon-leaf="icon-file" icon-expand="icon-plus-sign"
+									icon-collapse="icon-minus-sign" options="treeOptions"
+									selected-nodes="selectedNodes" ng-model="model.ro_om_mid"
+									on-selection="showSelected(node, selected)">
+								{{node.name}} <input id="{{node.name}}" type="checkbox"
+									value="{{node.name}}" ng-model="node.checkbox" ng-checked="selection.indexOf(node) > -1"
+									ng-click="toggleSelection(node,selected)" /> <label
+									for="{{node.name}}"></label> </treecontrol> -->
+									
+								<treecontrol class="tree-classic" tree-model="tree_data"
+									icon-leaf="icon-file" icon-expand="icon-plus-sign"
+									icon-collapse="icon-minus-sign" options="treeOptions"
+									selected-nodes="selectedNodes" ng-model="model.ro_om_mid"
+									on-selection="showSelected(node, selected)">
+								{{node.name}} <input id="{{node.name}}" type="checkbox"
+									value="{{node.name}}" ng-model="node.checkbox"
+									ng-click="toggleSelection(node)" /> <label
+									for="{{node.name}}"></label> </treecontrol>
+							</div>
+						</div>
+					</div>
+						
+					<div class="col-md-6 col-sm-6 col-md-offset-3 p-t-20">
+						<div class="form-group">
+							<input type="submit" value="Submit" id="Submit" ng-disabled="!model.ro_role_id"
+								ng-click="save(tree_data,model)" data-loading-text="Loading..."
+								class="btn btn-success" />
+						<!-- 	<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button> -->
+						</div>
+					</div>
+
+
+
+
+				</div>
+				<!-- end panel -->
+			</div>
+			<!-- end col-10 -->
+		</div>
+		<!-- end row -->
+	</div>
+
+
+
+
+</div>
+
+<!-- begin theme-panel -->
+<div class="theme-panel">
+	<a href="javascript:;" data-click="theme-panel-expand"
+		class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
+	<div class="theme-panel-content">
+		<h5 class="m-t-0">Color Theme</h5>
+		<ul class="theme-list clearfix">
+			<li class="active"><a href="javascript:;" class="bg-green"
+				data-theme="default" data-click="theme-selector"
+				data-toggle="tooltip" data-trigger="hover" data-container="body"
+				data-title="Default">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-red" data-theme="red"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Red">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-blue" data-theme="blue"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Blue">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-purple" data-theme="purple"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Purple">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-orange" data-theme="orange"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Orange">&nbsp;</a></li>
+			<li><a href="javascript:;" class="bg-black" data-theme="black"
+				data-click="theme-selector" data-toggle="tooltip"
+				data-trigger="hover" data-container="body" data-title="Black">&nbsp;</a></li>
+		</ul>
+		<div class="divider"></div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Header Styling</div>
+			<div class="col-md-7">
+				<select name="header-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">inverse</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label">Header</div>
+			<div class="col-md-7">
+				<select name="header-fixed" class="form-control input-sm">
+					<option value="1">fixed</option>
+					<option value="2">default</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Sidebar Styling</div>
+			<div class="col-md-7">
+				<select name="sidebar-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">grid</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label">Sidebar</div>
+			<div class="col-md-7">
+				<select name="sidebar-fixed" class="form-control input-sm">
+					<option value="1">fixed</option>
+					<option value="2">default</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Sidebar
+				Gradient</div>
+			<div class="col-md-7">
+				<select name="content-gradient" class="form-control input-sm">
+					<option value="1">disabled</option>
+					<option value="2">enabled</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-5 control-label double-line">Content Styling</div>
+			<div class="col-md-7">
+				<select name="content-styling" class="form-control input-sm">
+					<option value="1">default</option>
+					<option value="2">black</option>
+				</select>
+			</div>
+		</div>
+		<div class="row m-t-10">
+			<div class="col-md-12">
+				<a href="#" class="btn btn-inverse btn-block btn-sm"
+					data-click="reset-local-storage"><i class="fa fa-refresh m-r-3"></i>
+					Reset Local Storage</a>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end theme-panel -->
+
+<!-- begin scroll to top btn -->
+<a href="javascript:;"
+	class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+	data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+<!-- end scroll to top btn -->
+
+
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/scripts/controllers/roleMappingController.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>	
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap/ui-bootstrap-tpls.0.11.2.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/angular-tree-control.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/tree-grid-directive.js"></script>
+
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/tree-control.css'>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/tree-control-attribute.css'>	
+<link rel='stylesheet' href='${pageContext.request.contextPath}/css/tree-control/treeGrid.css'>

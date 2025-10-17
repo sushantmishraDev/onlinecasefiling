@@ -1,0 +1,750 @@
+var edmsApp = angular.module("EDMSApp", ['ui.bootstrap','ng-bootstrap-datepicker','ngMask']);
+
+edmsApp.directive('numberConverter', function() {
+	  return {
+	    priority: 1,
+	    restrict: 'A',
+	    require: 'ngModel',
+	    link: function(scope, element, attr, ngModel) {
+	      function toModel(value) {
+	        return "" + value; // convert to string
+	      }
+
+	      function toView(value) {
+	        return parseInt(value); // convert to number
+	      }
+
+	      ngModel.$formatters.push(toView);
+	      ngModel.$parsers.push(toModel);
+	    }
+	  };
+	});
+
+edmsApp.controller("dataEntryCtrl",	function($scope, $http) {
+	$scope.masterdata = [];
+	$scope.masterentity = {};
+	$scope.caseFile = {};
+	$scope.metaDataList =[];
+	$scope.metaFieldList =[];
+	$scope.metaData ={};
+	$scope.metaList=[];
+	$scope.lookUpMaster=[];	
+	$scope.caseTypeList=[];
+	$scope.benchCodeList=[];	
+	$scope.districtList=[];
+	$scope.yearList=[];
+	$scope.policestaitonList=[];
+	$scope.judgeList=[];
+	$scope.mainJudgeList=[];
+	$scope.lowerJudgeList=[];
+	$scope.appellateJudgeList=[];	
+	$scope.judgementList=[];
+	$scope.categoryCodeList=[];
+	$scope.barcodeList=[];
+	var baseUrl="/dms/";
+	$scope.masterentity.dfd_id='';
+	$scope.division=true;
+	$scope.judgementfilename='';
+	$scope.errorlist =[];
+	/*[Sunil]Start changes*/
+	console.log("***********judgement List*********");
+//	$scope.judgementfileList = $('#judgementfileList').val();
+	//alert($scope.judgementfileList);
+	console.log($scope.judgementList);	
+	/*[Sunil] End Changes*/
+
+	$scope.id= $('#fd_id').val();
+	$scope.judgmentdocId= $('#judgmentdocId').val();
+	
+	if($scope.judgmentdocId!=null){
+		$scope.masterentity.dfd_id=$scope.judgmentdocId;
+	}
+	//alert(2);
+	$scope.fd_file_bar_code= $('#fd_file_bar_code').val();
+	//alert($scope.fd_file_bar_code);
+	var url = baseUrl+'uploads/' + $scope.fd_file_bar_code;
+	DEFAULT_URL = url;
+	//DEFAULT_URL='/pdms/uploads/jbar.pdf';
+	//alert(DEFAULT_URL);
+	/*var request = new XMLHttpRequest();
+	console.log(request);
+    request.open('HEAD', url, false);
+    request.send();
+    if(request.status == 200) {
+        $scope.pdfData = true;
+        
+    } else {
+        $scope.pdfData = false;
+    }*/
+	console.log($scope.pdfData);
+    
+	getMetaFields();
+	rejectremarklist();
+	//getLookUpMaster();
+	//getStationMaster();
+	//getJudges();
+	//getCategoryCodes();
+	function getLookUpMaster() {			
+		var response = $http.get(baseUrl+'dataentry/getlookupmaster');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET LOOK UP MASTER ==");
+			$scope.lookUpMaster= data.modelList;
+			console.log(data);
+			getdropdown();
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	function getStationMaster() {			
+		var response = $http.get(baseUrl+'dataentry/getpolicestaiton');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET STATION MASTER ==");
+			$scope.policestaitonList= data.modelList;
+			console.log(data);
+		
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	
+	function getCategoryCodes() {			
+		var response = $http.get(baseUrl+'dataentry/getcategorycodes');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET CATEGORY MASTER ==");
+			$scope.categoryCodeList= data.modelList;
+			console.log(data);
+		
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	
+	function getCaseType() {			
+		var response = $http.get(baseUrl+'dataentry/getcasefilebarcode');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET file barcode ==");
+			$scope.barcodeList= data.modelList;
+			console.log(data);
+			
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	
+	function getJudges() {			
+		var response = $http.get(baseUrl+'dataentry/getjudges');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET JUDGES ==");
+			$scope.judgeList= data.modelList;
+			console.log(data);
+			
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	function getMetaFields() {			
+		var response = $http.get(baseUrl+'dataentry/getfields');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET FIELDS ==");
+			$scope.metaFieldList= data.modelList;
+			getMetadata();
+			console.log(data);
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	$scope.viewCasefile=function(){
+		window.location.href = baseUrl+"casefile/dataentry/"+$scope.id;
+	};
+	
+	$scope.JudmentlistChange=function()
+	{
+		//window.location.href = baseUrl+"judgementfile/dataentry/"+$scope.masterentity.dfd_id;
+		if($scope.judgementfilename != null)
+		{
+			$scope.judgementfileurl=baseUrl+"uploads/"+$scope.judgementfilename;
+			$('#judgementfile_Modal').modal('show');
+		}
+	};
+	
+	$scope.reopencasefileChange=function(){
+		window.location.href = baseUrl+"reopencasefile/dataentry/"+$scope.masterentity.id;
+	}
+	
+	function rejectremarklist() {
+		var response = $http.get(baseUrl+'dataentry/rejectremarklist');
+		response.success(function(data, status, headers, config) {		
+			console.log("== GET rejectremarklist ==");
+			$scope.remarklist= data;
+			//console.log(data);
+			
+		});
+		response.error(function(data, status, headers, config) {
+			// alert("Error");
+		});
+		
+	};
+	function getMetadata() {			
+		//var response = $http.get(baseUrl+'dataentry/getmetadata');
+		var response = $http.get(baseUrl+'dataentry/getmetadata',{params: {'md_fd_mid': $scope.id}});
+		response.success(function(data, status, headers, config) {	
+			console.log("<< GET META DATA >>");
+			//console.log(data);
+			var valuePresent = false;
+			$scope.caseFile = data.modelData;			
+			$scope.newMetaDataList=$scope.caseFile.metaDataList;
+			console.log("**********judgement*****sunil");
+			
+			$scope.masterentity.judgementList=$scope.caseFile.judgementfileList;		
+			$scope.masterentity.reopencasefileList=$scope.caseFile.reopencasefileList;
+			console.log($scope.masterentity.judgementList);
+			createTemplate();
+			
+			/*angular.forEach($scope.metaFieldList,function(value,index){	
+				valuePresent = false;				
+				angular.forEach(data.modelData.metaDataList,function(item,index){			
+					if(item.md_mf_mid==value.mf_id){						
+						$scope.metaDataList.push(item);
+						valuePresent = true;
+					}
+				});	
+				if(!valuePresent){	
+					$scope.metaDataList.push({'metaField':value,'md_mf_mid':value.mf_id,'md_fd_mid':fd_id});
+				}
+			});*/	
+			
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	
+	function getdropdown(){			
+		angular.forEach($scope.lookUpMaster,function(value,index){					
+			switch(value.lk_setname) {			
+			    case "CASE_TYPE":
+			    	$scope.caseTypeList.push(value);	
+			        break;
+			    case "BRANCH":
+			    	$scope.benchCodeList.push(value);	
+			        break;	
+			    case "DISTRICT":
+			    	$scope.districtList.push(value);	
+			        break;	
+			    default:
+			}
+        });
+		
+	}			
+	
+	$scope.getPoliceStns=function(data){
+		console.log("*******************");
+		console.log(data);
+		$scope.entity=angular.copy(data);
+		console.log($scope.entity.md_value);
+		
+		var response = $http.post(baseUrl+'dataentry/getpolicestsbydistrict',$scope.entity);
+		response.success(function(data, status, headers, config) {		
+			$scope.dropdownlist=[];
+			$scope.dropdownlist= data.data;
+			angular.forEach($scope.metaDataList,function(value,index){
+				if(value.metaField.mf_name=='Police_Station'){
+					console.log($scope.metaDataList[index]);
+					$scope.metaDataList[index].metaField.dropDownList=[]
+					//$scope.metaDataList[index].metaField.dropDownList=$scope.dropdownlist;
+
+					angular.forEach($scope.dropdownlist,function(dropdown,i){
+						console.log(dropdown);
+						$scope.metaDataList[index].metaField.dropDownList.push(dropdown);
+					});
+				}
+			});
+		});
+		response.error(function(data, status, headers, config) {
+			alert("Error");
+		});
+		
+	};
+	$scope.getJudges=function(data){
+		$scope.benchType=angular.copy(data);
+		
+		$scope.newMetaDataList=[];
+		added = false;
+		flag = 2;// to decide remove button
+		angular.forEach($scope.metaDataList,function(item,index){
+			if(item.md_mf_mid==11){
+				//item.flag=flag
+				if($scope.benchType.md_value==1)
+				{
+					if(!added)
+					{
+						item.flag=4;
+						$scope.newMetaDataList.push(item);
+					}	
+				}
+				else if($scope.benchType.md_value==2)
+				{
+					if(!added)
+					{
+						item.flag=4;
+						$scope.newMetaDataList.push(item);
+						$scope.addRow(11,1);
+					}
+				}else if($scope.benchType.md_value==3)
+				{
+					if(!added)
+					{
+						item.flag=flag;
+						$scope.newMetaDataList.push(item);
+						
+						$scope.addRow(11,1);
+						$scope.addRow(11,1);
+						flag=3;
+						$scope.division=true;
+					}
+				}
+				added = true;
+			}else{
+				$scope.newMetaDataList.push(item);
+			}
+			$scope.metaDataList = $scope.newMetaDataList;
+		});	
+	};
+	//function to do add one more field
+	$scope.addRow= function(fieldId,indexCount) {
+		$scope.newMetaDataList=[];
+		added = false;
+		flag = 1;// to decide remove button
+		var judgeflag=3;
+		angular.forEach($scope.metaDataList,function(item,index){
+				if(item.md_mf_mid==fieldId && !added){
+				if(item.md_mf_mid==fieldId && !added){
+					if($scope.benchType!=null && item.md_mf_mid == 11 && $scope.benchType.md_mf_mid == 33)
+						{
+							if($scope.benchType.md_value==1){
+								judgeflag=4;
+								$scope.newMetaDataList.push(item);
+							}
+							if($scope.benchType.md_value==2){
+								judgeflag=4;
+								$scope.newMetaDataList.push(item);
+								$scope.newMetaDataList.push({'metaField':item.metaField,'md_mf_mid':item.md_mf_mid,'md_fd_mid':$scope.id,'flag':judgeflag});
+							}
+							if($scope.benchType.md_value==3){
+								$scope.newMetaDataList.push(item);
+								judgeflag=4;
+								$scope.newMetaDataList.push({'metaField':item.metaField,'md_mf_mid':item.md_mf_mid,'md_fd_mid':$scope.id,'flag':judgeflag});
+							}
+						}
+					else
+						{
+							console.log("<< In inner Else >>");
+							$scope.newMetaDataList.push(item);
+							$scope.newMetaDataList.push({'metaField':item.metaField,'md_mf_mid':item.md_mf_mid,'md_fd_mid':$scope.id,'flag':flag});
+							added = true;
+						}	
+					
+				}else{
+					console.log("<< In Else >>");
+					$scope.newMetaDataList.push(item);
+					$scope.newMetaDataList.push({'metaField':item.metaField,'md_mf_mid':item.md_mf_mid,'md_fd_mid':$scope.id,'flag':flag});	
+				}
+				added = true;
+			}else{
+				$scope.newMetaDataList.push(item);
+			}
+			$scope.metaDataList = $scope.newMetaDataList;
+		});	
+	}
+	
+	//function to do remove one field
+	$scope.removeRow= function(fieldId,indexCount) {
+		console.log("<< REMOVE >>");
+		console.log($scope.metaDataList[indexCount]);
+		if($scope.metaDataList[indexCount].md_id){
+			console.log("==DELETING FROM DB==");
+			var response = $http.post(baseUrl+'casefile/deletemetadata',$scope.metaDataList[indexCount]);		
+			response.success(function(data, status, headers, config) {
+				console.log("<< SUCCESS >>");
+				console.log(data);
+				
+			});
+		}
+        $scope.metaDataList.splice(indexCount, 1);		
+	}
+	
+	//function to save Meta Data
+	$scope.metaDataSave= function() {
+		//$scope.caseFile={'submit':false,'fd_id':$scope.id,'metaDataList':$scope.metaDataList};	
+		$scope.caseFile.submit=false;
+		$scope.caseFile.id=$scope.id;
+		$scope.caseFile.metaDataList=$scope.metaDataList;
+		save();
+	}
+	
+	$scope.metaDataSubmit= function() {
+		$scope.caseFile.submit=true;
+		$scope.caseFile.id=$scope.id;
+		$scope.caseFile.metaDataList=$scope.metaDataList;	
+		//$scope.caseFile={'submit':true,'fd_id':$scope.id,'metaDataList':$scope.metaDataList};	
+		save();
+	}
+	
+	$scope.errorlist =[];
+	
+	function save(){
+		$scope.errorList =[];
+		
+		//$scope.caseFile={'fd_id':fd_id,'metaDataList':$scope.metaDataList};	
+		console.log("<< SAVE FUNTION >>");
+		validation = doValidation();
+		console.log($scope.caseFile);
+		$scope.buttonDisabled = true;
+		if(validation=="TRUE"){
+			var response = $http.post(baseUrl+'casefile/metadatasave',$scope.caseFile);		
+			response.success(function(data, status, headers, config) {
+				console.log("<< SUCCESS >>");
+				console.log(data);
+				console.log("--------------------------------");
+				if(data.response=="FALSE" && $scope.caseFile.submit)
+					{
+						$scope.errorlist = data.dataMapList;
+					}
+				else
+					{		
+					if(data.response=="TRUE")
+						{
+						$scope.errorlist=[];
+							if(!$scope.caseFile.submit){
+								$scope.newMetaDataList=data.modelData.metaDataList;
+								createTemplate();
+								bootbox.alert("Successfully Saved");
+								$scope.buttonDisabled = true;
+								
+							}else{
+								
+								bootbox.alert("Successfully Submitted Metadata");
+								window.close();
+								/*alert(data);
+								console.log("--------------------------------");
+								console.log(data.dataMapList);*/
+								//window.location.href=baseUrl+"document/documentlist";
+								//window.close();
+							}
+						}
+						}
+			});
+		}
+	}
+	//function to do validation. 
+	function doValidation(){	
+		console.log("<< VALIDATION >>");
+		$scope.errorList =[];
+		judgeCount =0;
+		angular.forEach($scope.metaDataList,function(value,index){	
+			//required validation	
+			if(value.metaField.mf_required_status==1){	
+				if(!value.md_value){
+					msg = value.metaField.mf_lable+" required."
+					$scope.errorList.push({'msg':msg});
+				}
+			}
+			//regex validation	
+			var regularExpression = /^[\w&. \-]+$/;
+			if(value.md_value && value.metaField.mf_type == "text"){	
+				console.log(value);
+				if(!regularExpression.test(value.md_value)){		
+					msg = value.metaField.mf_lable+" should not contain Special Character."
+					$scope.errorList.push({'msg':msg});	
+				}
+			}	
+			if(value.md_value && value.metaField.mf_id == 33){					
+				benchType = value.md_value;
+			}
+			if(value.md_value && value.metaField.mf_id == 11){	
+				judgeCount = judgeCount+1;
+			}
+			
+		});
+		if(benchType){	
+			switch (benchType) {
+			    case '1':
+			        if(judgeCount>1){
+			        	msg = "Only one judge possible."
+						$scope.errorList.push({'msg':msg});	
+			        }
+			        break; 
+			    case '2':
+		    	    if(judgeCount>2){
+			        	msg = " Only two judges possible.."
+						$scope.errorList.push({'msg':msg});	
+			        }
+			        break; 		    
+			}
+		}
+		console.log($scope.errorList);
+		if($scope.errorList.length>0)
+			return "FLASE";
+		else
+			return "TRUE";
+	}
+	
+	/*$scope.reject = function() {
+		
+		bootbox.confirm("Are you Rejecting file for scanning purpose?", function(result) {
+			  
+			}); 
+	};
+	*/
+	
+$scope.reject = function() {
+		$scope.caseFile.metaDataList=null;
+		$scope.caseFile.judgementfileList=null;
+		$scope.caseFile.caseFileStages=null;
+		$scope.caseFile.fd_stage_lid=$scope.remark;
+		console.log("-----------in reject method---------");
+		console.log($scope.caseFile);
+		bootbox.confirm("Are you Rejecting file", function(result) {
+			if(result){
+					var response = $http.post(baseUrl+'casefile/reject',$scope.caseFile);
+					response.success(function(data, status, headers, config) {
+						$scope.errorlist = {};
+						if (data.response == "FALSE") {
+							$scope.errorlist = data.dataMapList;
+							$.each($scope.errorlist, function(k, v) {
+								$("#" + k).parent().parent().addClass('has-error');
+							});
+
+						} else {
+							$scope.errorlist = [];
+							$scope.masterdata.unshift(data);
+							//window.location.href=baseUrl+"/casefile/index";
+							window.close();
+						}
+
+					});
+			  }
+			}); 
+	};
+	$scope.deletecasefile = function() {
+		$scope.caseFile.metaDataList=null;
+		$scope.caseFile.judgementfileList=null;
+		$scope.caseFile.caseFileStages=null;
+		console.log("-----------in reject method---------");
+		console.log($scope.caseFile);
+		bootbox.confirm("Please Confirm", function(result) {
+			if(result){
+					var response = $http.post(baseUrl+'casefile/delete',$scope.caseFile);
+					response.success(function(data, status, headers, config) {
+						$scope.errorlist = {};
+						if (data.response == "FALSE") {
+							$scope.errorlist = data.dataMapList;
+							$.each($scope.errorlist, function(k, v) {
+								$("#" + k).parent().parent().addClass('has-error');
+							});
+
+						} else {
+							$scope.errorlist = [];
+							$scope.masterdata.unshift(data);
+							//window.location.href=baseUrl+"/casefile/index";
+							window.close();
+						}
+
+					});
+			  }
+			}); 
+	};		
+	
+	$scope.save = function(fileDetails,action) {
+		var tempfileDetails=[];
+		$scope.docfileDetails = [];
+		angular.forEach(fileDetails,function(value,index){			
+	
+			var myDate=value.fd_judgement_date;
+			myDate=myDate.split("/");
+			var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+			value.fd_judgement_date=new Date(newDate).getTime();
+			tempfileDetails.push(value);
+		});
+		
+			
+		
+		$scope.action = action; 
+		$scope.bundleData = {
+			"cfdList" : tempfileDetails				
+		};
+		$scope.bundleData.ta_supervisor_id=$scope.ta_supervisor_id;
+		$scope.bundleData.casefileCount=$scope.ib_case_file_count;
+		
+		$scope.bundleData.bundle_id = $scope.bundle_id;
+		if(action=='CREATE')
+			$scope.bundleData.action = "SAVE";
+		else
+			$scope.bundleData.action = "UPDATE";
+		
+		console.log("=====case file count=====");
+		console.log($scope.ib_case_file_count);
+		console.log("---------------case file detail saved ---------");
+		console.log($scope.bundleData);
+			
+		var response = $http.post('casefiledetail/create', $scope.bundleData);
+		response.success(function(data, status, headers, config) {
+			$scope.errorlist = {};
+			if (data.response == "FALSE") {
+				$scope.errorlist = data.dataMapList;
+				$.each($scope.errorlist, function(k, v) {
+					$("#" + k).parent().parent().addClass('has-error');
+				});
+
+			} else {
+				$scope.errorlist = [];
+			
+				/*if(action=='CREATE')
+					bootbox.alert("Successfully added  new  record");
+				else if(action=='UPDATE')
+					bootbox.alert("Successfully updated record");*/
+				
+				$scope.masterdata.unshift(data);
+				$('#receipt_Modal').modal('show');
+				$('#casefile_Modal').modal('hide');
+				
+				getMasterdata();
+			}
+
+		});
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//function to do create MetaTemplate. 
+	function createTemplate(){
+		console.log("<< CREATE >>");	
+			
+		$scope.metaDataList=[];
+		angular.forEach($scope.metaFieldList,function(value,index){	
+			console.log(value);	
+			valuePresent = false;
+			flag = 0;// to decide remove button
+			judgeflag=2;
+			angular.forEach($scope.newMetaDataList,function(item,index){			
+				if(item.md_mf_mid==value.mf_id){
+					
+					item.metaField=value;
+					
+					valuePresent = true;
+					
+					
+					if(value.mf_id==33){
+						$scope.benchType=angular.copy(item);
+					}
+					if(value.mf_id!=11){
+						item.flag=flag;
+						$scope.metaDataList.push(item);
+						flag = 1;
+					}
+					if(value.mf_id==11){
+						if($scope.benchType!=null)
+						{
+							if($scope.benchType.md_value==1)
+							{
+								item.flag=4;
+								$scope.metaDataList.push(item);
+								
+							}else if($scope.benchType.md_value==2)
+							{
+								item.flag=4;
+								$scope.metaDataList.push(item);
+							}
+							else if($scope.benchType.md_value==3)
+							{
+								item.flag=judgeflag;
+								$scope.metaDataList.push(item);
+								judgeflag=3;
+							}
+						}
+					}
+					
+				}
+			});	
+			console.log(valuePresent);
+			if(!valuePresent){	
+				$scope.metaDataList.push({'metaField':value,'md_mf_mid':value.mf_id,'md_fd_mid':$scope.id,'flag':flag});
+			}
+			
+		});
+			console.log("**************111111111");
+		console.log($scope.metaDataList);
+		
+	}
+	
+	//function of datepicker
+	$scope.datepickers = {
+	        dt: false,
+	        dtSecond: false
+	      }
+	      $scope.today = function() {
+	       // $scope.data.dt = new Date();
+
+	        // ***** Q1  *****
+	        //$scope.data.dtSecond = new Date();
+	      };
+	      $scope.today();
+
+	      $scope.showWeeks = true;
+	      $scope.toggleWeeks = function () {
+	        $scope.showWeeks = ! $scope.showWeeks;
+	      };
+
+	      $scope.clear = function () {
+	        $scope.dt = null;
+	      };
+
+	      // Disable weekend selection
+	      $scope.disabled = function(date, mode) {
+	        return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+	      };
+
+	      $scope.toggleMin = function() {
+	        $scope.minDate = ( $scope.minDate ) ? null : new Date();
+	      };
+	      $scope.toggleMin();
+
+	      $scope.open = function($event, which) {
+	        $event.preventDefault();
+	        $event.stopPropagation();
+
+	        $scope.datepickers[which]= true;
+	      };
+
+	      $scope.dateOptions = {
+	        'year-format': "'yy'",
+	        'starting-day': 1
+	      };
+
+	      $scope.formats = ['dd-MMMM-yyyy', 'yyyy-MM-dd', 'shortDate'];
+	      $scope.format = $scope.formats[1];
+
+			
+});
+

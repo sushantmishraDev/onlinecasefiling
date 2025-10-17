@@ -2,6 +2,8 @@ package com.dms.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,17 +26,19 @@ import com.dms.model.ActionResponse;
 import com.dms.model.Application;
 import com.dms.model.ApplicationCheckListMapping;
 import com.dms.model.ApplicationStage;
+import com.dms.model.ApplicationUploaded;
 import com.dms.model.CaseCheckListMapping;
 import com.dms.model.CaseFileStage;
 import com.dms.model.Caveat;
 import com.dms.model.CaveatCheckListMapping;
-import com.dms.model.CaveatFileStage;
+import com.dms.model.CaveatDocuments;
 import com.dms.model.CaveatPetitionerDetails;
 import com.dms.model.CaveatRespondentDetails;
 import com.dms.model.CaveatStage;
 import com.dms.model.CheckList;
 import com.dms.model.IndexField;
 import com.dms.model.Lookup;
+import com.dms.model.PetitionUploaded;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.RespondentDetails;
@@ -44,8 +48,6 @@ import com.dms.service.ApplicationService;
 import com.dms.service.CaseFileService;
 import com.dms.service.CaseFileStageService;
 import com.dms.service.CaveatService;
-import com.dms.service.EcourtAddCaseService;
-import com.dms.service.EcourtHomeService;
 import com.dms.service.LookupService;
 import com.dms.service.ScrutinyService;
 import com.dms.utility.GlobalFunction;
@@ -119,7 +121,7 @@ public class ScrutinyController
 	
 	@RequestMapping(value="/copyFile",method=RequestMethod.GET)
 	@ResponseBody
-	public String copyFiles(HttpServletRequest request)
+	public String copyFiles(HttpServletRequest request) throws ParseException
 	{
 		String jsonData = null;
 		
@@ -129,9 +131,31 @@ public class ScrutinyController
 		
 	
 		Lookup lookUp=lookupService.getLookUpObject("DRAFT_PATH");	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("DRAFT_PATH_BCKUP");	
+		
 		String draft_path=lookUp.getLk_longname();
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
 
-		File source = new File(draft_path+File.separator+doc_name);	
+		File source =null;
+		
+        PetitionUploaded pu=scrutinyService.getPetitionUploaded(doc_name);
+		
+		//RegisteredCaseDetails rcd=scrutinyService.getRegisterCase(pu.getPu_rcd_mid());
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+	//	 String bef=sdf.format("2020-01-01 00:00:00");
+	        
+	        Date dateBef = sdf.parse("2020-07-01 00:00:00");
+			source = new File(draft_path+File.separator+doc_name);	
+		
+		
+		if(!source.exists()) {
+			source = new File(draft_path_bck + File.separator + doc_name);
+		}
+		
 		String uploadPath = context.getRealPath("");
 		
 		doc_name="case_"+doc_name;
@@ -151,19 +175,43 @@ public class ScrutinyController
 	}
 	@RequestMapping(value="/copyCaveatFile",method=RequestMethod.GET)
 	@ResponseBody
-	public String copyCaveatFile(HttpServletRequest request)
+	public String copyCaveatFile(HttpServletRequest request) throws ParseException
 	{
 		String jsonData = null;
 		
 		String doc_name=request.getParameter("cd_document_name");
 		
+		CaveatDocuments cd=scrutinyService.getCaveatUploaded(doc_name);
+		
+		//Caveat cav=scrutinyService.getCaveatById(cd.getCd_cav_mid());
+		
 		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
 		
 	
 		Lookup lookUp=lookupService.getLookUpObject("CAVEAT_PATH");	
-		String draft_path=lookUp.getLk_longname();
+		String draft_path=lookUp.getLk_longname();	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("CAVEAT_PATH_BCKUP");	
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
 
-		File source = new File(draft_path+File.separator+doc_name);	
+		File source =null;
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		//	 String bef=sdf.format("2020-01-01 00:00:00");
+		        
+		        Date dateBef = sdf.parse("2020-07-01 00:00:00");
+			
+			if(cd.getCd_uploaded_date().before(dateBef)) {
+				source = new File(draft_path_bck+File.separator+doc_name);	
+			}
+			else {
+				source = new File(draft_path+File.separator+doc_name);	
+			}
+
+		
 		String uploadPath = context.getRealPath("");
 		
 		doc_name="cav_"+doc_name;
@@ -183,7 +231,7 @@ public class ScrutinyController
 	}
 	@RequestMapping(value="/copyApplicationFile",method=RequestMethod.GET)
 	@ResponseBody
-	public String copyApplicationFile(HttpServletRequest request)
+	public String copyApplicationFile(HttpServletRequest request) throws ParseException
 	{
 		String jsonData = null;
 		
@@ -191,13 +239,40 @@ public class ScrutinyController
 		
 		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
 		
+		ApplicationUploaded au=scrutinyService.getApplicationUploaded(doc_name);
 	
-		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		/*Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
 		String draft_path=lookUp.getLk_longname();
 
-		File source = new File(draft_path+File.separator+doc_name);	
+		File source = new File(draft_path+File.separator+doc_name);	*/
 		String uploadPath = context.getRealPath("");
 		doc_name="appl_"+doc_name;
+		
+		
+		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		String draft_path=lookUp.getLk_longname();	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("APPLICATION_BCKUP_PATH");	
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
+
+		File source =null;
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		//	 String bef=sdf.format("2020-01-01 00:00:00");
+		        
+		        Date dateBef = sdf.parse("2020-07-01 00:00:00");
+			
+			if(au.getAu_uploaded_date().before(dateBef)) {
+				source = new File(draft_path_bck+File.separator+doc_name);	
+			}
+			else {
+				source = new File(draft_path+File.separator+doc_name);	
+			}
+		
+		
 		File dest = new File(uploadPath+"/uploads/"+doc_name);
 
 		try {

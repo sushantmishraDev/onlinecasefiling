@@ -6,13 +6,18 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 
 @Entity
 @Table(name = "application")
@@ -77,8 +82,52 @@ public class Application {
 	@Column(name = "ap_source")
 	private String ap_source;
 	
+
+	@Column(name = "ap_lstng_desc")
+	private String ap_lstng_desc;
+	
+
+	@Column(name = "ap_lstng_prayer")
+	private String ap_lstng_prayer;
+	
+	public String getAp_lstng_desc() {
+		return ap_lstng_desc;
+	}
+
+	public void setAp_lstng_desc(String ap_lstng_desc) {
+		this.ap_lstng_desc = ap_lstng_desc;
+	}
+
+	public String getAp_lstng_prayer() {
+		return ap_lstng_prayer;
+	}
+
+	public void setAp_lstng_prayer(String ap_lstng_prayer) {
+		this.ap_lstng_prayer = ap_lstng_prayer;
+	}
+
+	private  transient Integer  code; 
+	
+	private  transient String appno; 
 	
 	
+	
+	public String getAppno() {
+		return appno;
+	}
+
+	public void setAppno(String appno) {
+		this.appno = appno;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
 	@OneToOne
 	@JoinColumn(name="ap_at_mid",referencedColumnName="at_id",insertable=false,updatable=false)
 	private ApplicationTypes applicationType;
@@ -90,6 +139,12 @@ public class Application {
 	@OneToOne
 	@JoinColumn(name="ap_fd_mid",insertable=false,updatable=false)
 	private CaseFileDetail caseFileDetail;
+
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER, orphanRemoval=true)
+	@JoinColumn(name = "sb_ap_mid",referencedColumnName="ap_id",insertable = false, updatable = false)
+	@Where(clause="sb_ap_rec_status=1")
+	private List<SubApplication> subApplication;
+	
 	
 	private transient List<CheckList> checkList;
 	
@@ -267,6 +322,14 @@ public class Application {
 
 	public void setAp_source(String ap_source) {
 		this.ap_source = ap_source;
+	}
+
+	public List<SubApplication> getSubApplication() {
+		return subApplication;
+	}
+
+	public void setSubApplication(List<SubApplication> subApplication) {
+		this.subApplication = subApplication;
 	}	
 	
 	

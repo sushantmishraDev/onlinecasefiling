@@ -1,0 +1,256 @@
+var EDMSApp = angular.module('EDMSApp', ['ui.bootstrap']);
+EDMSApp.directive('loading', ['$http', function($http) {
+    return {
+        restrict: 'A',
+        link: function(scope, elm, attrs) {
+            scope.isLoading = function() {
+                return $http.pendingRequests.length > 0;
+            };
+            scope.$watch(scope.isLoading, function(v) {
+                if (v) {
+                    elm.show();
+                } else {
+                    elm.hide();
+                }
+            });
+        }
+    };
+}]);
+
+EDMSApp.controller('cavieatViewController', ['$scope', '$http', function($scope, $http) {
+
+
+    var urlBase = "/onlinecasefiling/"
+
+
+
+    $scope.show = false;
+
+
+    $scope.count = '';
+    $scope.registerCase = {};
+
+
+    $scope.petitionerDataList = [];
+    $scope.respondentDataList = [];
+    $scope.courtFeeList = [];
+    $scope.trialDataList = [];
+    $scope.impugnedDataList = [];
+    $scope.draftList = [];
+    $scope.uploadedDocumentsList = [];
+    $scope.checkList = [];
+    $scope.checkListObj = [];
+    $scope.chckedIndexs = [];
+
+
+    $scope.caseId = $('#caseId').val();
+    $scope.checkList=[];
+	function getCheckList(id){
+	    $http.get(urlBase+ 'caveat/getCheckList', {
+			params : {
+				'docId' : id
+			}
+		}).success(function(data, status, headers, config) {
+	                
+	              $scope.checkList = data.modelList;
+	               
+	}).error(function(data, status, headers, config) {
+		});
+
+	}
+    
+    if ($scope.caseId != null && $scope.caseId != undefined)
+        getRegisterCaveat($scope.caseId);
+
+    function getRegisterCaveat(id) {
+
+        $http.get(urlBase + 'caveat/getRegisterCaveat', {
+            params: {
+                'docId': id
+            }
+        }).success(function(data, status, headers, config) {
+
+            $scope.caveat = data.modelData;
+            getEditData();
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+    function getEditData() {
+        getCaveatPetitioner($scope.caseId);
+        getCaveatRespondent($scope.caseId);
+        getCourtFee($scope.caseId);
+        getUploadedDocuments($scope.caseId);
+        getCheckList($scope.caseId);
+    }
+
+
+    function getCaveatPetitioner(id) {
+
+        $http.get(urlBase + 'caveat/getCaveatPetitioner', {
+            params: {
+                'docId': id
+            }
+        }).success(function(data, status, headers, config) {
+
+            $scope.petitionerDataList = data.modelList;
+
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+
+    function getCaveatRespondent(id) {
+        $http.get(urlBase + 'caveat/getCaveatRespondent', {
+            params: {
+                'docId': id
+            }
+        }).success(function(data, status, headers, config) {
+
+            $scope.respondentDataList = data.modelList;
+
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+
+
+    function getActDetails(id) {
+        $http.get(urlBase + 'caveat/getActDetails', {
+            params: {
+                'docId': id
+            }
+        }).success(function(data, status, headers, config) {
+
+            $scope.actDataList = data.modelList;
+
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+
+
+    function getCourtFee(id) {
+        $http.get(urlBase + 'caveat/getCourtFee', {
+            params: {
+                'docId': id
+            }
+        }).success(function(data, status, headers, config) {
+            $scope.courtFeeList = data.modelList;
+
+
+
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+    function getUploadedDocuments(id) {
+
+        $http.get(urlBase + 'caveat/getUploadedDocuments', {
+            params: {
+                'rcd_id': id
+            }
+        }).
+        success(function(data) {
+            $scope.uploadedDocumentsList = data.modelList;
+            console.log($scope.uploadedDocumentsList);
+        }).
+        error(function(data, status, headers, config) {
+            console.log("Error in getting tree data");
+        });
+    };
+
+    $scope.onFileSelect = function($files) {
+        $scope.uploadProgress = 0;
+        $scope.selectedFile = $files;
+    };
+
+    function getRemarkList() {
+        $http.get(urlBase + 'scrutiny/getCheckList', {
+	    	params : {
+	    		'type' : 'C'
+	    	}
+	    }).success(function(data, status, headers, config) {
+            $scope.checkList = data.modelList;
+
+        }).error(function(data, status, headers, config) {});
+
+    }
+
+    $scope.checkAll = function() {
+        if ($scope.selectedAll) {
+            $scope.selectedAll = true;
+        } else {
+            $scope.selectedAll = false;
+        }
+        angular.forEach($scope.checkList, function(value, index) {
+
+            value.checkbox = $scope.selectedAll;
+            // $scope.bundlelist.splice($scope.bundlelist.indexOf(value), 1);
+            $scope.checkListObj.push(value);
+            console.log("Value in checkListObj");
+            console.log(JSON.stringify($scope.checkListObj));
+
+        });
+
+    };
+
+    $scope.checkedIndex = function(data) {
+        if ($scope.chckedIndexs.indexOf(data) === -1) {
+            $scope.chckedIndexs.push(data);
+        } else {
+            $scope.chckedIndexs.splice($scope.chckedIndexs.indexOf(data), 1);
+        }
+        console.log("checked value" + JSON.stringify($scope.chckedIndexs));
+    }
+
+    $scope.submit_file = function(remarks) {
+        $scope.buttonDisabled = true;
+        angular.forEach($scope.checkList, function(value, index) {
+            if (value.checkbox == true) {
+                $scope.checkListObj.push(value);
+            }
+        });
+        $scope.entity = {
+            'checkList': $scope.checkListObj,
+            'cav_id': $scope.caveat.cav_id
+        };
+        var response = $http.post(urlBase + 'scrutiny/submit_caveat_file', $scope.entity);
+        response.success(function(data, status, headers, config) {
+            //debugger;
+            $scope.buttonDisabled = false;
+
+            if (data.response == "REJECT") {
+                $scope.errorlist = data.dataMapList;
+                alert("File Sent for correction");
+                window.close();
+            } else {
+                $scope.buttonDisabled = false;
+                alert("File Submited for Case no generation");
+                window.close();
+
+            }
+
+        });
+        response.error(function(data, status, headers, config) {
+            $scope.buttonDisabled = false;
+            alert("Error");
+        });
+
+
+    };
+    $scope.showDocument=function(selectedfile){
+		var response = $http.get(urlBase+'caveat/copyCaveatFile',{params: {'cd_document_name': selectedfile.cd_document_name}});
+		response.success(function(data, status, headers, config) {		
+			console.log(data);
+			if(data.data != null)
+			{
+				window.open(urlBase+"/uploads/"+data.data,'_blank');
+			}
+		});
+		response.error(function(data, status, headers, config) {
+			bootbox.alert("Error");
+		});
+	};
+
+}]);

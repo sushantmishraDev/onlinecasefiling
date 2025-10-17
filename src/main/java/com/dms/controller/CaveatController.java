@@ -3,6 +3,9 @@ package com.dms.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,6 +13,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.persistence.Query;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -18,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,27 +33,44 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.dms.model.ActDetails;
 import com.dms.model.ActionResponse;
+import com.cms.model.Advocate;
 import com.dms.model.Application;
+import com.dms.model.CActDetails;
 import com.dms.model.CaseCheckListMapping;
 import com.dms.model.CaseFileStage;
+import com.dms.model.CaseType;
 import com.dms.model.Caveat;
+import com.dms.model.CaveatAuthority;
 import com.dms.model.CaveatCheckListMapping;
 import com.dms.model.CaveatCourtFee;
+import com.dms.model.CaveatCrimeDetails;
 import com.dms.model.CaveatDocuments;
+import com.dms.model.CaveatExtraAdvocate;
 import com.dms.model.CaveatPetitionerDetails;
 import com.dms.model.CaveatRespondentDetails;
 import com.dms.model.CaveatStage;
+import com.dms.model.CrimeDetails;
+import com.dms.model.District;
+import com.dms.model.ExtarCaveatImpugnedOrder;
+import com.dms.model.ExtraCaveatorDetails;
+import com.dms.model.ImpugnedOrder;
 import com.dms.model.IndexField;
 import com.dms.model.Lookup;
+import com.dms.model.LowerCourtCaseType;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RespondentDetails;
+import com.dms.model.SmsLog;
 import com.dms.model.User;
 import com.dms.model.UserRole;
+import com.dms.service.AdvocateService;
 import com.dms.service.CaseFileStageService;
 import com.dms.service.CaveatService;
 import com.dms.service.LookupService;
+import com.dms.service.ScrutinyService;
 import com.dms.service.UserRoleService;
+import com.dms.service.UserService;
 import com.dms.utility.GlobalFunction;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfReader;
@@ -63,11 +85,21 @@ public class CaveatController
 	private CaveatService caveatService;
 	@Autowired
 	ServletContext context;
+	
+	@Autowired
+	private ScrutinyService scrutinyService;
+	
+	@Autowired
+	private UserService userService;
+	
 	@Autowired
 	private LookupService lookupService;
 	
 	@Autowired
 	private UserRoleService userRoleService;
+	
+	@Autowired
+	private AdvocateService advocateService;
 	
 	@Autowired
 	private CaseFileStageService caseFileStageService;
@@ -77,6 +109,149 @@ public class CaveatController
 	{
 		cm = new GlobalFunction();
 	}
+	
+	
+	@RequestMapping(value = "/deleteExtraImpugnedOrder/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String deleteExtraImpugnedOrder(@PathVariable Long id, HttpSession session) {
+
+		ExtarCaveatImpugnedOrder response = null;
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<ExtarCaveatImpugnedOrder> pd = new ActionResponse<ExtarCaveatImpugnedOrder>();
+		String jsonData = null;
+
+		response = caveatService.deleteExtraImpugnedOrder(user, id);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/addActDetails", method = RequestMethod.POST)
+	@ResponseBody
+	public String addActDetails(@RequestBody CActDetails actDetails,
+			HttpSession session) {
+		CActDetails response = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CActDetails> rd = new ActionResponse<CActDetails>();
+		String jsonData = null;
+
+		if (actDetails.getCact_id() != null) {
+			rd.setData("Update");
+			actDetails.setCact_mod_by(user.getUm_id());
+			actDetails.setCact_mod_date((new Date()));
+		} else {
+			actDetails.setCact_cr_by(user.getUm_id());
+			actDetails.setCact_cr_date((new Date()));
+			actDetails.setCact_rec_status(1);
+			rd.setResponse("TRUE");
+		}
+		response = caveatService.addActDetails(actDetails);
+
+		if (response != null)
+			jsonData = cm.convert_to_json(rd);
+
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/getActDetails", method = RequestMethod.GET)
+	@ResponseBody
+	public String getActDetails(HttpServletRequest request) {
+
+		String id = request.getParameter("docId");
+		List<CActDetails> response = null;
+
+		Long doc = new Long(id);
+		ActionResponse<CActDetails> pd = new ActionResponse<CActDetails>();
+		String jsonData = null;
+
+		response = caveatService.getActDetails(doc);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/getExtraCaveatImpugnedOrder", method = RequestMethod.GET)
+	@ResponseBody
+	public String getExtraCaveatImpugnedOrder(HttpServletRequest request) {
+		String jsonData = "";
+		String id = request.getParameter("docId");
+		Long doc = new Long(id);
+		List<ExtarCaveatImpugnedOrder> extraimpugnedOrderList = caveatService.getExtraImpugnedOrder(doc);
+		ActionResponse<ExtarCaveatImpugnedOrder> response = new ActionResponse<ExtarCaveatImpugnedOrder>();
+		List<ExtarCaveatImpugnedOrder> newImpugnedOrderList = new ArrayList<ExtarCaveatImpugnedOrder>();
+		for(ExtarCaveatImpugnedOrder io:extraimpugnedOrderList){
+			ExtarCaveatImpugnedOrder temp=new ExtarCaveatImpugnedOrder();
+			temp=io;
+			if(io.getEc_io_hc_case_type()!=null){
+				CaseType ct = caveatService.getCaseTypeById(temp.getEc_io_hc_case_type());
+				temp.setHcCaseType(ct);
+			}
+			if(io.getEc_io_lc_case_type()!=null){
+				LowerCourtCaseType lc =caveatService.getLCCaseTypeById(temp.getEc_io_lc_case_type());
+				temp.setLcCaseType(lc);
+			}
+			if(io.getEc_io_district()!=null){
+				District dt =caveatService.getDistrictById(temp.getEc_io_district());
+				temp.setDistrict(dt);
+			}
+			newImpugnedOrderList.add(temp);
+		}
+		if (extraimpugnedOrderList != null) {
+			response.setResponse("TRUE");
+			response.setModelList(newImpugnedOrderList);
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/addExtraCaveatImpugnedOrder", method = RequestMethod.POST)
+	@ResponseBody
+	public String addExtraCaveatImpugnedOrder(@RequestBody ExtarCaveatImpugnedOrder extraCaveatImpugnedorder, HttpSession session) 
+	{
+
+		ExtarCaveatImpugnedOrder response = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<ExtarCaveatImpugnedOrder> extraIO = new ActionResponse<ExtarCaveatImpugnedOrder>();
+		String jsonData = null;
+
+		if (extraCaveatImpugnedorder.getEc_io_id()!= null) {
+			extraIO.setData("Update");
+			extraCaveatImpugnedorder.setEc_io_mod_by(user.getUm_id());
+			extraCaveatImpugnedorder.setEc_io_mod_date((new Date()));
+		} else {
+			extraCaveatImpugnedorder.setEc_io_cr_by(user.getUm_id());
+			extraCaveatImpugnedorder.setEc_io_cr_date((new Date()));
+			extraCaveatImpugnedorder.setEc_io_rec_status(1);
+			extraIO.setResponse("TRUE");
+
+		}
+		response =caveatService.addExtraImpugnedOrder(extraCaveatImpugnedorder);
+		
+
+		if (response != null)
+			jsonData = cm.convert_to_json(extraIO);
+
+		return jsonData;
+	}
+	
 	
 	@RequestMapping(value = "/caveatDraftView/{id}", method = RequestMethod.GET)
 	public String draftView(Model model, @PathVariable Long id, HttpSession session) {
@@ -95,7 +270,7 @@ public class CaveatController
 				{
 					viewname="/ecourt/addCaveat";					
 				}
-				else if(cav.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
+				else if(cav.getCaseStage().getLk_id().equals(1000041L))
 				{
 					boolean flag=caveatService.checkDateValidity(cav.getCav_id());
 					if(flag)
@@ -170,6 +345,31 @@ public class CaveatController
 
 	}
 	
+	@RequestMapping(value = "/getAdvocate", method = RequestMethod.GET)
+	@ResponseBody
+	public String getAdvocate(HttpServletRequest request) {
+		
+		
+
+		String id = request.getParameter("docId");
+		
+		ActionResponse<Advocate> response = new ActionResponse<Advocate>();
+		String jsonData = null;
+
+	
+		
+		Advocate cav = advocateService.getAdvocateByRollNo(id);
+		    
+		if (cav != null) {
+			response.setResponse("TRUE");
+			response.setModelData(cav);
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+
+	}
+	
 	@RequestMapping(value = "/getCaveatPetitioner", method = RequestMethod.GET)
 	@ResponseBody
 	public String getCaveatPetitioner(HttpServletRequest request) {
@@ -215,6 +415,30 @@ public class CaveatController
 		return jsonData;
 
 	}
+	
+	@RequestMapping(value = "/getCaveatExtraAdvocate", method = RequestMethod.GET)
+	@ResponseBody
+	public String getCaveatExtraAdvocate(HttpServletRequest request) {
+
+		String id = request.getParameter("docId");
+		List<CaveatExtraAdvocate> response = null;
+
+		Long doc = new Long(id);
+		ActionResponse<CaveatExtraAdvocate> pd = new ActionResponse<CaveatExtraAdvocate>();
+		String jsonData = null;
+
+		response = caveatService.getExtraAdvocate(doc);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+
 
 	
 	@RequestMapping(value = "/addCaveat", method = RequestMethod.POST)
@@ -226,6 +450,8 @@ public class CaveatController
 		String jsonData = null;
 		
 		Lookup lkStage=lookupService.getLookup("ECOURT_STAGE", "DRAFT");
+		
+	
 		
 		if(caveat.getCav_id()==null)
 		{			
@@ -247,10 +473,133 @@ public class CaveatController
 			{
 			rd.setResponse("UPDATE");
 				caveat=caveatService.save(caveat);				
-			}
+			}	
+		
 		rd.setModelData(caveat);
 		jsonData = cm.convert_to_json(rd);
 
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/addCaveatAuthority", method = RequestMethod.POST)
+	@ResponseBody
+	public String addAuthority(@RequestBody CaveatAuthority caveatAuthority,
+			HttpSession session) {
+
+		CaveatAuthority response = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CaveatAuthority> rd = new ActionResponse<CaveatAuthority>();
+		String jsonData = null;
+
+		if (caveatAuthority.getCa_id() != null) {
+			rd.setData("Update");
+			caveatAuthority.setCa_mod_by(user.getUm_id());
+			caveatAuthority.setCa_mod_date((new Date()));
+		} else {
+			caveatAuthority.setCa_cr_by(user.getUm_id());
+			caveatAuthority.setCa_cr_date((new Date()));
+			caveatAuthority.setCa_rec_status(1);
+			rd.setResponse("TRUE");
+
+		}
+		response = caveatService.addCaveatAuthority(caveatAuthority);
+
+		if (response != null)
+			jsonData = cm.convert_to_json(rd);
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/addCrimeDetail", method = RequestMethod.POST)
+	@ResponseBody
+	public String addCrimeDetail(@RequestBody CaveatCrimeDetails crimeDetails,
+			HttpSession session) {
+
+		CaveatCrimeDetails response = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CrimeDetails> rd = new ActionResponse<CrimeDetails>();
+		String jsonData = null;
+
+		if (crimeDetails.getCcd_id() != null) {
+			rd.setData("Update");
+			crimeDetails.setCcd_mod_by(user.getUm_id());
+			crimeDetails.setCcd_mod_date((new Date()));
+		} else {
+			crimeDetails.setCcd_cr_by(user.getUm_id());
+			crimeDetails.setCcd_cr_date((new Date()));
+			crimeDetails.setCcd_rec_status(1);
+			rd.setResponse("TRUE");
+
+		}
+		response = caveatService.addCrimeFetails(crimeDetails);
+
+		if (response != null)
+			jsonData = cm.convert_to_json(rd);
+
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/deleteCrimeDetail/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String deleteCrimeDetail(@PathVariable Long id, HttpSession session) {
+
+		CaveatCrimeDetails response = null;
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CrimeDetails> pd = new ActionResponse<CrimeDetails>();
+		String jsonData = null;
+
+		response = caveatService.deleteCrimeDetails(user, id);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/getAuthority", method = RequestMethod.GET)
+	@ResponseBody
+	public String getAuthority(HttpServletRequest request) {
+		String jsonData = "";
+		String id = request.getParameter("docId");
+		Long doc = new Long(id);
+		List<CaveatAuthority> impugnedOrderList = caveatService.getAuthorityDetails(doc);
+		ActionResponse<CaveatAuthority> response = new ActionResponse<CaveatAuthority>();
+		
+		if (impugnedOrderList != null) {
+			response.setResponse("TRUE");
+			response.setModelList(impugnedOrderList);
+			jsonData = cm.convert_to_json(response);
+
+		}
+		return jsonData;
+	}
+	
+
+	
+	@RequestMapping(value = "/getCrimeDetail", method = RequestMethod.GET)
+	@ResponseBody
+	public String getCrimeDetail(HttpServletRequest request) {
+		String jsonData = "";
+		String id = request.getParameter("docId");
+		Long doc = new Long(id);
+		List<CaveatCrimeDetails> impugnedOrderList = caveatService.getCrimeDetails(doc);
+		ActionResponse<CaveatCrimeDetails> response = new ActionResponse<CaveatCrimeDetails>();
+		List<CaveatCrimeDetails> newImpugnedOrderList = new ArrayList<CaveatCrimeDetails>();
+		if (impugnedOrderList != null) {
+			response.setResponse("TRUE");
+			response.setModelList(impugnedOrderList);
+			jsonData = cm.convert_to_json(response);
+
+		}
 		return jsonData;
 	}
 	
@@ -264,6 +613,7 @@ public class CaveatController
 		User user = (User) session.getAttribute("USER");
 		ActionResponse<CaveatPetitionerDetails> pd = new ActionResponse<CaveatPetitionerDetails>();
 		Long seqcount = caveatService.getCPSequenceCount(pDetails.getCpt_cav_mid());
+		
 		String jsonData = null;
 		if (pDetails.getCpt_id() != null) {
 			pd.setResponse("UPDATE");
@@ -271,6 +621,7 @@ public class CaveatController
 			pDetails.setCpt_mod_date((new Date()));
 
 		} else {
+			
 			pDetails.setCpt_cr_by(user.getUm_id());
 			pDetails.setCpt_cr_date((new Date()));
 			pDetails.setCpt_rec_status(1);
@@ -340,8 +691,8 @@ public class CaveatController
 
 		return jsonData;
 	}
-
-	@RequestMapping(value = "/deleteRespondent/{id}/", method = RequestMethod.DELETE)
+	
+	@RequestMapping(value = "/delete/{id}/", method = RequestMethod.DELETE)
 	@ResponseBody
 	public String deleteRespondent(@PathVariable Long id, HttpSession session) {
 
@@ -361,7 +712,131 @@ public class CaveatController
 		return jsonData;
 
 	}
+	
+	@RequestMapping(value = "/addExtraAdvocate", method = RequestMethod.POST)
+	@ResponseBody
+	public String addExtraAdvocate(@RequestBody CaveatExtraAdvocate rDetails,
+			HttpSession session) {
 
+		CaveatExtraAdvocate crd = null;
+		String result = "false";
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CaveatExtraAdvocate> response = new ActionResponse<CaveatExtraAdvocate>();
+		//Long seq = caveatService.getCRSeqCount(rDetails.getCrt_cav_mid());
+		String jsonData = null;
+
+		if (rDetails.getCea_id() != null) {
+			response.setResponse("UPDATE");
+		} else {
+			response.setResponse("CREATE");
+		}
+		crd = caveatService.addExtraAdvocate(rDetails);
+
+		if (crd != null)
+			jsonData = cm.convert_to_json(response);
+
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/deleteExtraAdvocate/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String deleteExtraAdvocate(@PathVariable Long id, HttpSession session) {
+
+		CaveatExtraAdvocate crd = null;
+
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<CaveatExtraAdvocate> pd = new ActionResponse<CaveatExtraAdvocate>();
+		String jsonData = null;
+
+		crd = caveatService.deleteExtraAdvocatge(id);
+
+		if (crd != null) {
+			pd.setResponse("TRUE");
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+
+
+	
+	@RequestMapping(value = "/getCaveatExtraCaveator", method = RequestMethod.GET)
+	@ResponseBody
+	public String getCaveatExtraCaveator(HttpServletRequest request) {
+
+		String id = request.getParameter("docId");
+		List<ExtraCaveatorDetails> response = null;
+
+		Long doc = new Long(id);
+		ActionResponse<ExtraCaveatorDetails> pd = new ActionResponse<ExtraCaveatorDetails>();
+		String jsonData = null;
+
+		response = caveatService.getExtraCaveator(doc);
+
+		if (response != null) {
+			pd.setResponse("TRUE");
+			pd.setModelList(response);
+			jsonData = cm.convert_to_json(pd);
+
+		}
+		return jsonData;
+
+	}
+	@RequestMapping(value = "/addExtraCaveatorDetails", method = RequestMethod.POST)
+	@ResponseBody
+	public String addExtraCaveator(@RequestBody ExtraCaveatorDetails ectDetails,HttpSession session) {
+
+		ExtraCaveatorDetails response = null;
+		String result = "false";
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<ExtraCaveatorDetails> pd = new ActionResponse<ExtraCaveatorDetails>();
+		Long seqcount = caveatService.getECTsequenceCount(ectDetails.getEct_cav_mid());
+		
+		String jsonData = null;
+		if (ectDetails.getEct_id() != null) {
+			pd.setResponse("UPDATE");
+			ectDetails.setEct_mod_by(user.getUm_id());
+			ectDetails.setEct_mod_date((new Date()));
+
+		} else 
+		{
+			ectDetails.setEct_cr_by(user.getUm_id());
+			ectDetails.setEct_cr_date((new Date()));
+			ectDetails.setEct_rec_status(1);
+			seqcount++;
+			ectDetails.setEct_sequence(seqcount);
+			pd.setResponse("CREATE");
+
+		}
+		response = caveatService.addExtraCaveatorDetails(ectDetails);
+
+		if (response != null)
+			jsonData = cm.convert_to_json(pd);
+
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value = "/deleteExtraCvaeator/{id}/", method = RequestMethod.DELETE)
+	@ResponseBody
+	public String deleteExtraCvaeator(@PathVariable Long id, HttpSession session) {
+		
+		ExtraCaveatorDetails ectd = null;
+		User user = (User) session.getAttribute("USER");
+		
+		ActionResponse<ExtraCaveatorDetails> response = new ActionResponse<ExtraCaveatorDetails>();
+		String jsonData = null;
+		ectd = caveatService.deleteExtraCaveator(user, id);
+		if (ectd != null) 
+		{
+			response.setResponse("TRUE");
+			jsonData = cm.convert_to_json(response);
+		}
+		
+		return jsonData;
+	}
 	
 	@RequestMapping(value = "/getCaveatDetails", method = RequestMethod.GET)
 	@ResponseBody
@@ -558,6 +1033,8 @@ public class CaveatController
 						 }	
 				}
 					catch (IOException e) {
+						errorList.add(" Please Upload PDF file...!");
+						response.setResponse("FALSE");
 					e.printStackTrace();
 				}
 			 			
@@ -618,7 +1095,7 @@ public class CaveatController
 	
 	@RequestMapping(value = "/submitCaveatCase", method = RequestMethod.POST)
 	@ResponseBody
-	public String submitCaveatCase(@RequestBody Caveat cav,HttpSession session) {
+	public String submitCaveatCase(@RequestBody Caveat cav,HttpSession session,HttpServletRequest request) {
 		String jsonData="";
 		ActionResponse<Caveat> response=new ActionResponse<Caveat>();
 		User user = (User) session.getAttribute("USER");
@@ -662,11 +1139,81 @@ public class CaveatController
 					cav.setCav_stage_lid(lkStage.getLk_id());
 					cav=caveatService.save(cav);
 					
+					
+					InetAddress ip;
+					 String hostname;
+					 String  extraLko="";
+					 
+					 String otpTmpId="";
+					 
+				        try {
+				            ip = InetAddress.getLocalHost();
+				            hostname = ip.getHostAddress();
+				            System.out.println("Your current IP address : " + ip);
+				            System.out.println("Your current Hostname : " + hostname);
+				            
+				            if(hostname.equals("172.16.0.6")) {
+				            	otpTmpId ="1107163706976351375";
+				            }
+				            else if(hostname.equals("127.0.0.1")) {
+				            	/*otpTmpId ="1107160793982323688";
+				            	 extraLko="-Lko. Bench ";*/
+				            	otpTmpId ="1107163706976351375";
+					            }
+				            else {
+				            	System.out.println("In Local");
+				            	otpTmpId ="1107163706976351375";
+				            	/* extraLko="-Lko. Bench ";*/
+				            }
+				 
+				        } catch (UnknownHostException e) {
+				 
+				            e.printStackTrace();
+				        }
+				        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+				        if(user.getUm_id() != null)
+						{
+						/*	 Integer otp=cm.generateOTP();
+							 user.setUm_otp(otp);
+							 user=userService.save(user);*/
+							 Lookup urlLookup=lookupService.getLookUpObject("SMS_URL");
+							 String sms_url=urlLookup.getLk_longname();
+							 String mob_no=user.getUm_mobile();
+							 String smstext="Your e-Filed Caveat having Diary_No  "+cav.getCav_diary_no()+", Caveator name - "
+							 +(cav.getCav_caveator_name().length() >=30 ? cav.getCav_caveator_name().substring(0,26)+"..." :cav.getCav_caveator_name())+" "
+							 		+ "has been received on  "+formatter.format(cs.getCs_cr_date())+" ";
+							 smstext=smstext.replace("&", "and");
+							 String otpresponse=cm.sendBSNLSMS(sms_url, mob_no, smstext,otpTmpId);
+							 String otpresponse1=cm.sendSMS(sms_url, mob_no, smstext,otpTmpId);
+							// String otpresponse="1";
+							 if(otpresponse.equals("1"))
+							 {
+								 user.setUm_otp(null);
+								 
+								
+								 
+								 SmsLog smslog = new SmsLog();
+								 smslog.setSl_mobile_no(mob_no);
+								 smslog.setSl_um_mid(user.getUm_id());
+								 smslog.setSl_text(smstext+" BSNL");
+								 smslog.setSl_cr_date(new Date());
+								 smslog.setSl_status(1);
+								 smslog.setSl_ip_address(request.getRemoteAddr());
+								 userService.saveSMSlog(smslog);
+								 
+							 }else{
+									response.setResponse("FALSE");
+									response.setData("Unable to send OTP, please try again");
+								}
+						}
+					
+					
 					response.setResponse("TRUE");
 					response.setModelData(cav);
 					jsonData=cm.convert_to_json(response);
+				 
 				 }
-				 else if(cav.getCaseStage().getLk_longname().equals("SUPERVISIOR_DEFECTS"))
+				 else if(cav.getCaseStage().getLk_id().equals(1000041L))
 				 {
 					 boolean flag=caveatService.checkDateValidity(cav.getCav_id());
 						if(flag)
@@ -806,9 +1353,9 @@ public class CaveatController
 	
 	@RequestMapping(value="/copyCaveatFile",method=RequestMethod.GET)
 	@ResponseBody
-	public String copyCaveatFile(HttpServletRequest request)
+	public String copyCaveatFile(HttpServletRequest request) throws ParseException
 	{
-		String jsonData = null;
+		/*String jsonData = null;
 		
 		String doc_name=request.getParameter("cd_document_name");
 		
@@ -833,7 +1380,61 @@ public class CaveatController
 			    response.setResponse("FALSE");
 			}
 		jsonData = cm.convert_to_json(response);
+		return jsonData;*/
+		
+
+		String jsonData = null;
+		
+		String doc_name=request.getParameter("cd_document_name");
+		
+		CaveatDocuments cd=scrutinyService.getCaveatUploaded(doc_name);
+		
+		//Caveat cav=scrutinyService.getCaveatById(cd.getCd_cav_mid());
+		
+		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
+		
+	
+		Lookup lookUp=lookupService.getLookUpObject("CAVEAT_PATH");	
+		String draft_path=lookUp.getLk_longname();	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("CAVEAT_PATH_BCKUP");	
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
+
+		File source =null;
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		//	 String bef=sdf.format("2020-01-01 00:00:00");
+		        
+		        Date dateBef = sdf.parse("2020-10-01 00:00:00");
+			
+			if(cd.getCd_uploaded_date().before(dateBef)) {
+				source = new File(draft_path_bck+File.separator+doc_name);	
+			}
+			else {
+				source = new File(draft_path+File.separator+doc_name);	
+			}
+
+		
+		String uploadPath = context.getRealPath("");
+		
+		doc_name="cav_"+doc_name;
+		File dest = new File(uploadPath+"/uploads/"+doc_name);
+
+		try {
+			    FileUtils.copyFile(source, dest);
+			    response.setResponse("TRUE");
+			    response.setData(doc_name);
+			} 
+			catch (IOException e) {
+			    e.printStackTrace();
+			    response.setResponse("FALSE");
+			}
+		jsonData = cm.convert_to_json(response);
 		return jsonData;
+	
 	}
 
 

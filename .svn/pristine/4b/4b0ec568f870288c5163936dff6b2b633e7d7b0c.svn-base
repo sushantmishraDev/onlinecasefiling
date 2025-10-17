@@ -1,0 +1,260 @@
+package com.dms.model;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "stamp_reporter_data")
+public class StampReporterData {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stamp_reporter_seq")
+	@SequenceGenerator(name = "stamp_reporter_seq", sequenceName = "stamp_reporter_seq", allocationSize = 1)
+	@Column(name = "srd_id")
+	private Long srd_id;
+	
+	@Column(name = "srd_application")
+	private String srd_application;
+	
+	@Column(name = "srd_rcd_mid")
+	private Long srd_rcd_mid;
+	
+	@Column(name = "srd_app_type1")
+	private Long srd_app_type1;
+	
+	@Column(name = "srd_app_type2")
+	private Long srd_app_type2;
+	
+	@Column(name = "srd_app_type3")
+	private Long srd_app_type3;
+	
+	@Column(name = "srd_app_type4")
+	private Long srd_app_type4;
+	
+	@Column(name = "srd_app_type5")
+	private Long srd_app_type5;
+	
+	@Column(name = "srd_category")
+	private String srd_category;
+	
+	@Column(name = "srd_intime")
+	private Date srd_intime;
+	
+	@Column(name = "srd_cognizable")
+	private String srd_cognizable;
+	
+	@Column(name="srd_cav_year")
+	private Integer srd_cav_year;
+	
+	@Column(name = "srd_bench_code")
+	private Long srd_bench_code;
+
+	@Column(name = "srd_cav_no")
+	private Integer srd_cav_no;
+
+	@Column(name = "srd_remark")
+	private String srd_remark;
+
+
+	@Column(name = "srd_cr_by")
+	private Long srd_cr_by;
+	
+	@Column(name = "srd_cr_date")
+	private Date srd_cr_date;
+	
+	@Column(name="srd_defective")
+	private boolean srd_defective;
+	
+	@Column(name="srd_intime_remark")
+	private String srd_intime_remark;
+	
+	@Transient
+	private PetitionerDetails petitionerDetails;
+	
+	@Transient
+	private RespondentDetails respondentDetails;
+	
+
+	public Long getSrd_id() {
+		return srd_id;
+	}
+
+	public void setSrd_id(Long srd_id) {
+		this.srd_id = srd_id;
+	}
+
+	public String getSrd_application() {
+		return srd_application;
+	}
+
+	public void setSrd_application(String srd_application) {
+		this.srd_application = srd_application;
+	}
+
+	public Long getSrd_app_type1() {
+		return srd_app_type1;
+	}
+
+	public void setSrd_app_type1(Long srd_app_type1) {
+		this.srd_app_type1 = srd_app_type1;
+	}
+
+	public Long getSrd_app_type2() {
+		return srd_app_type2;
+	}
+
+	public void setSrd_app_type2(Long srd_app_type2) {
+		this.srd_app_type2 = srd_app_type2;
+	}
+
+	public Long getSrd_app_type3() {
+		return srd_app_type3;
+	}
+
+	public void setSrd_app_type3(Long srd_app_type3) {
+		this.srd_app_type3 = srd_app_type3;
+	}
+
+	public String getSrd_category() {
+		return srd_category;
+	}
+
+	public void setSrd_category(String srd_category) {
+		this.srd_category = srd_category;
+	}
+
+	public Date getSrd_intime() {
+		return srd_intime;
+	}
+
+	public void setSrd_intime(Date srd_intime) {
+		this.srd_intime = srd_intime;
+	}
+
+	public String getSrd_cognizable() {
+		return srd_cognizable;
+	}
+
+	public void setSrd_cognizable(String srd_cognizable) {
+		this.srd_cognizable = srd_cognizable;
+	}
+
+	public Integer getSrd_cav_year() {
+		return srd_cav_year;
+	}
+
+	public void setSrd_cav_year(Integer srd_cav_year) {
+		this.srd_cav_year = srd_cav_year;
+	}
+
+	public Long getSrd_bench_code() {
+		return srd_bench_code;
+	}
+
+	public void setSrd_bench_code(Long srd_bench_code) {
+		this.srd_bench_code = srd_bench_code;
+	}
+
+	public Integer getSrd_cav_no() {
+		return srd_cav_no;
+	}
+
+	public void setSrd_cav_no(Integer srd_cav_no) {
+		this.srd_cav_no = srd_cav_no;
+	}
+
+	public String getSrd_remark() {
+		return srd_remark;
+	}
+
+	public void setSrd_remark(String srd_remark) {
+		this.srd_remark = srd_remark;
+	}
+
+	public Long getSrd_cr_by() {
+		return srd_cr_by;
+	}
+
+	public void setSrd_cr_by(Long srd_cr_by) {
+		this.srd_cr_by = srd_cr_by;
+	}
+
+	public Date getSrd_cr_date() {
+		return srd_cr_date;
+	}
+
+	public void setSrd_cr_date(Date srd_cr_date) {
+		this.srd_cr_date = srd_cr_date;
+	}
+
+	public Long getSrd_rcd_mid() {
+		return srd_rcd_mid;
+	}
+
+	public void setSrd_rcd_mid(Long srd_rcd_mid) {
+		this.srd_rcd_mid = srd_rcd_mid;
+	}
+
+	public Long getSrd_app_type4() {
+		return srd_app_type4;
+	}
+
+	public void setSrd_app_type4(Long srd_app_type4) {
+		this.srd_app_type4 = srd_app_type4;
+	}
+
+	public Long getSrd_app_type5() {
+		return srd_app_type5;
+	}
+
+	public void setSrd_app_type5(Long srd_app_type5) {
+		this.srd_app_type5 = srd_app_type5;
+	}
+
+	public boolean getSrd_defective() {
+		return srd_defective;
+	}
+
+	public void setSrd_defective(boolean srd_defective) {
+		this.srd_defective = srd_defective;
+	}
+
+	public String getSrd_intime_remark() {
+		return srd_intime_remark;
+	}
+
+	public void setSrd_intime_remark(String srd_intime_remark) {
+		this.srd_intime_remark = srd_intime_remark;
+	}
+
+	public PetitionerDetails getPetitionerDetails() {
+		return petitionerDetails;
+	}
+
+	public void setPetitionerDetails(PetitionerDetails petitionerDetails) {
+		this.petitionerDetails = petitionerDetails;
+	}
+
+	public RespondentDetails getRespondentDetails() {
+		return respondentDetails;
+	}
+
+	public void setRespondentDetails(RespondentDetails respondentDetails) {
+		this.respondentDetails = respondentDetails;
+	}
+	
+	
+
+}

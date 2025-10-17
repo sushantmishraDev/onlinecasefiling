@@ -10,28 +10,40 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dms.model.ActDetails;
+import com.dms.model.AllowEfiling;
+import com.dms.model.AllowEfiling1;
+import com.dms.model.ApplicationCourtFee;
 import com.dms.model.CaseType;
+import com.dms.model.CaveatCourtFee;
 import com.dms.model.CourtFee;
+import com.dms.model.CrimeDetails;
 import com.dms.model.ImpugnedOrder;
 import com.dms.model.IndexField;
 import com.dms.model.LinkedCaseDetails;
 import com.dms.model.LowerCourtCaseType;
+import com.dms.model.Notice;
+import com.dms.model.NoticeDepartmentMaster;
 import com.dms.model.PetitionUploaded;
 import com.dms.model.PetitionerDetails;
 import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.RespondentDetails;
+import com.dms.model.StNoDetails;
 import com.dms.model.TrialCourt;
 import com.dms.model.User;
 
 @Service
 public class EcourtAddCaseService 
 {
-	@PersistenceContext
-	EntityManager em;
+	/*@PersistenceContext
+	EntityManager em;*/
+	@PersistenceContext(unitName="persistenceUnitEfiling")
+	@Qualifier(value = "entityManagerFactoryEfiling")
+	private EntityManager em;
 	
 	
 	
@@ -148,10 +160,37 @@ public List<ImpugnedOrder> getImpugnedOrder() {
 public ImpugnedOrder deleteImpugnedOrder(User user, Long id) {
 	ImpugnedOrder oldOrder=null;
 	ImpugnedOrder newOrder=null;
-	user.setMod_by(id);
-    user.setMod_date(new Date());
     oldOrder=em.find(ImpugnedOrder.class, id);
+	oldOrder.setIo_mod_by(user.getUm_id());
+    oldOrder.setIo_mod_date(new Date());
     oldOrder.setIo_rec_status(2);
+    newOrder =em.merge(oldOrder);
+	
+	return newOrder;
+}
+
+@Transactional
+public StNoDetails deleteSesstionTrack(User user, Long id) {
+	StNoDetails oldOrder=null;
+	StNoDetails newOrder=null;
+    oldOrder=em.find(StNoDetails.class, id);
+	oldOrder.setsnd_mod_by(user.getUm_id());
+    oldOrder.setsnd_mod_date(new Date());
+    oldOrder.setsnd_rec_status(2);
+    newOrder =em.merge(oldOrder);
+	
+	return newOrder;
+}
+
+
+@Transactional
+public CrimeDetails deleteCrimeDetails(User user, Long id) {
+	CrimeDetails oldOrder=null;
+	CrimeDetails newOrder=null;
+    oldOrder=em.find(CrimeDetails.class, id);
+	oldOrder.setCd_mod_by(user.getUm_id());
+    oldOrder.setCd_mod_date(new Date());
+    oldOrder.setCd_rec_status(2);
     newOrder =em.merge(oldOrder);
 	
 	return newOrder;
@@ -171,6 +210,63 @@ public ImpugnedOrder addImpugnedOrder(ImpugnedOrder imOrder) {
 	}
 	
 	return io;
+}
+
+@Transactional
+public CrimeDetails addCrimeFetails(CrimeDetails imOrder) {
+	CrimeDetails io=null;
+	 try {
+		
+		io=em.merge(imOrder);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return io;
+}
+
+@Transactional
+public StNoDetails addSessionTrack(StNoDetails imOrder) {
+	StNoDetails io=null;
+	 try {
+		
+		io=em.merge(imOrder);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return io;
+}
+
+@Transactional
+public Notice addAdvanceNotice(Notice nt) {
+	Notice notice=null;
+	 try {
+		
+		notice=em.merge(nt);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return notice;
+}
+
+
+@Transactional
+public NoticeDepartmentMaster save(NoticeDepartmentMaster nt) {
+	NoticeDepartmentMaster notice=null;
+	 try {
+		
+		notice=em.merge(nt);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return notice;
 }
 
 
@@ -257,6 +353,59 @@ public RegisteredCaseDetails getRegisterCase(Long id) {
 }
 
 
+@Transactional
+public AllowEfiling1 getAllowEfiling(Integer id,char c) {
+
+	AllowEfiling1 result=null;
+    Query query=null;
+	try {
+		query = em.createQuery(" SELECT ae from AllowEfiling1 ae where ae.ae_code=:id and ae.ae_allow_for=:ae_allow_for").setParameter("id", id).
+				setParameter("ae_allow_for", c);
+		result=(AllowEfiling1) query.getSingleResult();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return result;
+}
+
+@Transactional
+public AllowEfiling getAllowEfilingByRcd(Long id,char c) {
+
+	AllowEfiling result=null;
+    Query query=null;
+	try {
+		query = em.createQuery(" SELECT ae from AllowEfiling ae where ae.ae_reference_mid=:id and ae.ae_allow_for=:ae_allow_for").setParameter("id", id).
+				setParameter("ae_allow_for", c);
+		result=(AllowEfiling) query.getSingleResult();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return result;
+}
+
+
+@Transactional
+public AllowEfiling1 codeValidation(Integer id,String appno,char c) {
+
+	AllowEfiling1 result=null;
+    Query query=null;
+	try {
+		query = em.createQuery(" SELECT ae from AllowEfiling1 ae where ae.ae_code=:id and ae.ae_allow_for=:ae_allow_for and ae.ae_appno=:ae_appno").setParameter("id", id).
+				setParameter("ae_allow_for", c).setParameter("ae_appno", appno);
+		result=(AllowEfiling1) query.getSingleResult();
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return result;
+}
+
+
 
 @Transactional
 public List<TrialCourt> getTrialcourt() {
@@ -284,6 +433,21 @@ public TrialCourt addTrialCourt(TrialCourt tCourt) {
 	
 	return tc;
 }
+
+@Transactional
+public AllowEfiling1 addAllowEfiling(AllowEfiling1 allowEfiling) {
+	AllowEfiling1 tc=null;
+	 try {
+		
+		tc=em.merge(allowEfiling);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	return tc;
+}
+
 
 
 
@@ -413,6 +577,19 @@ public RegisteredCaseDetails saveCaseDetails(RegisteredCaseDetails r) {
 		return result;
 	}
 	
+	
+	@Transactional
+	public List<Notice> getNotice(Long rcd_id) {
+		List<Notice> result=null;
+		
+		try{
+			result = em.createQuery("SELECT pu FROM Notice pu  where pu.nt_rcd_mid="+rcd_id+"").getResultList();
+		}catch(Exception e)	{
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
 	 @Transactional
 	 public boolean deletePetition(Long id) 
 	 {
@@ -455,6 +632,22 @@ public RegisteredCaseDetails saveCaseDetails(RegisteredCaseDetails r) {
 			CaseType r= new CaseType();
 			try {
 				Query query  =  em.createQuery("SELECT r from CaseType r WHERE r.ct_id =:id");
+				query.setParameter("id", id);
+				r= (CaseType) query.getSingleResult();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return r;
+		}
+		
+		
+		@Transactional
+		public CaseType getCaseTypeByLabel(String id) {
+			
+			CaseType r= new CaseType();
+			try {
+				Query query  =  em.createQuery("SELECT r from CaseType r WHERE r.ct_label =:id");
 				query.setParameter("id", id);
 				r= (CaseType) query.getSingleResult();
 			} catch (Exception e) {
@@ -525,6 +718,59 @@ public RegisteredCaseDetails saveCaseDetails(RegisteredCaseDetails r) {
         	    return result;
 		
          }
+
+
+
+         @Transactional
+		public AllowEfiling1 getAllowEfilingForRcdId(Long rcd_id) {
+        	 AllowEfiling1 ae =null;
+        	 try{
+ 				ae =(AllowEfiling1) em.createQuery("SELECT lcd FROM AllowEfiling1 lcd  where lcd.ae_reference_mid=:rcd_id").setParameter("rcd_id", rcd_id).setMaxResults(1).getSingleResult();
+ 			}catch(Exception e)	{
+ 				e.printStackTrace();
+ 			}
+	        	    return ae;
+			
+		}
+
+
+
+
+		public List<CourtFee> getReceiptIfExistsInCourtFee(CourtFee courtFee) {
+			List<CourtFee> ae =null;
+        	 try{
+ 				ae =(List<CourtFee>) em.createQuery("SELECT cf FROM CourtFee cf  where cf.cf_receipt_no = :cf_receipt_no and cf.cf_rec_status =:cf_rec_status").setParameter("cf_receipt_no",courtFee.getCf_receipt_no()).setParameter("cf_rec_status",courtFee.getCf_rec_status()).getResultList();
+ 			}catch(Exception e)	{
+ 				e.printStackTrace();
+ 			}
+	        	    return ae;
+		}
+
+
+
+
+		public ApplicationCourtFee getReceiptIfExistsInCourtFeeInApplicationCourtFee(CourtFee courtFee) {
+			ApplicationCourtFee ae =null;
+       	 try{
+				ae =(ApplicationCourtFee) em.createQuery("SELECT acf FROM ApplicationCourtFee acf  where acf.acf_receipt_no =:acf_receipt_no  and acf.acf_rec_status =:cf_rec_status").setParameter("acf_receipt_no",courtFee.getCf_receipt_no()).setParameter("cf_rec_status",courtFee.getCf_rec_status()).setMaxResults(1).getSingleResult();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+	        	    return ae;
+		}
+
+
+
+
+		public CaveatCourtFee getReceiptIfExistsInCourtFeeInCaveatCourtFee(CourtFee courtFee) {
+			CaveatCourtFee ae =null;
+	       	 try{
+					ae =(CaveatCourtFee) em.createQuery("SELECT ccf FROM CaveatCourtFee ccf  where ccf.ccf_receipt_no =:ccf_receipt_no  and ccf.ccf_rec_status =:ccf_rec_status").setParameter("ccf_receipt_no",courtFee.getCf_receipt_no()).setParameter("ccf_rec_status",courtFee.getCf_rec_status()).setMaxResults(1).getSingleResult();
+				}catch(Exception e)	{
+					e.printStackTrace();
+				}
+		        	    return ae;
+		}
 }
 
 

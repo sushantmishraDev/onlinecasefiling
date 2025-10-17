@@ -1,0 +1,64 @@
+package com.dms.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="metafield_rule")
+public class MetaFieldRule {
+	
+	@Id
+	@GeneratedValue (strategy = GenerationType.SEQUENCE, generator="MstrSeq")
+	@SequenceGenerator(name="MstrSeq", sequenceName="MstrSeq", allocationSize=1)
+	@Column(name="mfr_id")
+	private Long mfr_id;
+	
+	@Column(name="mfr_field_id")
+	private Long mfr_field_id;
+	
+	@Column(name="mfr_vm_mid")
+	private Long mfr_vm_mid;
+	
+	@Column(name="mfr_rec_status")
+	private Integer mfr_rec_status;
+
+	public Long getMfr_id() {
+		return mfr_id;
+	}
+
+	public void setMfr_id(Long mfr_id) {
+		this.mfr_id = mfr_id;
+	}
+
+	public Long getMfr_field_id() {
+		return mfr_field_id;
+	}
+
+	public void setMfr_field_id(Long mfr_field_id) {
+		this.mfr_field_id = mfr_field_id;
+	}
+
+	public Long getMfr_vm_mid() {
+		return mfr_vm_mid;
+	}
+
+	public void setMfr_vm_mid(Long mfr_vm_mid) {
+		this.mfr_vm_mid = mfr_vm_mid;
+	}
+
+	public Integer getMfr_rec_status() {
+		return mfr_rec_status;
+	}
+
+	public void setMfr_rec_status(Integer mfr_rec_status) {
+		this.mfr_rec_status = mfr_rec_status;
+	}
+	
+	
+
+}

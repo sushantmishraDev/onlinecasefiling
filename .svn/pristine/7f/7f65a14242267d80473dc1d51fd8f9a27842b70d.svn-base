@@ -1,0 +1,227 @@
+var DocumentApp = angular.module("EDMSApp", [ 'ui.bootstrap','smart-table']);
+
+DocumentApp.controller("editProfileCtrl", function($scope, $http, $window) {
+
+	
+	$scope.userobj = {};
+	$scope.user={};
+	$scope.errors = [];
+	$scope.date={};
+	$scope.validitydate={};
+	//var baseUrl = "/dms/";
+	var baseUrl = "/onlinecasefiling/";
+
+/*	$scope.getEditProfileData = function() {
+		//alert(11);
+		console.log("Edit Profile");
+
+		$http.get(baseUrl + 'user/getUserDetails').success(function(data) {
+			console.log(data);
+
+			$scope.userobj = data.data;
+
+			console.log($scope.userobj);
+		}).error(function(data, status, headers, config) {
+			console.log("Error in getting property details");
+		});
+
+	};*/
+
+
+	function convertDate(inputFormat) 
+	{
+		  function pad(s) { return (s < 10) ? '0' + s : s; }
+		  var d = new Date(inputFormat);
+		  return [ d.getFullYear(), pad(d.getMonth()+1),pad(d.getDate())].join('-');
+	}
+	
+	
+       getEditProfileData();
+	
+	  function getEditProfileData() 
+	  {
+		//alert(11);
+		  
+		console.log("Edit Profile");
+		$http.get(baseUrl+'user/getUserDetails').success(function(data) {
+			console.log(data);
+			$scope.date = data.data.um_pass_validity_date;
+			//alert($scope.date);
+			if($scope.date!=null){
+				$scope.validitydate=convertDate($scope.date);
+				//alert($scope.validitydate);
+			}
+	            $scope.userobj = data.data;
+	            
+			console.log($scope.userobj);
+		}).error(function(data, status, headers, config) {
+			console.log("Error in getting property details");
+		});
+
+	};
+	
+	
+	
+
+	$scope.savePassword = function(data) {
+		console.log(data);
+		console.log("********");
+
+		$scope.password;
+
+		$scope.entity = {
+			'password' : $scope.password
+		}
+
+		console.log($scope.password);
+
+		var response = $http.post(baseUrl + 'user/updateUserDetails',
+				$scope.entity);
+		response.success(function(data, status, headers, config) {
+			if (data.response == "TRUE") {
+				bootbox.alert("Password Change Successfully!");
+				window.location.href = baseUrl + "views/landingPage";
+				$scope.errorlist = [];
+
+			} else {
+
+				$scope.errorlist = data.dataMapList;
+
+			}
+
+		});
+		response.error(function(data, status, headers, config) {
+			console.log("Error in getting Master");
+		});
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/*$scope.save = function(userobj) 
+	 { 
+	   //alert(1);	
+	   $scope.entity = userobj;
+	   
+		console.log("List before save");
+		var response = $http.post('/dms/user/updateName',$scope.entity);
+		response.success(function(data, status, headers, config) {
+			$scope.errorlist = {};
+			if (data.response == "FALSE") {
+				$scope.errorlist = data.dataMapList;
+			}
+			else 
+			{
+				 bootbox.alert("Successfully updated record", function() {
+					
+			});
+		  }
+
+		});
+	};*/
+	$scope.save = function(userobj) 
+	 { 
+	   //alert(1);	
+	   $scope.entity = userobj;
+	   
+		console.log("List before save");
+		var response = $http.post(baseUrl+'/user/updateName',$scope.entity);
+		response.success(function(data, status, headers, config) {
+			$scope.errorlist = {};
+			if (data.response == "FALSE") {
+				$scope.errorlist = data.dataMapList;
+			}
+			else 
+			{
+				 alert("Successfully updated record");
+		  }
+
+		});
+	};
+	
+	
+	//
+	$scope.openModel = function() 
+	 {
+		//$('#changePassword_Modal').modal('show');
+		$('#changePassword_Modal').modal({
+		    backdrop: 'static',
+		    keyboard: false
+		});
+		
+	 };
+	$scope.resetform = function()
+	{
+		$scope.passwordn="";
+		$scope.passwordcn="";
+		$scope.password="";
+		$scope.errorlist="";
+		$scope.error="";
+		//$scope.changePasswordForm.$setUntouched();
+		changePasswordForm($scope);
+		
+	}
+	
+
+	function changePasswordForm($scope){
+		$scope.changePasswordForm.$setUntouched();
+		$scope.changePasswordForm.$setPristine();
+	}
+	
+	
+	//
+	
+	$scope.changePassword = function(user) {		
+
+		$('#changePassword_Modal').modal({
+		    backdrop: 'static',
+		    keyboard: false
+		});	
+		debugger
+		$scope.user=user;
+	/*	$scope.passwordn;
+		$scope.passwordcn;*/
+		
+		if($scope.user.newpassword == $scope.user.confirmpassword ){
+			
+			$scope.error= "";
+	
+//			$scope.entity={'password':$scope.password,'passwordn':$scope.passwordn}
+		
+		    var response = $http.post(baseUrl+ 'user/changePass',$scope.user);
+		    response.success(function(data, status, headers, config) {
+			if (data.response == "TRUE") {
+				alert("Password changed Successfully!");
+				//window.location.href = "/pdms/pdms/logout";
+				//window.location.href=baseUrl+"views/landingPage";
+				$('#changePassword_Modal').modal('hide');
+				$window.location.href = baseUrl;
+				$scope.errorlist = [];
+			} 
+			else{
+			$scope.error="current password doesn't exist";
+
+			}
+
+		});
+		response.error(function(data, status, headers, config) {
+			console.log("Error in getting Master");
+		});
+		
+		}
+		else
+			/*$scope.errorlist = data.dataMapList;*/
+			$scope.error="newpassword and confirmpassword didn't match";
+	}
+	
+	 $scope.landingForm= function() 
+	   {
+              window.location.href=baseUrl+"views/landingPage";
+	   }         	
+  
+});

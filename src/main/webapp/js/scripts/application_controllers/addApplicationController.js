@@ -31,6 +31,11 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 	
 	$scope.application={};
 	
+	
+	$scope.application.subApplication = [ {
+		'sb_ap_rec_status':1
+	} ];
+	
 	$scope.caseDetail={};
 	$scope.tabShow1=true;
 	$scope.tabShow2=false;
@@ -43,6 +48,8 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 	
 	$scope.draftId= $('#draftId').val();
 	$scope.fd_id= $('#fd_id').val();
+	$scope.codeNo= $('#code').val();
+	$scope.appno= $('#appno').val();
 	
 	
 	
@@ -113,7 +120,7 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 	
 	
 	
-	
+	$scope.subAppStatus=false;
 	   
 	if($scope.draftId!=null && $scope.draftId!=undefined){
 	getRegisterApplication($scope.draftId);
@@ -129,8 +136,17 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 			}).success(function(data, status, headers, config) {
 		                
 		                $scope.application = data.modelData;
-
-		    			
+		                $scope.subAppStatus=true;
+		                if($scope.application.subApplication.length==0) {
+		                	$scope.subAppStatus=false;
+			                $scope.application.subApplication = [ {
+			                	'sb_ap_mid' : $scope.application.ap_id,
+			            		'sb_ap_rec_status':1
+			            	} ]; 
+		                }
+		                
+		                console.log($scope.application);
+		               
 		}).error(function(data, status, headers, config) {
 			});
 
@@ -163,38 +179,163 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 				  
 		
 	
-	$scope.addApplication=function(application){
+	$scope.addApplication=function(application,otherApp){
+		console.log($scope.subapplications);
+		 $scope.newString = $("#txtEditor1").Editor("getText");
+		 $scope.newString1 = $("#txtEditor").Editor("getText");
+		 application.ap_lstng_desc= $scope.newString;
+		 application.ap_lstng_prayer= $scope.newString1;
+		console.log(application);
+		application.code=Number($scope.codeNo);
+		application.appno =	$scope.appno
+		
+		
+		$scope.entity = {
+				'application' : application,
+				'otherAppNos' : otherApp
+			};
+		
+		console.log($scope.entity);
+		
 		if(application.ap_fd_mid==null){
 			application.ap_fd_mid=$scope.fd_id;	
+			$scope.subAppStatus=true;
 		}
 		if(application.ap_fd_mid==null){
 				alert("Case File Details not found");
 				return false;
 		}
+		
+		$scope.validSubApp=true;
+		for(var i=1;i<$scope.entity.otherAppNos.length;i++) 
+		{
+			if($scope.entity.otherAppNos[i].sb_ap_at_mid!=null){
+			}
+			else {
+					$scope.validSubApp=false;
+					break;
+			}
+		}
+		if($scope.validSubApp==true)
+			{
+
+			var response =$http.post(urlBase+'application/addApplication',application);
+			response.success(function(data, status, headers, config){
+				   if(data.response=="ADD"){
+					   
+					alert("Application Added Successfully!");
+					$scope.application=data.modelData;
+					
+				   }
+				   else if(data.response=="UPDATE"){
+					   
+					alert("Application Updated Successfully!");
+					 window.location.reload(true); 
+				   }
+				   
+			});	
+			
+			
+		}
+		else
+			{
+			alert("Please Select Applications Type");
+			}
+		/*
 		var response =$http.post(urlBase+'application/addApplication',application);
 		response.success(function(data, status, headers, config){
 			   if(data.response=="ADD"){
 				   
 				alert("Application Added Successfully!");
+				window.location.reload(true); 
 				$scope.application=data.modelData;
 			   }
 			   else if(data.response=="UPDATE"){
 				   
 				alert("Application Updated Successfully!");
+				 window.location.reload(true); 
 			   }
 	
 			
-		});	
+		});	*/
+		
+		
+		
 	}
 
 
+
+	$scope.deleteSubApplication=function(id){
+		  var result=confirm("Do you want to Remove this Application");
+			if (result) {
+		   $http({
+			method : 'DELETE',
+			url : urlBase + 'application/deleteSubApplication/' + id + '/'
+		}).success(function(res) {
+			   if(res.response=="TRUE"){
+				   window.location.reload(true); 
+				   //alert(" Application Deleted Successfully!");
+				if($scope.application.ap_id!=null && $scope.application.ap_id!=undefined){
+					
+				}
+				
+			   }
+			
+		});	
+	}
+	
+	}
 
 $scope.ShowId = function(event)
 {
 	$scope.tabShow1=true;
 	$scope.tabShow2=true;
 	$scope.tabShow3=true;
+	$scope.tabShow4=true;
 };
+
+getCaseDetails();
+
+function getCaseDetails(){
+	  $http.get(urlBase+'application/getCaseDetails/'+$scope.fd_id).success(function (data) {
+	    		$scope.caseDetailsCIS=data.modelData;	
+	    	
+	    		
+	    		
+	    		console.log("dataaaaaaaaaaaaaaaaa",$scope.caseDetailsCIS[0]);
+	    		getPet();
+	    		  getRes();
+	    	
+	      }).
+	      error(function(data, status, headers, config) {
+	      	console.log("Error in getting casetypes");
+	      });
+}
+
+function getPet(){
+	  $http.get(urlBase+'application/getPet/'+$scope.caseDetailsCIS[0]).success(function (data) {
+	    		$scope.petitioner=data.modelData;	
+	    		console.log("dataaaaaaaaaaaaaaaaa",$scope.caseDetailsCIS[0]);
+	    	
+	      }).
+	      error(function(data, status, headers, config) {
+	      	console.log("Error in getting casetypes");
+	      });
+}
+
+$scope.caseDetailsCIS=[];
+function getRes(){
+	  $http.get(urlBase+'application/getRes/'+$scope.caseDetailsCIS[0]).success(function (data) {
+	    		$scope.respondent=data.modelData;	
+	    		console.log("dataaaaaaaaaaaaaaaaa",$scope.caseDetailsCIS);
+	    		
+	    	
+	      }).
+	      error(function(data, status, headers, config) {
+	      	console.log("Error in getting casetypes");
+	      });
+}
+
 	
 $scope.nextTab=function(event){
 }
@@ -372,7 +513,42 @@ $scope.nextTab=function(event){
 			}
 		
 		
+			
+			
+			
 		/////////////////Document Upload Close///////////////
+			
+			
+
+			$scope.addNewColumn = function() {
+				$scope.counter++;
+
+				var newItemNo = $scope.application.subApplication.length + 1;
+				$scope.application.subApplication.push({/*
+					'colId' : 'col' + newItemNo*/
+					'sb_ap_mid' : $scope.application.ap_id,
+					'sb_ap_rec_status':1
+				});
+
+			};
+			
+			$scope.removeFlag = false;
+			$scope.removeColumn = function(index) {
+				$scope.counter--;
+
+				console.log($scope.application.subApplication);
+				if (index != 0) {
+					$scope.application.subApplication.splice(index, 1);
+
+					$scope.addFieldFlag = false;
+				}
+
+				console.log(index.length);
+
+				$scope.removeFlag = true;
+
+			};
+
 	
 	 
 	 

@@ -1,0 +1,53 @@
+package com.dms.model;
+public class Search {
+	
+	private Long metafield;
+	private String criteria;
+	private String searchtext;
+	private String operator;
+
+	public Search() {
+
+	}
+
+	public Search(Long metafield, String criteria, String searchtext, String operator) {
+		this.metafield = metafield;
+		this.criteria = criteria;
+		this.operator = operator;
+		this.searchtext = searchtext;
+	}
+
+	public Long getMetafield() {
+		return metafield;
+	}
+
+	public void setMetafield(Long metafield) {
+		this.metafield = metafield;
+	}
+
+	public String getCriteria() {
+		return criteria;
+	}
+
+	public void setCriteria(String criteria) {
+		this.criteria = criteria;
+	}
+
+	public String getSearchtext() {
+		return searchtext;
+	}
+
+	public void setSearchtext(String searchtext) {
+		this.searchtext = searchtext;
+	}
+
+	public String getOperator() {
+		return operator;
+	}
+
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+	
+	
+}

@@ -9,7 +9,7 @@
 								<h3 class="panel-title">
 									<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
 									    <i class="fa fa-plus-circle pull-right"></i> 
-										Case Details
+										Application Details
 									</a>
 								</h3>
 							</div>
@@ -21,15 +21,16 @@
                                         <tr>
                                             <th>Draft No</th>
                                             <th>Diary No</th>
-                                            <th>Case Year</th>
+                                            <th>Application Type</th>
+                                            <th>App No./Year</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr class="odd gradeX">
                                              <td>{{application.ap_draft_no}}</td>
                                              <td>{{application.ap_diary_no}}</td>
-                                            
-                                             <td>{{application.ap_case_year}}</td>
+                                            <td>{{application.applicationType.at_name}}</td>
+                                             <td>{{application.ap_no}}/{{application.ap_year}}</td>
                                           </tr>
                                     </tbody>
                                 </table>
@@ -108,7 +109,7 @@
 							</div>
 						</div>
 						
-						<div class="panel panel-inverse overflow-hidden"  ng-show="application.caseStage.lk_longname=='SUPERVISIOR_DEFECTS'">
+						<div class="panel panel-inverse overflow-hidden"  ng-show="application.caseStage.lk_id = 1000041">
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseNine">

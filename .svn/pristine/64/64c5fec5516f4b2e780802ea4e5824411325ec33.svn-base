@@ -1,0 +1,71 @@
+package com.dms.service;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dms.model.CategoryCode;
+import com.dms.model.DocumentFileDetails;
+
+@Service
+public class DocumentFileDetailsService {
+
+	@PersistenceContext
+	private EntityManager em;
+
+	@Transactional
+	public List<DocumentFileDetails> getAll(){
+		List<DocumentFileDetails> result=em.createQuery("SELECT d FROM DocumentFileDetails s where dfd_rec_status = 1").getResultList();
+		return result;		
+	}
+	
+	@Transactional
+	public List<DocumentFileDetails> getAllByfdid(Long fdid){
+		List<DocumentFileDetails> result=em.createQuery("SELECT s FROM DocumentFileDetails s where dfd_rec_status = 1 and dfd_fd_mid=:val1").setParameter("val1", fdid).getResultList();
+		return result;		 
+	}
+	
+	@Transactional
+	public DocumentFileDetails getAllByfdid(Long fdid,Long judgmentdocId){
+		DocumentFileDetails result=new DocumentFileDetails();
+		result=(DocumentFileDetails) em.createQuery("SELECT s FROM DocumentFileDetails s where dfd_rec_status = 1 and dfd_fd_mid=:val1 and dfd_id=:val2").setParameter("val1", fdid).setParameter("val2", judgmentdocId).getSingleResult();
+		return result;		 
+	}
+
+	
+	@Transactional
+    public DocumentFileDetails save(DocumentFileDetails parm1) {
+    
+		DocumentFileDetails dfd = null;
+    	try {	
+    		dfd= em.merge(parm1);	    	
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return dfd;
+    }
+	
+	@Transactional
+    public void delete(Long id) {    
+		DocumentFileDetails m = em.find(DocumentFileDetails.class, id);		   
+		  em.remove(m);
+    }
+	
+	@Transactional
+	public DocumentFileDetails getById(Long id){
+		DocumentFileDetails m= em.find(DocumentFileDetails.class, id);
+		return m;
+	}
+
+	@Transactional
+	public DocumentFileDetails getByDfd_id(Long dfd_id){
+		DocumentFileDetails result=(DocumentFileDetails) em.createQuery("SELECT s FROM DocumentFileDetails s where dfd_id=:val1").setParameter("val1", dfd_id).getSingleResult();
+		return result;		 
+	}
+	
+	
+}

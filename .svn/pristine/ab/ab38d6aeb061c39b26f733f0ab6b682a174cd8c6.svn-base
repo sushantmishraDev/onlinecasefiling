@@ -1,0 +1,712 @@
+package com.dms.controller;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.dms.model.ActionResponse;
+import com.dms.model.Folder;
+import com.dms.model.FolderPermission;
+import com.dms.model.Lookup;
+import com.dms.model.Permission;
+import com.dms.model.Repository;
+import com.dms.model.RepositoryPermission;
+import com.dms.model.SecurityQuestion;
+import com.dms.model.User;
+import com.dms.model.UserDetails;
+import com.dms.model.UserRole;
+import com.dms.service.FolderService;
+import com.dms.service.LookupService;
+import com.dms.service.PermissionService;
+import com.dms.service.RepositoryService;
+import com.dms.service.UserRoleService;
+import com.dms.service.UserService;
+import com.dms.utility.GlobalFunction;
+import com.dms.validation.PermissionValidator;
+import com.dms.validation.SecurityQuestionValidator;
+import com.dms.validation.UserMstrValidator;
+
+@Controller
+public class UserController {
+	
+	@Autowired
+	private UserService userservice;
+	
+	@Autowired
+	private FolderService folderService;
+	
+	@Autowired
+	private RepositoryService repositoryService;
+	
+	@Autowired
+	private PermissionService permissionService;
+
+	@Autowired
+	private LookupService lookUpService;
+	
+	@Autowired
+	private UserRoleService urService;
+	
+	@Autowired
+	private UserMstrValidator umvalidation;
+	
+	@Autowired
+	private PermissionValidator permissionValidation;
+	
+	@Autowired
+	private SecurityQuestionValidator sqvalidation;
+	
+	private List<Long> childfolders=new ArrayList<Long>();
+	
+	HttpSession session;
+	
+	private GlobalFunction globalfunction;
+	
+	public UserController() {
+		globalfunction = new GlobalFunction();
+	}
+	
+	@RequestMapping(value = "/user/manage")
+	public String manage(Model model) {
+		return "/user/manage";
+	}
+	
+	@RequestMapping(value = "/user/edit")
+	public String edit(Model model) {
+		return "/views/editProfile";
+	}
+	
+	@RequestMapping(value = "/user/getallusers")
+	public @ResponseBody String getUserData(HttpSession session) {
+		String jsonData = null;
+		User user=new User();
+    	user=(User) session.getAttribute("USER");
+    	List<Long> userids= urService.getSytemAdminUsers();
+    	
+    	List<User> users=new ArrayList<User>();
+    	
+    	if(userids.contains(user.getUm_id())){
+    		// if logged in user is system admin then get all users
+    		users=userservice.getAllByRole();
+    	}else{
+    		// else get users by benchcode
+    		users=userservice.getUsersByBechcode(user.getUm_bench_code(),user.getUm_id());
+    	}
+		
+    	if(users != null){
+		jsonData = globalfunction.convert_to_json(users);
+		}
+		
+		System.out.println(jsonData);
+		return jsonData;
+	}
+	
+	
+	@RequestMapping(value="/user/getbenchcode",method=RequestMethod.GET)
+	public @ResponseBody String getbenchcode(Model model)
+	{
+		String jsonData=null;
+		
+		List<Lookup> benchcodes=lookUpService.getAll("BRANCH");
+		
+		if(benchcodes!=null)
+		{
+			jsonData=globalfunction.convert_to_json(benchcodes);
+		}
+		
+		return jsonData;
+	}
+
+	
+	@RequestMapping(value="/user/getmasters",method=RequestMethod.GET)
+	public @ResponseBody String getrolelist(Model model)
+	{
+		String jsonData=null;
+		String roleData="";
+		String designationData="";
+		String departmentData="";
+		
+		List<Lookup> getrole=lookUpService.getAll("DMS_ROLE");
+		
+		if(getrole!=null)
+		{
+			roleData=globalfunction.convert_to_json(getrole);
+		}
+		
+		List<Lookup> getdesignationlist=lookUpService.getAll("DESIGNTION");
+		
+		if(getdesignationlist!=null)
+		{
+			designationData=globalfunction.convert_to_json(getdesignationlist);
+		}
+		
+		List<Lookup> getdepartmentlist=lookUpService.getAll("DEPARTMENT");
+		
+		if(getdepartmentlist!=null)
+		{
+			departmentData=globalfunction.convert_to_json(getdepartmentlist);
+		}
+		
+		jsonData = "{\"roleData\":"+roleData+",\"designationData\":"+designationData+",\"departmentData\":"+departmentData+"}";
+		System.out.println(jsonData);
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value="/getroleList",method=RequestMethod.GET)
+	public @ResponseBody String getvendor(Model model)
+	{
+		String jsonData=null;
+		String roleData="";
+		String teamData="";
+		String shiftData="";
+		
+		
+		List<Lookup> getrole=lookUpService.getAll("ROLE");
+		
+		if(getrole!=null)
+		{
+			roleData=globalfunction.convert_to_json(getrole);
+		}
+		
+		List<Lookup> getteam=lookUpService.getAll("VENDOR");
+		
+		if(getteam!=null)
+		{
+			teamData=globalfunction.convert_to_json(getteam);
+		}
+		
+		List<Lookup> getshift=lookUpService.getAll("SHIFT");
+			
+		if(getshift!=null)
+		{
+			shiftData=globalfunction.convert_to_json(getshift);
+		}
+		
+		jsonData = "{\"roleData\":"+roleData+",\"teamData\":"+teamData+",\"shiftData\":"+shiftData+"}";
+		System.out.println(jsonData);
+		return jsonData;
+
+	}
+	
+	@RequestMapping(value = "/user/updateuserpermission", method = RequestMethod.POST)	
+	public @ResponseBody String updateuserpermission(@RequestBody Permission perm,HttpSession session) {
+		String jsonData="";
+		this.childfolders.clear();
+		ActionResponse<Permission> response = new ActionResponse();
+		response = permissionValidation.doValidation(perm);
+		
+		if(response.getResponse()=="TRUE")
+		{
+		
+			perm=permissionService.save(perm);
+			
+			if(perm.getType()==2){
+				
+				if(perm.getStatus()==0)
+				{
+					List<Long> folderids=new ArrayList<Long>();
+					
+					folderids=getallchildrens(perm.getValue());
+					
+					if(!folderids.isEmpty())
+						permissionService.updateChildFolders(folderids,perm.getUserId(),perm.getStatus());
+				}
+			}
+			
+			Long userId=perm.getUserId();
+			List<Folder>folderpermissions=permissionService.getNotAssignedFolders(userId);
+			
+			if(!folderpermissions.isEmpty())
+			{
+				for(Folder f:folderpermissions)
+				{
+					Permission folderexist=permissionService.checkFolderexist(f,userId);
+					if(folderexist==null){
+					Permission per=new Permission();
+					perm.setType(2);
+					perm.setStatus(0);
+					perm.setUserId(userId);
+					perm.setValue(f.getId());
+					permissionService.save(per);
+					}
+				}
+			}
+			
+			List<Repository> repositorypermissions=permissionService.getNotAssignedRepositories(userId);
+			if(!repositorypermissions.isEmpty())
+			{
+				for(Repository r:repositorypermissions)
+				{
+					Permission repositoryexist=permissionService.checkRepositoryexist(r,userId);
+					if(repositoryexist==null){
+					Permission per=new Permission();
+					perm.setType(1);
+					perm.setStatus(0);
+					perm.setUserId(userId);
+					perm.setValue(r.getId());
+					permissionService.save(per);
+					}
+				}
+			}
+			
+			
+			
+			jsonData=getUserPermissions(userId);
+			
+		}else{
+			jsonData=globalfunction.convert_to_json(response);
+		}
+		
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/user/assignallfolders", method = RequestMethod.POST)	
+	public @ResponseBody String assignallfolders(@RequestBody Permission perm,HttpSession session) {
+		this.childfolders.clear();
+		
+		String jsonData="";
+		
+		Long userId=perm.getUserId();
+		Long folderId=perm.getValue();
+		ActionResponse<Permission> response = new ActionResponse();
+		response = permissionValidation.doValidation(perm);
+		
+		if(response.getResponse()=="TRUE")
+		{
+			perm=permissionService.save(perm);
+			
+			if(perm.getType()==2){
+				
+				if(perm.getStatus()==1)
+				{
+					List<Long> folderids=new ArrayList<Long>();
+					
+					folderids=getallchildrens(perm.getValue());
+					
+					if(!folderids.isEmpty())
+						permissionService.updateChildFolders(folderids,perm.getUserId(),perm.getStatus());
+				}
+			}
+			jsonData=getUserPermissions(userId);
+		
+		}else{
+			jsonData=globalfunction.convert_to_json(response);
+		}
+		
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/user/getuserpermission", method = RequestMethod.POST)
+	public @ResponseBody String getuserpermission(@RequestBody User user,HttpSession session) {
+		String jsonData="";
+		Long userId=user.getUm_id();
+		List<Folder>folderpermissions=permissionService.getNotAssignedFolders(userId);
+		
+		if(!folderpermissions.isEmpty())
+		{
+			for(Folder f:folderpermissions)
+			{
+				Permission folderexist=permissionService.checkFolderexist(f,userId);
+				if(folderexist==null){
+				Permission perm=new Permission();
+				perm.setType(2);
+				perm.setStatus(0);
+				perm.setUserId(userId);
+				perm.setValue(f.getId());
+				permissionService.save(perm);
+				}
+			}
+		}
+		
+		List<Repository> repositorypermissions=permissionService.getNotAssignedRepositories(userId);
+		if(!repositorypermissions.isEmpty())
+		{
+			for(Repository r:repositorypermissions)
+			{
+				Permission repositoryexist=permissionService.checkRepositoryexist(r,userId);
+				if(repositoryexist==null){
+				Permission perm=new Permission();
+				perm.setType(1);
+				perm.setStatus(0);
+				perm.setUserId(userId);
+				perm.setValue(r.getId());
+				permissionService.save(perm);
+				}
+			}
+		}
+		
+		List<RepositoryPermission> repperms=new ArrayList<RepositoryPermission>();
+		List<FolderPermission> folderperms=new ArrayList<FolderPermission>();
+		jsonData=getUserPermissions(userId);
+		
+		//jsonData="{\"repositories\":"+globalfunction.convert_to_json(repperms)+",\"folders\":"+globalfunction.convert_to_json(folderperms)+"}";
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/user/create", method = RequestMethod.POST)	
+	public @ResponseBody String create(@RequestBody User um,HttpSession session) {	
+		String jsonData="";
+		ActionResponse<User> response = umvalidation.doValidation(um);		
+		User temp_um = um;
+		User user = (User) session.getAttribute("USER");
+		
+		if(response.getResponse() == "TRUE"){					
+			//um.setCr_date(new Date());
+			
+			um.setPassword(globalfunction.md5encryption(um.getPassword()));
+			
+			um.setCr_by(user.getUm_id());
+			 um.setCr_date(new Date());
+			 
+			 Calendar cal = Calendar.getInstance();
+			 cal.setTime(new Date());
+			 cal.add(Calendar.DATE, -1);
+			 
+			um = userservice.save(um);	
+			if(um.getUm_id()!=null){
+				UserRole ur = urService.getByUserId(um.getUm_id());			
+				if(ur.getUr_id()==null){
+					ur.setUr_um_mid(um.getUm_id());
+					ur.setUr_role_id(temp_um.getUm_role_id());
+					ur.setUr_cr_date(new Date());
+					ur.setUr_rec_status(1);
+				}else{
+					ur.setUr_role_id(temp_um.getUm_role_id());
+					ur.setUr_mod_date(new Date());
+				}
+				urService.save(ur);
+			}
+			um=userservice.getUser(um.getUm_id());
+			response.setModelData(um);
+		}	
+		jsonData = globalfunction.convert_to_json(response);
+	//	jsonData="{\"response\":"+ globalfunction.convert_to_json(response)+",\"response1\":"+ globalfunction.convert_to_json(response1)+"}";
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/user/update", method=RequestMethod.POST)
+	public @ResponseBody String update(@RequestBody User um,HttpSession session)
+	{
+		String jsonData="";
+		ActionResponse<User> response = umvalidation.doValidation(um);
+		User user = (User) session.getAttribute("USER");
+		if(response.getResponse()=="TRUE")
+		{
+			 
+			/*if(um.getPassword().equals(user1.getPassword()))
+			{
+				um.setUm_department_id(um.getUm_department_id());
+				um.setUm_fullname(um.getUm_fullname());
+				um.setRec_status(um.getRec_status());
+				//um.setUm_pass_validity_date();
+			}
+			else
+			{*/
+			//	um.setPassword(globalfunction.md5encryption(um.getPassword()));
+			
+
+			 um=userservice.save(um);
+			response.setModelData(um);
+			//um.setPassword(globalfunction.md5encryption(um.getPassword()));
+		}
+		jsonData = globalfunction.convert_to_json(response);
+		return jsonData;
+		
+		}
+	private String getUserPermissions(Long userId) {
+		// TODO Auto-generated method stub
+		List<RepositoryPermission> repperms=new ArrayList<RepositoryPermission>();
+		List<FolderPermission> folderperms=new ArrayList<FolderPermission>();
+		Map<List<RepositoryPermission>, List<FolderPermission>> allpermissions= new HashMap<List<RepositoryPermission>, List<FolderPermission>>();
+		
+		List<Permission> temppermissions=permissionService.getPermissionByUser(userId);
+		
+		for(Permission permission:temppermissions){
+			permission.setIsParent(0);
+			permission.setAssignAll(false);
+			if(permission.getType()==1){
+				Repository r=repositoryService.getRepository(permission.getValue());
+				RepositoryPermission repperm=new RepositoryPermission();
+				
+				repperm.setId(permission.getId());
+				repperm.setAssignAll(permission.getAssignAll());
+				repperm.setStatus(permission.getStatus());
+				repperm.setName(r.getName());
+				repperm.setFolderPath(permission.getFolderPath());
+				repperm.setUserId(permission.getUserId());
+				repperm.setValue(permission.getValue());
+				repperm.setType(permission.getType());
+				repperm.setIsParent(permission.getIsParent());
+				
+				repperms.add(repperm);
+			}
+			else if(permission.getType()==2)
+			{
+				Folder f=folderService.getFolderById(permission.getValue());
+				  String folderPath="";
+				    Long parent_id=f.getParent_id();
+				    while(parent_id !=null){
+				    	Folder fd=folderService.getFolderById(parent_id);
+				    	folderPath = fd.getFolder_name()+" -> "+folderPath;
+					    parent_id   = fd.getParent_id();							
+				    }
+				    
+				    
+				    folderPath=folderPath+f.getFolder_name();
+				    permission.setFolderPath(folderPath);
+				    
+				if(!f.getChildrens().isEmpty()){
+					permission.setAssignAll(false);
+					permission.setIsParent(1);
+					int size=f.getChildrens().size();
+					int i=0;
+					for(Folder fchildren:f.getChildrens()){
+						i++;
+						Permission childfolderpermission=findchildren(fchildren,temppermissions,userId);
+						if(childfolderpermission.getId()!=null){
+							if(childfolderpermission.getStatus()!=1){
+								i--;
+							}
+						}
+					}
+					if(i!=size)
+						permission.setAssignAll(true);
+					
+					System.out.println("folderID="+permission.getName()+"&i="+i+"&size="+size);
+				}
+				
+				FolderPermission folderperm=new FolderPermission();
+				
+				folderperm.setId(permission.getId());
+				folderperm.setAssignAll(permission.getAssignAll());
+				folderperm.setStatus(permission.getStatus());
+				folderperm.setName(f.getFolder_name());
+				folderperm.setFolderPath(permission.getFolderPath());
+				folderperm.setUserId(permission.getUserId());
+				folderperm.setValue(permission.getValue());
+				folderperm.setIsParent(permission.getIsParent());
+				folderperm.setType(permission.getType());
+				folderperms.add(folderperm);
+			}
+			
+		}
+		String jsonData="{\"response\":\"TRUE\",\"repositories\":"+globalfunction.convert_to_json(repperms)+",\"folders\":"+globalfunction.convert_to_json(folderperms)+"}";
+		return jsonData;
+	}
+
+	private Permission findchildren(Folder fchildren,List<Permission> temppermissions,Long userId) {
+		Permission child=new Permission();
+		for(Permission permission:temppermissions){
+			if(permission.getValue().longValue()==fchildren.getId().longValue() && userId.longValue()==permission.getUserId().longValue()){
+				child=new Permission();
+				child.setAssignAll(permission.getAssignAll());
+				child.setId(permission.getId());
+				child.setStatus(permission.getStatus());
+			}
+		}
+		return child;
+	}
+	
+	public List<Long> getallchildrens(Long folderId){
+		this.childfolders.add(folderId);
+		List<Folder> flist=folderService.getFoldersByParentId(folderId);
+		
+		if(!flist.isEmpty()){
+			for(Folder f:flist)
+			{
+				this.getallchildrens(f.getId());
+			}
+		}
+		return this.childfolders;
+	}
+	
+	@RequestMapping(value = "/user/getUserDetails",method = RequestMethod.GET)
+	public @ResponseBody String getUserDetails(HttpSession session) {
+		
+		String jsonData=null;
+		
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<User>response=new ActionResponse();
+    	
+		User userdetails = (User) session.getAttribute("USER");
+		
+		System.out.println("user.getUm_id()  "+user.getUm_id());
+		
+		User userdetail = userservice.getUserDetail(userdetails.getUm_id());
+	    
+		response.setResponse("TRUE");
+		response.setData(userdetail);
+	
+		
+		
+		jsonData = globalfunction.convert_to_json(response);
+		
+		
+		return jsonData;
+		
+	}
+	
+	/*@RequestMapping(value = "/user/updateUserDetails", method = RequestMethod.POST)
+	   public @ResponseBody String changePassword(@RequestBody SecurityQuestion sq,HttpSession session) 
+		{ 
+		  User user=(User) session.getAttribute("USER");
+		  
+		  ActionResponse<SecurityQuestion> response =new ActionResponse<SecurityQuestion>() ;
+		  
+		  String pass=sq.getPassword();
+	    
+		  response.setResponse("TRUE");
+		  response.setData(pass);
+		  user.setPassword(globalfunction.md5encryption(pass));
+		  
+		  userservice.save(user);
+		  
+		  System.out.println(pass);
+
+		  String jsonData = null;
+		  jsonData = globalfunction.convert_to_json(response);
+		  System.out.println("last "+response.getResponse());
+		  System.out.println("***********User password change sucessfully*********");
+		  return jsonData;
+		}	
+*/
+	
+
+		@RequestMapping(value = "user/changePassword", method = RequestMethod.POST)
+		public @ResponseBody String changePassword(@RequestBody SecurityQuestion sq,HttpSession session) 
+		{ 
+			String jsonData = null;
+			User user=(User) session.getAttribute("USER");
+			System.out.println("Name Is:"+user.getUm_fullname());
+			ActionResponse<SecurityQuestion> response =new ActionResponse<SecurityQuestion>() ;
+			response = sqvalidation.doValidationForChanePwd(sq);
+			System.out.println("Password is: "+sq.getPassword());
+			
+			String pass=sq.getPassword();
+			
+			if (response.getResponse() == "TRUE") 
+			{
+				user.setPassword(globalfunction.md5encryption(pass));
+				System.out.println(pass);
+				userservice.update(user);
+			}
+			
+			jsonData = globalfunction.convert_to_json(response);
+			System.out.println("last"+response.getResponse());
+		    return jsonData;
+		}
+
+	@RequestMapping(value = "/user/updateName", method = RequestMethod.POST)
+	 public @ResponseBody String updateName(@RequestBody User user,HttpSession session)
+	 {
+		 String jsonData=null; 
+		 
+		 ActionResponse<User>response=new ActionResponse();
+		 User userdetail = userservice.getUserDetail(user.getUm_id()); 
+		 
+		 System.out.println("userdetail:"+userdetail.getUm_id());
+		 System.out.println("updated full name :" +user.getUm_fullname());
+
+		 userdetail.setUm_fullname(user.getUm_fullname());
+		 userservice.save(userdetail);
+		 //usersession.setUm_fullname(user.getUm_fullname());
+		 
+		 session.setAttribute("USER", userdetail);
+		 
+		 response.setResponse("TRUE");
+		 jsonData = globalfunction.convert_to_json(response);
+		 
+		 return jsonData;
+		
+	 }
+	 
+	@RequestMapping(value = "/user/validityDays", method=RequestMethod.POST)
+	public @ResponseBody String validityDays()
+	{
+	    String Expiry_days=null;
+		List<Lookup> lklist=lookUpService.getAll("PASSWORD_EXPIRY_DAYS");
+		Lookup lk=lklist.get(0);
+		Expiry_days=lk.getLk_longname();
+		//cal2.add(Calendar.DATE, Integer.parseInt(lk.getLk_longname()));
+	    return Expiry_days;	
+	}
+	
+	@RequestMapping(value = "/user/changepassword", method = RequestMethod.POST)
+	public @ResponseBody String changePassword(@RequestBody User u,HttpSession session) 
+	{ 
+		String jsonData = null;
+		User user=(User) session.getAttribute("USER");
+		System.out.println(user.getUm_fullname());
+		ActionResponse<User> response =new ActionResponse<User>() ;
+		response = umvalidation.doValidationForPassword(u);
+		
+		String pass=u.getConfirmpassword();
+		//System.out.println(u.getPassword()+"pass");
+		if (response.getResponse() == "TRUE") {
+			user.setPassword(globalfunction.md5encryption(pass));
+			System.out.println(pass);
+			userservice.update(user);
+		}
+		
+		jsonData = globalfunction.convert_to_json(response);
+		System.out.println("last "+response.getResponse());
+	    return jsonData;
+	}
+
+	@RequestMapping(value = "/ecourt/createaccount", method = RequestMethod.POST)
+	public String usercreation(@RequestBody UserDetails ud){
+		
+		String jsonData = null;
+		
+		return "";
+	}
+
+	@RequestMapping(value = "user/changePass", method = RequestMethod.POST)
+	public @ResponseBody String changePassword1(@RequestBody User u,HttpSession session) 
+	{ 
+		String jsonData = null;
+		
+		User user=(User) session.getAttribute("USER");
+		System.out.println(user.getUm_fullname());
+		User us =null;
+		ActionResponse<User> response =new ActionResponse<User>() ;
+		us = userservice.checkPassExist(u.getPassword(),user.getUm_id());
+		/*User upass= new User();
+		upass.setPassword(u.getNewpassword());
+		upass.setConfirmpassword(u.getConfirmpassword());
+		response= umvalidation.doValidationForPassword(upass);*/
+		String pass=u.getConfirmpassword();
+		
+		
+		//System.out.println(u.getPassword()+"pass");
+		if (us.getUm_id()!=null) {
+			user.setPassword(globalfunction.md5encryption(pass));
+			System.out.println(pass);
+			userservice.update(user);
+			response.setResponse("TRUE");
+		}
+		else
+		{
+			response.setResponse("WRONG");
+		}
+		jsonData = globalfunction.convert_to_json(response);
+		System.out.println("last "+response.getResponse());
+	    return jsonData;
+	
+	
+	}
+}

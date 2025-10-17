@@ -33,6 +33,11 @@ public class PoliceStation {
 
 	@Column(name = "ps_cr_by")
 	private Long cr_by;
+	
+	@Column(name = "ps_district_mid")
+	private Long ps_district_mid;
+
+	
 
 	@Column(name = "ps_cr_date")
 	private Date cr_date;
@@ -57,6 +62,14 @@ public class PoliceStation {
 
 	public void setLk_branch(Lookup lk_branch) {
 		this.lk_branch = lk_branch;
+	}
+	
+	public Long getPs_district_mid() {
+		return ps_district_mid;
+	}
+
+	public void setPs_district_mid(Long ps_district_mid) {
+		this.ps_district_mid = ps_district_mid;
 	}
 
 	public Long getPs_id() {

@@ -32,22 +32,32 @@ edmsApp.directive('numbersOnly', function() {
 edmsApp.controller('loginController', ['$scope','$http','$controller', function ($scope,$http,$controller) {
 	
 	
+	
+	$(document).ready(function(){
+		createCaptcha();
+		});
 	var urlBase="/onlinecasefiling/";
 	$scope.flattypes=[];
 	$scope.flatcats=[];
 	$scope.loginform={};
 	$scope.forgotpwd={};
 	$scope.userRoles=[];
+	
+	// for audio captcha
+	var synth = window.speechSynthesis;
+	$scope.captcha1="";
 	$scope.errorlist = '';
 	//$scope.errorlist={"name":["Already Exist"]};
 	$('.register').hide();
 	//$('.login').hide();
 	$scope.register={};
+	$scope.user={};
 	$scope.register.type='aor';
 	$scope.isadvocate=false;
 	$scope.registershow=false;
 	$scope.loginshow=true;
 	$scope.forgotshow=false;
+	$scope.captcha1;
 	$scope.registerForm=function(){
 		//$('.register').show();
 		//$('.login').hide();
@@ -56,10 +66,26 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		$scope.forgotshow=false;
 		this.refresh();
 	}
-	$scope.loginForm=function(){
-		$scope.registershow=false;
-		$scope.loginshow=true;
+	
+	$scope.afterOtpForm=function(){
+		//$('.register').show();
+		//$('.login').hide();
+		$scope.registershow=true;
+		$scope.loginshow=false;
 		$scope.forgotshow=false;
+		$scope.validateotp=true;
+		$scope.otptext=false;
+		$scope.isadvocate=true;
+		var voices = [];
+		
+	}
+	$scope.loginForm=function(){
+		
+		/*$scope.registershow=false;
+		$scope.loginshow=true;
+		createCaptcha();
+		$scope.forgotshow=false;*/
+		window.location.reload();
 //		$('.login').show();
 //		$('.register').hide();		
 	}
@@ -71,11 +97,137 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		$scope.otptext=false;
 		$scope.sendotp=true;	
 	}
-	function validateotpform(){
+	
+	
+	function populateVoiceList() {
+		  voices = synth.getVoices().sort(function (a, b) {
+		      const aname = a.name.toUpperCase(), bname = b.name.toUpperCase();
+		      if ( aname < bname ) return -1;
+		      else if ( aname == bname ) return 0;
+		      else return +1;
+		  });
+		  
+		}
+	
+	/*function speak(msg){
+		console.log("captchaaaaaaaa",$scope.captcha1);
+		console.log("captchaaaaaaaa",voices);
+	    if (synth.speaking) {
+	        console.error('speechSynthesis.speaking');
+	        return;
+	    }
+	    if ($scope.captcha1 !== '') {
+	    var utterThis = new SpeechSynthesisUtterance(msg);
+	    utterThis.onend = function (event) {
+	        console.log('SpeechSynthesisUtterance.onend');
+	    }
+	    utterThis.onerror = function (event) {
+	        console.error('SpeechSynthesisUtterance.onerror');
+	    }
+	   // var selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-name');
+	    for(i = 0; i < voices.length ; i++) {
+	    	//hi-IN
+	      if(voices[i].lang == "hi-IN") {
+	        utterThis.voice = voices[i];
+	        break;
+	      }
+	    }
+	    utterThis.pitch = 0.9;
+	    utterThis.rate = 1;
+	    synth.speak(utterThis);
+	  }
+	}*/
+	
+	
+	$scope.speakCaptcha =function(){
+		
+		
+		
+			  try {
+			    const messageParts = $scope.captcha1.split(' ')
+
+			    let currentIndex = 0
+			    const speak = (textToSpeak) => {
+			      const msg = new SpeechSynthesisUtterance();
+			      const voices = window.speechSynthesis.getVoices();
+			      msg.voice = voices[0];
+			      msg.volume = 1; // 0 to 1
+			      msg.rate = 1; // 0.1 to 10
+			      msg.pitch = .1; // 0 to 2
+			      msg.text = textToSpeak;
+			      msg.lang = 'en-US';
+
+			      msg.onend = function() {
+			        currentIndex++;
+			        if (currentIndex < messageParts.length) {
+			          setTimeout(() => {
+			            speak(messageParts[currentIndex])
+			          }, 500)
+			        }
+			      };
+			      speechSynthesis.speak(msg);
+			    }
+			    speak(messageParts[0])
+			  } catch (e) {
+			    console.error(e)
+			  }
+		
+		
+		
+		
+		console.log("function calleddddddddd");
+		
+	
+
+	
+
+	
+
+	
+
+	populateVoiceList();
+	if (speechSynthesis.onvoiceschanged !== undefined) {
+	  speechSynthesis.onvoiceschanged = populateVoiceList;
+	}
+
+	
+
+	//speak();
+
+	/*pitch.onchange = function() {
+	  pitchValue.textContent = pitch.value;
+	}
+
+	rate.onchange = function() {
+	  rateValue.textContent = rate.value;
+	}
+
+	voiceSelect.onchange = function(){
+	  speak();
+	}*/
+}
+	
+	
+	
+
+	
+
+	
+	function registraionFormValidateotpform(){
+		$scope.registershow=false;
+		$scope.forgotshow=true;	
 		$scope.validateotp=true;
 		$scope.otptext=true;
 		$scope.sendotp=false;	
 	}
+	
+	function validateotpform(){
+		$scope.registershow=false;
+		$scope.validateotp=true;
+		$scope.otptext=true;
+		$scope.sendotp=false;	
+	}
+
 	$scope.refresh=function(){
 		$scope.registertemp=$scope.register;
 		$scope.register={};
@@ -89,11 +241,16 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		$http.post(urlBase+'user/validateAdvocate',$scope.register).
         success(function (data) {
         	if(data.response=="TRUE"){
-        		$scope.isadvocate=true;
+        		$scope.isadvocate=false;
         		$scope.register.username=data.modelData.rollNo;
         		$scope.register.name=data.modelData.name;
         		$scope.register.email=data.modelData.email;
         		$scope.register.mobile=data.modelData.mobile;
+        		
+        		console.log($scope.register.email);
+        		
+        		$scope.forgotpwd.username=data.modelData.rollNo;
+        		 $scope.sendOTP();
         		
     			//window.location.href=urlBase+"ecourt/ecourtHome";
         	}else{
@@ -120,10 +277,20 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		$http.post(urlBase+'user/register',$scope.register).
         success(function (data) {
         	if(data.response=="TRUE"){
-        		$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
+        		if($scope.register.type=='aor'){
+        			alert(data.data);
+        		$scope.loginForm();
+        		}
+        		else{
+        			$scope.isadvocate=false;
+        			$scope.forgotpwd.username=$scope.register.username;
+           		 $scope.sendOTP();
+        		}
+        		
+        		/*$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
         		setTimeout(function() {
        			 $(".msg_div").html("");
-       		    }, 5000);
+       		    }, 5000);*/
         		$scope.registertemp=$scope.register;
         		$scope.register={};
         		$scope.register.type=$scope.registertemp.type;	
@@ -172,6 +339,91 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		return $scope.validate;
 		
 	}
+	
+	//////////captcha
+	
+	
+	var code;
+	function createCaptcha() {
+	  //clear the contents of captcha div first 
+	  document.getElementById('captcha').innerHTML = "";
+	  var charsArray =
+	  "0123456789";
+	  var lengthOtp = 6;
+	  var captcha = [];
+	  
+	  
+	  $http.get(urlBase+'dms/generateCaptcha').
+      success(function (data) {	
+    	  $scope.captcha1="";
+    	  
+  	//	$scope.captcha1 =data.modelData;
+  		for(var i =0 ; i < data.modelData.length ; i++){
+  			var j =data.modelData[i];
+  			console.log("aaaaaa",j);
+  			$scope.captcha1 =$scope.captcha1+j+" ";
+  		}
+  		
+    	  //captcha = data.modelData;    
+    	  if(data.response=="TRUE"){
+    	  var canv = document.createElement("canvas");
+    	  canv.id = "captcha";
+    	  canv.width = 100;
+    	  canv.height = 50;
+    	  var ctx = canv.getContext("2d");
+    	  ctx.font = "25px Georgia";
+    	  ctx.strokeText(data.modelData, 0, 30);
+    	  //storing captcha so that can validate you can save it somewhere else according to your specific requirements
+    	  code = data.modelData;
+    	  document.getElementById("captcha").appendChild(canv); // adds the canvas to the body element
+      }
+      }).
+      error(function(data, status, headers, config) {
+    	  console.log("Error in getting Captcha");
+      });
+	  /*for (var i = 0; i < lengthOtp; i++) {
+	    //below code will not allow Repetition of Characters
+	    var index = Math.floor(Math.random() * charsArray.length + 1); //get the next character from the array
+	    if (captcha.indexOf(charsArray[index]) == -1)
+	      captcha.push(charsArray[index]);
+	    else i--;
+	  }*/
+	 /* var canv = document.createElement("canvas");
+	  canv.id = "captcha";
+	  canv.width = 100;
+	  canv.height = 50;
+	  var ctx = canv.getContext("2d");
+	  ctx.font = "25px Georgia";
+	  ctx.strokeText(captcha.join(""), 0, 30);
+	  //storing captcha so that can validate you can save it somewhere else according to your specific requirements
+	  code = captcha.join("");
+	  document.getElementById("captcha").appendChild(canv); // adds the canvas to the body element
+*/	}
+	function validateCaptcha() {
+	  event.preventDefault();
+	  debugger
+	  if (document.getElementById("cpatchaTextBox").value == code) {
+	    //alert("Valid Captcha")
+	  }else{
+	    alert("Invalid Captcha. try Again");
+	    createCaptcha();
+	  }
+	}
+	
+	/////////captcha
+	
+	function validatePassword(password) {
+		  const regex = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+		  return regex.test(password);
+		}
+
+		// Example usage:
+		
+		
+
+		
+	
+	
 	function RegisterFormValidate(){
 		$scope.validate = "TRUE";
 			if($scope.register.hasOwnProperty("username") == false){
@@ -201,16 +453,39 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 				}
 					
 			}
+
+			if($scope.register.hasOwnProperty("mobile") == false){
+				$("#personmobile").parent().addClass('has-error');
+				$scope.validate = "FALSE";
+			}else{
+				$("#personmobile").parent().removeClass('has-error');
+			}
 			if($scope.register.hasOwnProperty("mobile") == false){
 				$("#mobile").parent().addClass('has-error');
 				$scope.validate = "FALSE";
 			}else{
 				$("#mobile").parent().removeClass('has-error');
 			}
+			/*if($scope.register.hasOwnProperty("adhar") == false){
+				$("#adhar").parent().addClass('has-error');
+				$scope.validate = "FALSE";
+			}else{
+				$("#adhar").parent().removeClass('has-error');
+			}*/
 			if($scope.register.hasOwnProperty("password") == false){
 				$("#registerpassword").parent().addClass('has-error');
 				$scope.validate = "FALSE";
+				
 			}else{
+				const isValid = validatePassword($scope.register.password);
+				if (isValid) {
+					  console.log("Password is valid.");
+					} else {
+						$("#registerpassword").parent().addClass('has-error');
+						$scope.validate = "FALSE";
+						alert("Password is not valid.");
+					  console.log("Password is not valid.");
+					}
 				$("#registerpassword").parent().removeClass('has-error');
 			}
 			if($scope.register.hasOwnProperty("confirmPassword") == false){
@@ -278,29 +553,39 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 	}
 	
 	$scope.login= function() {
-		 
-		if(loginFormValidate("login")=="TRUE"){	
-			console.log($scope.loginform); 
-	        $http.post(urlBase+'dms/userlogin',$scope.loginform).
-	            success(function (data) {
-	            	console.log("Success got Login details");
-	            	console.log(data);  	            	
-	            	if(data.response=="TRUE"){	
-            			window.location.href=urlBase+"ecourt/ecourtHome";
-            			
-	            	}
-	            	else{
-	            		$(".msg_div").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
-	            		setTimeout(function() {
-	           			 $(".msg_div").html("");
-	           		    }, 5000);
-	            	}           	
-	            }).
-	            error(function(data, status, headers, config) {
-            		$(".msg_div").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button> <strong>Oops!</strong> Something went wrong.</div>");
-	            	console.log("Error in getting Login details");
-	            });
-		}	     
+		
+		event.preventDefault();
+		  debugger
+		  if (document.getElementById("cpatchaTextBox").value == code) {
+		  /*  alert("Valid Captcha")*/
+		    if(loginFormValidate("login")=="TRUE"){	
+				console.log($scope.loginform); 
+		        $http.post(urlBase+'dms/userlogin',$scope.loginform).
+		            success(function (data) {
+		            	console.log("Success got Login details");
+		            	console.log(data);  	            	
+		            	if(data.response=="TRUE"){	
+	            			window.location.href=urlBase+"ecourt/ecourtHome";
+	            			
+		            	}
+		            	else{
+		            		$(".msg_div").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
+		            		setTimeout(function() {
+		           			 $(".msg_div").html("");
+		           		    }, 5000);
+		            	}           	
+		            }).
+		            error(function(data, status, headers, config) {
+	            		$(".msg_div").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button> <strong>Oops!</strong> Something went wrong.</div>");
+		            	console.log("Error in getting Login details");
+		            });
+			}	
+		  }else{
+		    alert("Invalid Captcha. try Again");
+		    createCaptcha();
+		  }
+		
+		     
     };
     
     
@@ -327,36 +612,86 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 		}
     }; 
     
-    $scope.sendOTP= function() {
-    	
-		/*if(loginFormValidate("fgpwd")=="TRUE"){	*/
-			console.log($scope.forgotpwd); 
-	
-	var response = $http.post(urlBase+'genearteOTP',$scope.forgotpwd); 
-	response.success(function (data, status, headers, config) 
+    $scope.loading = true;
+    
+    $scope.sendOTP= function(){
+	    $scope.loading = false;
+	    
+		var response = $http.post(urlBase+'genearteOTP',$scope.forgotpwd); 
+		response.success(function (data, status, headers, config) 
 	            		{
 	            	 if(data.response=="TRUE")
 	            	{	
+	            		 if(data.modelData.adv_id!=null){
+	            			 $scope.register.mobile=data.modelData.mobile;
+	            			 alert("otp send to your ********"+$scope.register.mobile.charAt($scope.register.mobile.length-2)+""+$scope.register.mobile.charAt($scope.register.mobile.length-1)  + " mobile number");
+	            		 registraionFormValidateotpform();
+	            	}
+	            		 else if($scope.register.type=='inperson'){
+	            			 //$scope.forgotshow=false;
+		            			 //alert("otp send to your ********"+$scope.register.mobile.charAt($scope.register.mobile.length-2)+""+$scope.register.mobile.charAt($scope.register.mobile.length-1)  + " mobile number");
+		            		 registraionFormValidateotpform();
+	            		 }
+	            	 else{
 	            		 validateotpform();
-	            		
+	            		}
+	            		 $scope.loading = true;
             			//window.location.href=urlBase+"views/forgetPassword";
 	            	}else if(data.response=="FALSE"){
 	            		$(".msg_div").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
 	            		setTimeout(function() {
 	           			 $(".msg_div").html("");
 	           		    }, 5000);
+	            		 $scope.loading = true;
 	            	}           	
 	            });
 	            response.error(function(data, status, headers, config) {
             		$("#msg_div_otp").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button> <strong>Oops!</strong> Something went wrong.</div>");
 	            	console.log("Error in getting Login details");
+	            	 $scope.loading = true;
 	            });
 		/*}*/
     };
     
+    
+$scope.updatepassword= function() {
+	const isValid = validatePassword($scope.user.newpassword);
+	if (isValid) {
+		  console.log("Password must contains atleast one alphabet,special characters and number");
+		  
+		  var response = $http.post(urlBase+'updatepassword',$scope.user); 
+			response.success(function(data, status, headers, config) {	
+				 if(data.response=="TRUE")
+		     	{	
+					 alert("Password Updated Successfully Try to login");
+					 location.reload(true);
+		     	}
+				 else
+					 {
+					 alert("Password Mismatch");
+					 }
+			});
+			response.error(function(data, status, headers, config) {
+				alert("Error");
+			});
+		} else {
+			$("#registerpassword").parent().addClass('has-error');
+			$scope.validate = "FALSE";
+			alert("Password must contains atleast one alphabet,special characters and number.");
+		  console.log("Password is not valid.");
+		}
+	
+};
+    
+	function newPasswordForm(user){
+		$scope.validOTP=true;
+		$scope.otptext=false;
+		$scope.validateotp=false;
+		$scope.user=user;
+	}
     $scope.validateOtp= function() {
     	
-		if(loginFormValidate("fgpwd")=="TRUE"){	
+		/*if(loginFormValidate("fgpwd")=="TRUE"){	*/
 			console.log($scope.forgotpwd); 
 	
 	var response = $http.post(urlBase+'validateOtp',$scope.forgotpwd); 
@@ -364,14 +699,25 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
 	            		{
 	            	 if(data.response=="TRUE")
 	            	{	
-
-	             		$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
+	            		 if(data.data.adv_id!=null){
+	            			 $scope.afterOtpForm();
+	            		 }
+	            		
+	            		 else if($scope.register.type=='inperson'){
+	            			 alert("Successfully Registered");
+	            			 $scope.loginForm();
+	            		 }
+	            		 else{
+	            		 newPasswordForm(data.data);
+	            		 }
+	            		 
+	             		/*$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
 	             		setTimeout(function() {
 	            			 $(".msg_div").html("");
 	            		    }, 5000);
 	             		
 	         			$('.login').show();
-	         			$('.register').hide();
+	         			$('.register').hide();*/
 	         			
             			//window.location.href=urlBase+"views/forgetPassword";
 	            	}else if(data.response=="FALSE"){
@@ -385,7 +731,7 @@ edmsApp.controller('loginController', ['$scope','$http','$controller', function 
             		$("#msg_div_otp").html("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button> <strong>Oops!</strong> Something went wrong.</div>");
 	            	console.log("Error in getting Login details");
 	            });
-		}
+		/*}*/
     };
     
 }]);
