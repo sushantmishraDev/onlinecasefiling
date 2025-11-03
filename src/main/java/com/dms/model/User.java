@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -70,6 +69,25 @@ public class User {
 	@Column(name="um_otp")
 	private Integer  um_otp;
 	
+	@Column(name="um_otpgen_time")
+	private Date otpGeneratedTime;
+	
+	
+	
+
+
+
+
+	public Date getOtpGeneratedTime() {
+		return otpGeneratedTime;
+	}
+
+	public void setOtpGeneratedTime(Date otpGeneratedTime) {
+		this.otpGeneratedTime = otpGeneratedTime;
+	}
+
+
+
 	@Column(name="um_rec_status")
 	private Integer  um_rec_status;
 	

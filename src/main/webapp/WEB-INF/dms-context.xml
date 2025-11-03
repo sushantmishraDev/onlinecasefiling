@@ -52,7 +52,7 @@
 	<!-- **********Live connection************  -->
  	  
 	
-	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCIS"
+	<!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCIS"
 		destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
 		<property name="url" value="jdbc:postgresql://192.168.0.36:5433/cisdb_16012018?charSet=LATIN1"/> 
@@ -60,19 +60,6 @@
         <property name="password" value="aldhc@321"/>
 	</bean>    
 	
-	
-	<!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING"
-		destroy-method="close">
-		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url"
-			value="jdbc:postgresql://localhost:5433/efilingTest?charSet=LATIN1" />
-		<property name="username" value="postgres" />
-		<property name="password" value="postgres" />
-		<property name ="timeBetweenEvictionRunsMillis" value="30000"/>
-        <property name ="minEvictableIdleTimeMillis" value="30000"/>
-        <property name ="removeAbandoned" value="true"/>
-       <property name ="removeAbandonedTimeout" value="150"/>
-	</bean> -->
 	
 	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING">
      	<property name="driverClassName" value="org.postgresql.Driver"/>
@@ -89,7 +76,7 @@
 		<property name="username" value="cms" />
 		<property name="password" value="cms1234" />
 	</bean>  
-
+ -->
 	<!-- **********Lko Live connection************  -->
 	<!--  <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceDMS">
      	<property name="driverClassName" value="org.postgresql.Driver"/>
@@ -110,13 +97,13 @@
 	
 	
 	 
-  	<!--   <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING"
+  	   <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceEFILING"
 		destroy-method="close">
 		<property name="driverClassName" value="org.postgresql.Driver" />
 		<property name="url"
 			value="jdbc:postgresql://localhost:5432/New_Efiling2021?charSet=LATIN1" />
 		<property name="username" value="postgres" />
-		<property name="password" value="postgres" />
+		<property name="password" value="vijay" />
 		<property name ="timeBetweenEvictionRunsMillis" value="30000"/>
         <property name ="minEvictableIdleTimeMillis" value="30000"/>
         <property name ="removeAbandoned" value="true"/>
@@ -138,7 +125,7 @@
 			value="jdbc:mysql://192.168.0.80:3306/adv_roll?charSet=LATIN1" />
 		<property name="username" value="cms" />
 		<property name="password" value="cms1234" />
-	</bean>   -->
+	</bean> 
  
  
 
