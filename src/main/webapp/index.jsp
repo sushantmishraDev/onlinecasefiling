@@ -278,19 +278,41 @@ canvas {
 							</div>
 						</div>
 
-						<div class="form-group d-flex align-items-center">
+					<div class="form-group d-flex align-items-center">
+    <!-- Send OTP -->
+   <div class="row">
+    <div class="col-md-12">
+     <button type="button"
+        ng-click="sendotp()"
+        ng-hide="timerRunning"
+        class="btn btn-primary me-3"
+        style="margin-right: 65px; max-width: 180px;">
+        Send OTP
+    </button>
 
-							<!-- OTP Send / Resend Button -->
-							<button type="button" ng-click="sendotp()"
-								ng-disabled="timerRunning" class="btn btn-primary me-3"
-								style="margin-right: 65px; max-width: 180px;">{{
-								timerRunning ? ('Resend in ' + timeLeft + 's') : 'Send OTP' }}</button>
+    <!-- Countdown display -->
+    <span
+        ng-show="timerRunning"
+        class=" me-3"
+        style="margin-right: 65px; max-width: 180px; font-weight:bold;color:red;"
+        >
+        Resend in {{ formatTime(timeLeft) }}
+    </span>>
 
-							<!-- OTP Input -->
-							<input type="text" placeholder="Enter Valid OTP" required
-								ng-model="loginform.um_otp" id="otp" class="form-control w-auto"
-								style="max-width: 173px;" numbers-only />
-						</div>
+    <!-- OTP input -->
+    <input type="text"
+        placeholder="Enter Valid OTP"
+        required
+        ng-model="loginform.um_otp"
+        id="otp"
+        class="form-control w-auto"
+        style="max-width: 173px;"
+        numbers-only />
+    </div>
+   
+   </div>
+</div>
+
 
 
 

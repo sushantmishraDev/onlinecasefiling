@@ -692,77 +692,83 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	$scope.timerRunning = false;
 	$scope.timeLeft = 0;
 
-	let otpTimer = null; // <-- important: must be declared outside function
+	let otpTimer = null;
 
+	// Send OTP
 	$scope.sendotp = function() {
-		// prevent duplicate timer starts
-		if ($scope.timerRunning) return;
+	    if ($scope.timerRunning) return; // prevent multiple clicks
 
-		$scope.loading = true;
+	    $scope.loading = true;
 
-		var response = $http.post(urlBase + 'genearteOTP', $scope.loginform);
-		response.success(function(data) {
-			if (data.response === "TRUE") {
-				alert("OTP has been sent to your registered mobile number ********" +
-				    data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 2) +
-				    data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 1));
+	    var response = $http.post(urlBase + 'genearteOTP', $scope.loginform);
+	    response.success(function(data) {
+	        if (data.response === "TRUE") {
+	            alert("OTP has been sent to your registered mobile number ********" +
+	                data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 2) +
+	                data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 1));
 
+	            if (data.modelData.adv_id != null) {
+	                $scope.register.mobile = data.modelData.mobile;
+	                registraionFormValidateotpform();
+	            } else if ($scope.register.type === 'inperson') {
+	                registraionFormValidateotpform();
+	            } else {
+	                validateotpform();
+	            }
 
-				if (data.modelData.adv_id != null) {
-					$scope.register.mobile = data.modelData.mobile;
-					alert("OTP sent to your ********" +
-						$scope.register.mobile.charAt($scope.register.mobile.length - 2) +
-						"" + $scope.register.mobile.charAt($scope.register.mobile.length - 1) +
-						" mobile number");
-					registraionFormValidateotpform();
-				} else if ($scope.register.type === 'inperson') {
-					registraionFormValidateotpform();
-				} else {
-					validateotpform();
-				}
+	            // Start timer for 1 minute (60 seconds)
+	            startOTPTimer(600);
+	        } else {
+	            showError(data.data);
+	        }
 
-				// Start countdown timer (30 seconds)
-				startOTPTimer(60);
-			} else {
-				showError(data.data);
-			}
-
-			$scope.loading = false;
-		}).error(function() {
-			showError("Oops! Something went wrong.");
-			$scope.loading = false;
-		});
+	        $scope.loading = false;
+	    }).error(function() {
+	        showError("Oops! Something went wrong.");
+	        $scope.loading = false;
+	    });
 	};
 
-	// Timer function using $interval (Angular-safe)
+	// Timer function
 	function startOTPTimer(seconds) {
-		if (otpTimer) {
-			$interval.cancel(otpTimer);
-		}
+	    if (otpTimer) {
+	        $interval.cancel(otpTimer);
+	    }
 
-		$scope.timeLeft = seconds;
-		$scope.timerRunning = true;
-		$scope.otpSent = true;
+	    $scope.timeLeft = seconds;
+	    $scope.timerRunning = true;
+	    $scope.otpSent = true;
 
-		otpTimer = $interval(function() {
-			if ($scope.timeLeft > 0) {
-				$scope.timeLeft--;
-			} else {
-				$interval.cancel(otpTimer);
-				otpTimer = null;
-				$scope.timerRunning = false;
-			}
-		}, 1000);
+	    otpTimer = $interval(function() {
+	        if ($scope.timeLeft > 0) {
+	            $scope.timeLeft--;
+	        } else {
+	            $interval.cancel(otpTimer);
+	            otpTimer = null;
+	            $scope.timerRunning = false;
+	        }
+	    }, 1000);
 	}
 
-	// Reusable error display
+	// Format time as mm:ss
+	$scope.formatTime = function(seconds) {
+	    const minutes = Math.floor(seconds / 60);
+	    const remainingSeconds = seconds % 60;
+	    return (
+	        (minutes < 10 ? '0' + minutes : minutes) +
+	        ':' +
+	        (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds)
+	    );
+	};
+
+	// Show error helper
 	function showError(message) {
-		$(".msg_div").html(
-			"<div class='alert alert-danger alert-dismissible' role='alert'>" +
-			"<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
-			"<span aria-hidden='true'>&times;</span></button>" + message + "</div>"
-		);
-		setTimeout(() => $(".msg_div").html(""), 5000);
+	    $(".msg_div").html(
+	        "<div class='alert alert-danger alert-dismissible' role='alert'>" +
+	        "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+	        "<span aria-hidden='true'>&times;</span></button>" + message + "</div>"
+	    );
+	    setTimeout(() => $(".msg_div").html(""), 5000);
 	}
 
 
