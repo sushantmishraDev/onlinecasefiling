@@ -65,17 +65,15 @@ public class AdvocateEfiling {
 	@Column(name="otp")
 	private Integer otp;
 	
-	private LocalDateTime otpGeneratedTime;
-	
-	
-	public LocalDateTime getOtpGeneratedTime() {
-		return otpGeneratedTime;
-	}
-
-	public void setOtpGeneratedTime(LocalDateTime otpGeneratedTime) {
-		this.otpGeneratedTime = otpGeneratedTime;
-	}
-
+	/*
+	 * private LocalDateTime otpGeneratedTime;
+	 * 
+	 * 
+	 * public LocalDateTime getOtpGeneratedTime() { return otpGeneratedTime; }
+	 * 
+	 * public void setOtpGeneratedTime(LocalDateTime otpGeneratedTime) {
+	 * this.otpGeneratedTime = otpGeneratedTime; }
+	 */
 	
 
 	public Integer getOtp() {

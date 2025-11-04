@@ -865,36 +865,21 @@ public class LoginController extends HttpServlet {
 
 	    //  CASE 2: ADVOCATE EXISTS
 	    else if (adv != null) {
-
-	        if (adv.getOtp() == null || adv.getOtpGeneratedTime() == null) {
-	            response.setResponse("FALSE");
-	            response.setData("OTP not found or expired. Please request again.");
-	            result = cm.convert_to_json(response);
-	            return result;
-	        }
-
-	        Duration duration = Duration.between(adv.getOtpGeneratedTime(), LocalDateTime.now());
-	        if (duration.toMinutes() > 10) {
-	            response.setResponse("FALSE");
-	            response.setData("OTP expired. Please request a new OTP.");
-	            result = cm.convert_to_json(response);
-	            return result;
-	        }
-
 	        if (u.getUm_otp().equals(adv.getOtp())) {
-	            adv.setOtp(null);
-	            adv.setOtpGeneratedTime(null);
-	            userService.saveAdvocate(adv);
+	            // OTP matched, proceed
 	            response.setData(adv);
 	            response.setResponse("TRUE");
-	        } else {
-	            response.setResponse("FALSE");
-	            response.setData("Please enter correct OTP");
-	        }
-	    }
 
-	    //  CASE 3: NONE FOUND
-	    else {
+	            // Instead of generating a new password, we just proceed with success message
+	            response.setResponse("TRUE");
+	            response.setData("OTP verified successfully. You can now log in.");
+	        } else {
+	            // OTP did not match
+	            response.setResponse("FALSE");
+	            response.setData("Please enter the correct OTP.");
+	        }
+	    } else {
+	        // Advocate not found
 	        response.setResponse("FALSE");
 	        response.setData("User not found or invalid credentials.");
 	    }

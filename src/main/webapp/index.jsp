@@ -637,7 +637,7 @@ canvas {
 	<script
 		src="${pageContext.request.contextPath}/js/angularJs/angular.min.js"></script>
 	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=4"></script>
+		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=5"></script>
 	<script>
             $(document).ready(function() {
                 App.init();
