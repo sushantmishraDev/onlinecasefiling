@@ -17,9 +17,19 @@ public class ActionResponse<T> {
 	
 	private Map<Object, List> dataObjectLists;
 	
+	public Object getAdvData() {
+		return advData;
+	}
+
+	public void setAdvData(Object advData) {
+		this.advData = advData;
+	}
+
 	private List<Object> dataList;
 	
 	private Object data;
+	
+	private Object advData;
 	
 	private T modelData;
 	

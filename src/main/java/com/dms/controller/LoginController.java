@@ -852,9 +852,9 @@ public class LoginController extends HttpServlet {
 	        //  Match OTP
 	        if (u.getUm_otp().equals(user.getUm_otp())) {
 	            user.setUm_rec_status(1);
-	            user.setUm_otp(null);
-	            user.setOtpGeneratedTime(null); // clear OTP timestamp
-	            user = userService.save(user);
+				/*
+				 * user.setUm_otp(null); user.setOtpGeneratedTime(null); // clear OTP timestamp
+				 */	            user = userService.save(user);
 	            response.setData(user);
 	            response.setResponse("TRUE");
 	        } else {
@@ -867,7 +867,8 @@ public class LoginController extends HttpServlet {
 	    else if (adv != null) {
 	        if (u.getUm_otp().equals(adv.getOtp())) {
 	            // OTP matched, proceed
-	            response.setData(adv);
+	            response.setAdvData(adv);
+	            
 	            response.setResponse("TRUE");
 
 	            // Instead of generating a new password, we just proceed with success message
@@ -894,8 +895,15 @@ public class LoginController extends HttpServlet {
 		String jsonData = "";
 		User user = userService.validateUser(u.getUsername());
 		ActionResponse<User> response = new ActionResponse<User>();
+		
 		if (user.getUm_id() != null) {
-			if (u.getUm_otp().equals(user.getUm_otp()) && u.getNewpassword().equals(u.getConfirmpassword())) {
+			/*
+			 * if (u.getUm_otp().equals(user.getUm_otp()) &&
+			 * u.getNewpassword().equals(u.getConfirmpassword())) {
+			 */
+				
+				if ( u.getNewpassword().equals(u.getConfirmpassword())) {
+					
 				String ipaddress = request.getRemoteAddr();
 				user.setPassword(cm.md5encryption(u.getNewpassword()));
 				user.setMod_date(new Date());

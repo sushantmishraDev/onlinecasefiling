@@ -283,7 +283,7 @@ canvas {
    <div class="row">
     <div class="col-md-12">
      <button type="button"
-        ng-click="sendotp()"
+        ng-click="sendOtp()"
         ng-hide="timerRunning"
         class="btn btn-primary me-3"
         style="margin-right: 65px; max-width: 180px;">
@@ -297,7 +297,7 @@ canvas {
         style="margin-right: 65px; max-width: 180px; font-weight:bold;color:red;"
         >
         Resend in {{ formatTime(timeLeft) }}
-    </span>>
+    </span>
 
     <!-- OTP input -->
     <input type="text"
@@ -406,12 +406,12 @@ canvas {
 						</div>
 						<div class="login-buttons" ng-show="sendotp">
 							<button type="submit" ng-disabled="loading==false"
-								ng-click="sendOTP()" class="btn btn-success btn-block btn-lg">Send
-								OTP</button>
+								ng-click="sendOtp()" class="btn btn-success btn-block btn-lg">Send
+								OTP *</button>
 						</div>
 						<div class="login-buttons" ng-show="validateotp">
 							<button type="submit" ng-click="validateOtp()"
-								class="btn btn-success btn-block btn-lg">Validate OTP</button>
+								class="btn btn-success btn-block btn-lg">Validate OTP!</button>
 						</div>
 						<div class="form-group" ng-show="validOTP">
 							<button type="button" ng-click="updatepassword()"
@@ -583,7 +583,7 @@ canvas {
 							<div class="col-md-9">
 								<div class="register-buttons">
 									<button type="button" ng-click="registration()"
-										class="btn btn-success btn-block btn-lg">Register</button>
+										class="btn btn-success btn-block btn-lg">Register!</button>
 								</div>
 							</div>
 						</div>

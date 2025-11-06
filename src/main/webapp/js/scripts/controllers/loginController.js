@@ -39,6 +39,14 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	$scope.flatcats = [];
 	$scope.loginform = {};
 	$scope.forgotpwd = {};
+	
+	$scope.showSendOtp = false;   // renamed flag for controlling form visibility
+	$scope.otptext = false;
+	$scope.validOTP = false;
+
+	
+	
+	
 	$scope.userRoles = [];
 
 	// for audio captcha
@@ -87,14 +95,25 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 		//		$('.login').show();
 		//		$('.register').hide();		
 	}
-	$scope.forgotPwdForm = function() {
+/*	$scope.forgotPwdForm = function() {
 		$scope.registershow = false;
 		$scope.loginshow = false;
 		$scope.forgotshow = true;
 		$scope.validateotp = false;
 		$scope.otptext = false;
 		$scope.sendotp = true;
-	}
+	}*/
+	
+	$scope.forgotPwdForm = function() {
+	    $scope.registershow = false;
+	    $scope.loginshow = false;
+	    $scope.forgotshow = true;
+	    $scope.validateotp = false;
+	    $scope.otptext = false;
+	    $scope.showSendOtp = true; // changed here
+		$scope.sendotp = true;
+	};
+
 
 
 	function populateVoiceList() {
@@ -216,14 +235,14 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 		$scope.forgotshow = true;
 		$scope.validateotp = true;
 		$scope.otptext = true;
-		$scope.sendotp = false;
+		$scope.sendOtp = false;
 	}
 
 	function validateotpform() {
 		$scope.registershow = false;
 		$scope.validateotp = true;
 		$scope.otptext = true;
-		$scope.sendotp = false;
+		$scope.sendOtp = false;
 	}
 
 	$scope.refresh = function() {
@@ -246,9 +265,10 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 						$scope.register.mobile = data.modelData.mobile;
 
 						console.log($scope.register.email);
+						console.log($scope.register.username);
 
 						$scope.forgotpwd.username = data.modelData.rollNo;
-						$scope.sendotp();
+						$scope.sendOtp();
 
 						//window.location.href=urlBase+"ecourt/ecourtHome";
 					} else {
@@ -282,7 +302,7 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 						else {
 							$scope.isadvocate = false;
 							$scope.forgotpwd.username = $scope.register.username;
-							$scope.sendotp();
+							$scope.sendOtp();
 						}
 
 						/*$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
@@ -687,25 +707,52 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	$scope.loading = true;
 
 	// Initialize scope variables
-	$scope.loading = false;
+/*	$scope.loading = false;*/
 	$scope.otpSent = false;
 	$scope.timerRunning = false;
 	$scope.timeLeft = 0;
 
 	let otpTimer = null;
+	
 
 	// Send OTP
-	$scope.sendotp = function() {
+	$scope.sendOtp = function() {
+		
+		alert("***********enterd in send otp method")
 	    if ($scope.timerRunning) return; // prevent multiple clicks
 
 	    $scope.loading = true;
+		
+		let requestData = null;
 
-	    var response = $http.post(urlBase + 'genearteOTP', $scope.loginform);
+		  if ($scope.loginshow && $scope.loginform && $scope.loginform.username) {
+		      requestData = $scope.loginform;
+			  console.log("****************from login form************"+requestData);
+		  } 
+		  else if ( $scope.forgotpwd && $scope.forgotpwd.username) {
+		      requestData = $scope.forgotpwd;
+			  console.log("--------------from forgot form------------"+requestData);
+		  } 
+		  else {
+		      showError("Please enter your username first!");
+		      $scope.loading = false;
+		      return;
+		  }
+		
+
+	    var response = $http.post(urlBase + 'genearteOTP', requestData);
 	    response.success(function(data) {
 	        if (data.response === "TRUE") {
-	            alert("OTP has been sent to your registered mobile number ********" +
-	                data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 2) +
-	                data.modelData.um_mobile.charAt(data.modelData.um_mobile.length - 1));
+				if (data.modelData && data.modelData.um_mobile) {
+				    const mob = data.modelData.um_mobile;
+				    const masked =
+				        mob.length >= 2
+				            ? "********" + mob.slice(-2)
+				            : "********";
+				    alert("OTP has been sent to your registered mobile number " + masked);
+				} else {
+				    alert("OTP sent successfully!");
+				}
 
 	            if (data.modelData.adv_id != null) {
 	                $scope.register.mobile = data.modelData.mobile;
@@ -814,9 +861,15 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 		var response = $http.post(urlBase + 'validateOtp', $scope.forgotpwd);
 		response.success(function(data, status, headers, config) {
 			if (data.response == "TRUE") {
-				if (data.data.adv_id != null) {
+				
+				/*if (data.advData.adv_id != null) {
+					$scope.afterOtpForm();
+				}*/
+				
+				if(data.advData!=null){
 					$scope.afterOtpForm();
 				}
+				
 
 				else if ($scope.register.type == 'inperson') {
 					alert("Successfully Registered");
