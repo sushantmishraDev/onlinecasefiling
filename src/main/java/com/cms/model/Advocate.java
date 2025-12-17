@@ -46,7 +46,7 @@ public class Advocate {
 	private String enrollCouncil;
 	
 	@Column(name="enrollNO")
-	private Long enrollNo;
+	private String enrollNo;
 	
 	@Column(name="enrollyear")
 	private Integer enrollYear;
@@ -151,11 +151,11 @@ public class Advocate {
 		this.enrollCouncil = enrollCouncil;
 	}
 
-	public Long getEnrollNo() {
+	public String getEnrollNo() {
 		return enrollNo;
 	}
 
-	public void setEnrollNo(Long enrollNo) {
+	public void setEnrollNo(String enrollNo) {
 		this.enrollNo = enrollNo;
 	}
 

@@ -226,7 +226,9 @@ public class LoginController extends HttpServlet {
 				response.setData("Record already exist");
 			} else {
 				if (adv.getAdv_id() == null) {
-					if (adv1.getRollNo().equals("A/A9999/2001")) {
+					
+//					if (adv1.getRollNo().equals("A/A9999/2001")) {
+				    if (adv1 != null && "A/A9999/2001".equals(adv1.getRollNo())) {
 						response1.setResponse("TRUE");
 						response1.setModelData(adv1);
 						jsonData = cm.convert_to_json(response1);

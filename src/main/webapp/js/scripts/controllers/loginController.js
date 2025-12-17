@@ -718,7 +718,6 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	// Send OTP
 	$scope.sendOtp = function() {
 		
-		alert("***********enterd in send otp method")
 	    if ($scope.timerRunning) return; // prevent multiple clicks
 
 	    $scope.loading = true;

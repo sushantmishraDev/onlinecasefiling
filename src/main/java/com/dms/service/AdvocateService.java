@@ -32,6 +32,8 @@ public class AdvocateService {
 	@Transactional("transactionManagerCMS")
 	public Advocate getByRollNo(Register register) {
 		
+		//    String enrollmentLongObject = String.valueOf(register.getEnrollNo());
+		
 		Advocate a= new Advocate();
 		try {
 			Query query  =  emCMS.createQuery("SELECT a from Advocate a WHERE a.rollNo =:rollNo and a.enrollNo=:enrollNo and a.enrollYear=:enrollYear");

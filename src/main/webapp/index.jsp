@@ -364,7 +364,7 @@ canvas {
 					<form class="margin-bottom-0" name="fgtpwdFrm" novalidate
 						role="form">
 						<span class="msg_div"></span>
-						<div class="form-group" ng-show="sendotp"
+						<div class="form-group" ng-show="sendOtp"
 							ng-class="{ 'has-error' : fgtpwdFrm.username.$invalid && !fgtpwdFrm.username.$pristine , 'has-success' : fgtpwdFrm.username.$valid  }">
 							<label for="username" class="control-label ">Username <span
 								class="star"> *</span></label>
@@ -404,7 +404,7 @@ canvas {
 									placeholder="Confirm Password" />
 							</div>
 						</div>
-						<div class="login-buttons" ng-show="sendotp">
+						<div class="login-buttons" ng-show="sendOtp">
 							<button type="submit" ng-disabled="loading==false"
 								ng-click="sendOtp()" class="btn btn-success btn-block btn-lg">Send
 								OTP *</button>
@@ -567,7 +567,7 @@ canvas {
 							ng-show="register.type=='aor' && !isadvocate">
 							<label class="col-md-3 control-label">Bar Enroll No/Year</label>
 							<div class="col-md-6">
-								<input numbers-only type="text" ng-model="register.enrollNo"
+								<input  type="text" ng-model="register.enrollNo"
 									id="enrollNo" class="form-control" placeholder="Enroll No" />
 							</div>
 							<div class="col-md-3">
