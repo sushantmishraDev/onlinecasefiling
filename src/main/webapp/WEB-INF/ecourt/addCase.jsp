@@ -71,7 +71,7 @@
 
 
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtAddCaseDetailController.js?v=13"></script>
+	src="${pageContext.request.contextPath}/js/scripts/controllers/ecourtAddCaseDetailController.js?v=11"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/ngMask.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bootstrap/bootstrap.min.js"></script>

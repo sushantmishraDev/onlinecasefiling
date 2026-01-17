@@ -1191,7 +1191,7 @@ $scope.addShow=true;
 		}
 		$scope.verifiedNotice=false;
 		
-		$scope.verifyNotice =	function(){
+		$scope.verifyNotice1 =	function(){
 		    $http.get('https://e-manu.up.gov.in/api/get-details-by-notice-number?api_key=4MAiH53dpHXQ2RFNMKanaXuOITVRakKKh7BA0aBQ2g1gDh64Itl1hzgje3PG&noticeno='+$scope.registerCase.rcd_notice_no+'&est_code=UPHC01', {			
 			}).success(function(data, status, headers, config) {
 				console.log(data);
@@ -1210,7 +1210,7 @@ $scope.addShow=true;
 
 		}
 		
-		$scope.verifyNotice1 =	function(){
+		$scope.verifyNotice =	function(){
 		    $http.get(urlBase+ 'ecourt_add_case/validateNotice', {
 				params : {
 					'docId' : $scope.registerCase.rcd_notice_no
