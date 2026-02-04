@@ -226,9 +226,9 @@ public class LoginController extends HttpServlet {
 				response.setData("Record already exist");
 			} else {
 				if (adv.getAdv_id() == null) {
-					
+
 //					if (adv1.getRollNo().equals("A/A9999/2001")) {
-				    if (adv1 != null && "A/A9999/2001".equals(adv1.getRollNo())) {
+					if (adv1 != null && "A/A9999/2001".equals(adv1.getRollNo())) {
 						response1.setResponse("TRUE");
 						response1.setModelData(adv1);
 						jsonData = cm.convert_to_json(response1);
@@ -354,7 +354,7 @@ public class LoginController extends HttpServlet {
 			response.setData("Your account has been created, please click on below link to Sign In.");
 		}
 		// check type of user
-		// if true check in users table
+		// if true check in users tabl e
 		// if true then return user already exist
 		// if false then return details of advocate
 		// if inperson check if same username exist in db
@@ -587,7 +587,10 @@ public class LoginController extends HttpServlet {
 
 		return "/ecourt/createaccountinperson";
 	}
-
+	
+	
+	// **************************  OTP GENERATE METHOD FOR REGISTRATION **********************************
+	
 	@RequestMapping(value = "/genearteOTP", method = RequestMethod.POST)
 	@ResponseBody
 	public String genearteOTP(@RequestBody User user1, HttpServletRequest request, HttpSession session) {
@@ -599,28 +602,16 @@ public class LoginController extends HttpServlet {
 		ActionResponse<com.dms.model.AdvocateEfiling> response1 = new ActionResponse<com.dms.model.AdvocateEfiling>();
 		com.dms.model.AdvocateEfiling adv = userService.getAdvocateByRollNo(user1.getUsername());
 		Advocate adv1 = advocateService.getAdvocateByRollNo(user1.getUsername());
-		if (adv.getAdv_id() == null) {
-
-			if (adv1 != null) {
-				adv.setAdv_id(adv1.getAdv_id());
-				adv.setRollNo(adv1.getRollNo());
-				adv.setRollYear(adv.getRollYear());
-				adv.setAddress1(adv1.getAddress1());
-				adv.setFhName(adv1.getFhName());
-				adv.setEmail(adv1.getEmail());
-				adv.setEnrollCouncil(adv1.getEnrollCouncil());
-				adv.setEnrollNo(adv1.getEnrollNo());
-				adv.setEnrollYear(adv1.getEnrollYear());
-				adv.setMobile(adv1.getMobile());
-				adv = userService.saveAdvocate(adv);
-			}
+		
+		
+		if(adv1!=null && !adv1.getMobile().equals(adv.getMobile())){
+			
+			adv.setMobile(adv1.getMobile());
+			
+			advocateService.save(adv);
 		}
-		/* if(user!=null && user.getUserroles().get(0).getUr_role_id()!=1000008) { */
-		/*
-		 * if(adv1!=null && !adv1.getMobile().equals(adv.getMobile())) {
-		 * adv.setMobile(adv1.getMobile()); adv=userService.saveAdvocate(adv); }
-		 */
-		/* } */
+		
+		
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date current = null;
@@ -758,6 +749,203 @@ public class LoginController extends HttpServlet {
 		return result;
 
 	}
+	
+	
+	
+	/*      ----------------------------------------   Java Fullstack Developer Vijay Chaurasiya  -------------------     */
+	
+	@RequestMapping(value = "/generateOTP", method = RequestMethod.POST)
+	@ResponseBody
+	public String generateOTP(@RequestBody User user1,
+	                          HttpServletRequest request,
+	                          HttpSession session) {
+
+	    String result = "";
+	    ActionResponse<User> userResponse = new ActionResponse<>();
+	    ActionResponse<AdvocateEfiling> advResponse = new ActionResponse<>();
+
+	    // -------- Fetch records --------
+	    User user = userService.validateUser(user1.getUsername());
+	    AdvocateEfiling adv = userService.getAdvocateByRollNo(user1.getUsername());
+		Advocate adv1 = advocateService.getAdvocateByRollNo(user1.getUsername());
+		
+		
+		
+
+	    boolean userExists = (user != null && user.getUm_id() != null);
+	    boolean advExists  = (adv != null && adv.getAdv_id() != null);
+
+	    // -------- Validate existence --------
+	    if (!userExists) {
+	        userResponse.setResponse("FALSE");
+	        userResponse.setData("User not registered");
+	        return cm.convert_to_json(userResponse);
+	    }
+	    
+	    
+	    
+	 // Update mobile ONLY if advocate exists in both tables
+	    if (adv1 != null && adv != null && user != null) {
+
+	        String advMobile = adv1.getMobile();
+	        String userMobile = user.getUm_mobile();
+
+	        if (advMobile != null && !advMobile.equals(userMobile)) {
+
+	            user.setUm_mobile(advMobile);
+	            adv.setMobile(advMobile);
+
+	            userService.save(user);
+	            adv = userService.saveAdvocate(adv);
+	        }
+	    }
+
+	    
+
+	    // -------- Check court closing time --------
+	    try {
+	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        Date now = sdf.parse(sdf.format(new Date()));
+
+	        Date closeStart = sdf.parse(
+	                lookupService.getLookUpObject("CLOSING_START").getLk_longname()
+	        );
+	        Date closeEnd = sdf.parse(
+	                lookupService.getLookUpObject("CLOSING_END").getLk_longname()
+	        );
+
+	        if (now.after(closeStart) && now.before(closeEnd)) {
+	            userResponse.setResponse("FALSE");
+	            userResponse.setData("E-Filing Closed According To High Court Order");
+	            return cm.convert_to_json(userResponse);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    // -------- OTP Template Id --------
+	    String otpTmpId = "1107160736261112296";
+	    String extraLko = "";
+
+	    try {
+	        InetAddress ip = InetAddress.getLocalHost();
+	        String hostname = ip.getHostAddress();
+
+	        if ("127.0.0.1".equals(hostname)) {
+	            otpTmpId = "1107160736261112296";
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    // -------- Generate OTP --------
+	    Integer otp = cm.generateOTP();
+	    Lookup urlLookup = lookupService.getLookUpObject("SMS_URL");
+	    String smsUrl = urlLookup.getLk_longname();
+
+	   
+	    // ================= ADVOCATE LOGIN =====================
+	  
+	    if (userExists && advExists) {
+
+	        adv.setOtp(otp);
+	        userService.saveAdvocate(adv);
+	        
+	    	user.setUm_otp(otp);
+			user.setOtpGeneratedTime(new Date());
+			
+			
+			user = userService.save(user);
+
+	        String mobile = adv.getMobile();
+	        String smsText = "Your OTP is " + otp +
+	                " for eFiling password change. Don't disclose to anyone";
+
+	        String r1 = cm.sendSMS(smsUrl, mobile, smsText, otpTmpId);
+	        String r2 = cm.sendBSNLSMS(smsUrl, mobile,
+	                smsText + " - Allahabad High Court", otpTmpId);
+
+	        if ("1".equals(r1) || "1".equals(r2)) {
+
+	            advResponse.setResponse("TRUE");
+	            advResponse.setData("OTP sent successfully");
+	            advResponse.setModelData(adv);
+
+	            SmsLog log = new SmsLog();
+	            log.setSl_mobile_no(mobile);
+	            log.setSl_um_mid(user.getUm_id());
+	            log.setSl_text(smsText);
+	            log.setSl_cr_date(new Date());
+	            log.setSl_status(1);
+	            log.setSl_ip_address(request.getRemoteAddr());
+	            userService.saveSMSlog(log);
+
+	        } else {
+	            advResponse.setResponse("FALSE");
+	            advResponse.setData("Unable to send OTP, please try again");
+	        }
+
+	        return cm.convert_to_json(advResponse);
+	    }
+
+	   
+	    // ================= IN-PERSON LOGIN ====================
+	  
+	    user.setUm_otp(otp);
+	    user.setOtpGeneratedTime(new Date());
+	    userService.save(user);
+
+	    String mobile = user.getUm_mobile();
+	    String smsText = "Your OTP is " + otp +
+	            " for eFiling password change. Don't disclose to anyone" + extraLko;
+
+	    String r1 = cm.sendSMS(smsUrl, mobile, smsText, otpTmpId);
+	    String r2 = cm.sendBSNLSMS(smsUrl, mobile,
+	            smsText + " - Allahabad High Court", otpTmpId);
+
+	    if ("1".equals(r1) || "1".equals(r2)) {
+
+	        userResponse.setResponse("TRUE");
+	        userResponse.setData("OTP sent successfully");
+	        userResponse.setModelData(user);
+
+	        SmsLog log = new SmsLog();
+	        log.setSl_mobile_no(mobile);
+	        log.setSl_um_mid(user.getUm_id());
+	        log.setSl_text(smsText);
+	        log.setSl_cr_date(new Date());
+	        log.setSl_status(1);
+	        log.setSl_ip_address(request.getRemoteAddr());
+	        userService.saveSMSlog(log);
+
+	    } else {
+	        userResponse.setResponse("FALSE");
+	        userResponse.setData("Unable to send OTP, please try again");
+	    }
+
+	    return cm.convert_to_json(userResponse);
+	}
+
+	/*      ----------------------------------------   Java Fullstack Developer Vijay Chaurasiya  -------------------     */
+	
+	
+	
+	
+	
+
+
+	
+	
+	
+	/*      ----------------------------------------      Vijay Chaurasiya  -------------------     */
+	
+	//   Otp Generate method for login page 
+
+	
+	
+	
+	
+	
 
 	/*
 	 * @RequestMapping(value = "/validateOtp", method = RequestMethod.POST)
@@ -813,99 +1001,97 @@ public class LoginController extends HttpServlet {
 	 * 
 	 * }
 	 */
-	
+
 	@RequestMapping(value = "/validateOtp", method = RequestMethod.POST)
 	@ResponseBody
 	public String validateOtp(@RequestBody User u, HttpSession session) {
-	    String result = "";
-	    User user = userService.validateUser(u.getUsername());
-	    AdvocateEfiling adv = userService.getAdvocateByRollNo(u.getUsername());
-	    ActionResponse<User> response = new ActionResponse<>();
+		String result = "";
+		User user = userService.validateUser(u.getUsername());
+		AdvocateEfiling adv = userService.getAdvocateByRollNo(u.getUsername());
+		ActionResponse<User> response = new ActionResponse<>();
 
-	    //  CASE 1: USER EXISTS
-	    if (user != null && user.getUm_id() != null) {
+		// CASE 1: USER EXISTS
+		if (user != null && user.getUm_id() != null) {
 
-	        //  Check if OTP and timestamp exist
-	        if (user.getUm_otp() == null || user.getOtpGeneratedTime() == null) {
-	            response.setResponse("FALSE");
-	            response.setData("OTP not found or expired. Please request again.");
-	            result = cm.convert_to_json(response);
-	            return result;
-	        }
+			// Check if OTP and timestamp exist
+			if (user.getUm_otp() == null || user.getOtpGeneratedTime() == null) {
+				response.setResponse("FALSE");
+				response.setData("OTP not found or expired. Please request again.");
+				result = cm.convert_to_json(response);
+				return result;
+			}
 
-	        //  Check expiration (10 minutes)
-	       // Duration duration = Duration.between(user.getOtpGeneratedTime(), new Date());
-	        
-	        long tenMinutesInMillis = 10 * 60 * 1000; // 10 minutes in milliseconds
-	        
-	        long currentTimeInMillis = System.currentTimeMillis();
+			// Check expiration (10 minutes)
+			// Duration duration = Duration.between(user.getOtpGeneratedTime(), new Date());
 
-	        // Calculate the time difference
-	        long timeDifference = currentTimeInMillis - user.getOtpGeneratedTime().getTime();
-	        
-	        
-	        if (timeDifference >= 0 && timeDifference >= tenMinutesInMillis) {
-	            response.setResponse("FALSE");
-	            response.setData("OTP expired. Please request a new OTP.");
-	            result = cm.convert_to_json(response);
-	            return result;
-	        }
+			long tenMinutesInMillis = 10 * 60 * 1000; // 10 minutes in milliseconds
 
-	        //  Match OTP
-	        if (u.getUm_otp().equals(user.getUm_otp())) {
-	            user.setUm_rec_status(1);
+			long currentTimeInMillis = System.currentTimeMillis();
+
+			// Calculate the time difference
+			long timeDifference = currentTimeInMillis - user.getOtpGeneratedTime().getTime();
+
+			if (timeDifference >= 0 && timeDifference >= tenMinutesInMillis) {
+				response.setResponse("FALSE");
+				response.setData("OTP expired. Please request a new OTP.");
+				result = cm.convert_to_json(response);
+				return result;
+			}
+
+			// Match OTP
+			if (u.getUm_otp().equals(user.getUm_otp())) {
+				user.setUm_rec_status(1);
 				/*
 				 * user.setUm_otp(null); user.setOtpGeneratedTime(null); // clear OTP timestamp
-				 */	            user = userService.save(user);
-	            response.setData(user);
-	            response.setResponse("TRUE");
-	        } else {
-	            response.setResponse("FALSE");
-	            response.setData("Please enter correct OTP");
-	        }
-	    }
+				 */ user = userService.save(user);
+				response.setData(user);
+				response.setResponse("TRUE");
+			} else {
+				response.setResponse("FALSE");
+				response.setData("Please enter correct OTP");
+			}
+		}
 
-	    //  CASE 2: ADVOCATE EXISTS
-	    else if (adv != null) {
-	        if (u.getUm_otp().equals(adv.getOtp())) {
-	            // OTP matched, proceed
-	            response.setAdvData(adv);
-	            
-	            response.setResponse("TRUE");
+		// CASE 2: ADVOCATE EXISTS
+		else if (adv != null) {
+			if (u.getUm_otp().equals(adv.getOtp())) {
+				// OTP matched, proceed
+				response.setAdvData(adv);
 
-	            // Instead of generating a new password, we just proceed with success message
-	            response.setResponse("TRUE");
-	            response.setData("OTP verified successfully. You can now log in.");
-	        } else {
-	            // OTP did not match
-	            response.setResponse("FALSE");
-	            response.setData("Please enter the correct OTP.");
-	        }
-	    } else {
-	        // Advocate not found
-	        response.setResponse("FALSE");
-	        response.setData("User not found or invalid credentials.");
-	    }
+				response.setResponse("TRUE");
 
-	    result = cm.convert_to_json(response);
-	    return result;
+				// Instead of generating a new password, we just proceed with success message
+				response.setResponse("TRUE");
+				response.setData("OTP verified successfully. You can now log in.");
+			} else {
+				// OTP did not match
+				response.setResponse("FALSE");
+				response.setData("Please enter the correct OTP.");
+			}
+		} else {
+			// Advocate not found
+			response.setResponse("FALSE");
+			response.setData("User not found or invalid credentials.");
+		}
+
+		result = cm.convert_to_json(response);
+		return result;
 	}
-
 
 	@RequestMapping(value = "/updatepassword", method = RequestMethod.POST)
 	public @ResponseBody String updatepassword(@RequestBody User u, HttpServletRequest request, HttpSession session) {
 		String jsonData = "";
 		User user = userService.validateUser(u.getUsername());
 		ActionResponse<User> response = new ActionResponse<User>();
-		
+
 		if (user.getUm_id() != null) {
 			/*
 			 * if (u.getUm_otp().equals(user.getUm_otp()) &&
 			 * u.getNewpassword().equals(u.getConfirmpassword())) {
 			 */
-				
-				if ( u.getNewpassword().equals(u.getConfirmpassword())) {
-					
+
+			if (u.getNewpassword().equals(u.getConfirmpassword())) {
+
 				String ipaddress = request.getRemoteAddr();
 				user.setPassword(cm.md5encryption(u.getNewpassword()));
 				user.setMod_date(new Date());

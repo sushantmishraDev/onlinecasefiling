@@ -14,7 +14,7 @@
 					<li class=""><a href="#nav-tab-10" id="10" data-toggle="tab" data-ng-click="ShowId($event)">Crime Details</a></li>					
 					<li class=""><a href="#nav-tab-11" id="11" data-toggle="tab" data-ng-click="ShowId($event)">ST details</a></li>
 					<li class=""><a href="#nav-tab-7" id="7" data-toggle="tab" data-ng-click="ShowId($event)">Upload Document </a></li>
-					<!-- <li class=""><a href="#nav-tab-12" id="12" data-toggle="tab" data-ng-click="ShowId($event)">Advance Notice </a></li> -->
+					<li class=""><a href="#nav-tab-12" id="12" data-toggle="tab" data-ng-click="ShowId($event)">Advance Notice </a></li>
 					
 					
 				</ul>

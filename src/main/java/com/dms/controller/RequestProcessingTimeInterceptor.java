@@ -41,7 +41,7 @@ public class RequestProcessingTimeInterceptor extends HandlerInterceptorAdapter 
 		user=(User) request.getSession().getAttribute("USER");
 		if(user!=null || url.equals(request.getContextPath()+"/dms/userlogin") || url.equals(request.getContextPath()+"/dms/generateCaptcha") 
 				|| url.equals(request.getContextPath()+"/user/register") || url.equals(request.getContextPath()+"/user/validateAdvocate") 
-				|| url.equals(request.getContextPath()+"/genearteOTP") || url.equals(request.getContextPath()+"/validateOtp")  || url.equals(request.getContextPath()+"/noticelogin")
+				|| url.equals(request.getContextPath()+"/genearteOTP") ||url.equals(request.getContextPath()+"/generateOTP")|| url.equals(request.getContextPath()+"/validateOtp")  || url.equals(request.getContextPath()+"/noticelogin")
 				|| url.equals(request.getContextPath()+"/updatepassword") || url.equals(request.getContextPath()+"/validateNotice"))
 		{
 			if(url.equals(request.getContextPath()+"/dms/userlogin")  || url.equals(request.getContextPath()+"/user/register") 

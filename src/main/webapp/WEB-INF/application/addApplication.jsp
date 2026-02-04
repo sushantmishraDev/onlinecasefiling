@@ -6,7 +6,7 @@
 					<li class="active"><a href="#nav-tab-1" id="1" data-toggle="tab" data-ng-click="ShowId($event)">Application Details</a></li>
 					<li class="">	   <a href="#nav-tab-2" id="2" data-toggle="tab" data-ng-click="ShowId($event)">E-Court Fee </a></li>
 					<li class="">	   <a href="#nav-tab-3" id="3" data-toggle="tab" data-ng-click="ShowId($event)">Upload Application </a></li>
-					<!-- <li class="">	   <a href="#nav-tab-4" id="4" data-toggle="tab" data-ng-click="ShowId($event)">Listing Application </a></li> -->
+					<li class="">	   <a href="#nav-tab-4" id="4" data-toggle="tab" data-ng-click="ShowId($event)">Listing Application </a></li> 
 				</ul>
 				<div class="tab-content">
 				
@@ -38,9 +38,16 @@
 </div>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+
 
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/scripts/application_controllers/addApplicationController.js"></script>
+	
+	
+	
+	
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bootstrap/bootstrap.min.js"></script>
 	<script type="text/javascript"
@@ -51,6 +58,7 @@
 	src="${pageContext.request.contextPath}/js/angularJs/angular-tree-control.js"></script>
 	
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/angularJs/ng-file-upload.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 
 <script type="text/javascript"

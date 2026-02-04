@@ -18,7 +18,10 @@ EDMSApp.directive('loading', ['$http', function ($http) {
     };
 }]);
 
-EDMSApp.controller('addApplicationController',['$scope','$http','Upload',function ($scope, $http,Upload) {
+EDMSApp.controller('addApplicationController',
+['$scope','$http','Upload','$window','$timeout',
+ function ($scope, $http, Upload, $window, $timeout) {
+
 
 	var urlBase="/onlinecasefiling/";
 	
@@ -37,12 +40,13 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 	} ];
 	
 	$scope.caseDetail={};
-	$scope.tabShow1=true;
-	$scope.tabShow2=false;
-	$scope.tabShow3=false;
-	$scope.tabShow4=false;
-	$scope.tabShow5=false;
-	$scope.tabShow6=false;
+	$scope.tabShow1 = true;
+	$scope.tabShow2 = true;
+	$scope.tabShow3 = true;
+	$scope.tabShow4 = true;
+	$scope.tabShow5 = true;
+	$scope.tabShow6 = true;
+
 
 	
 	
@@ -548,9 +552,57 @@ $scope.nextTab=function(event){
 				$scope.removeFlag = true;
 
 			};
+			
+			$scope.downloadApplication = function () {
 
-	
-	 
-	 
+			    $timeout(function () {
+
+			        var element = document.getElementById('pdfPrep');
+
+			        var textareas = element.querySelectorAll("textarea");
+			        var backup = [];
+
+			        angular.forEach(textareas, function (ta) {
+			            var div = document.createElement("div");
+			            div.innerText = ta.value || ta.placeholder;
+			            div.style.whiteSpace = "pre-wrap";
+			            div.style.fontFamily = "Times New Roman, serif";
+			            div.style.fontSize = "11pt";
+			            div.style.lineHeight = "1.5";
+
+			            backup.push({ parent: ta.parentNode, ta: ta, div: div });
+			            ta.parentNode.replaceChild(div, ta);
+			        });
+
+			        var opt = {
+			            margin: 10,
+			            filename: 'Listing_Application.pdf',
+			            image: { type: 'jpeg', quality: 1 },
+			            html2canvas: {
+			                scale: 3,
+			                useCORS: true,
+			                scrollY: 0
+			            },
+			            jsPDF: {
+			                unit: 'mm',
+			                format: 'a4',
+			                orientation: 'portrait'
+			            },
+			            pagebreak: { mode: ['css', 'legacy'] }
+			        };
+
+			        html2pdf()
+			            .set(opt)
+			            .from(element)
+			            .save()
+			            .then(function () {
+			                angular.forEach(backup, function (b) {
+			                    b.parent.replaceChild(b.ta, b.div);
+			                });
+			            });
+
+			    }, 300); // ⬅ wait for Angular DOM
+			};
+
 	
 }]);

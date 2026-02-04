@@ -268,7 +268,7 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 						console.log($scope.register.username);
 
 						$scope.forgotpwd.username = data.modelData.rollNo;
-						$scope.sendOtp();
+						$scope.sendOtp('register');
 
 						//window.location.href=urlBase+"ecourt/ecourtHome";
 					} else {
@@ -302,7 +302,7 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 						else {
 							$scope.isadvocate = false;
 							$scope.forgotpwd.username = $scope.register.username;
-							$scope.sendOtp();
+							$scope.sendOtp('register');
 						}
 
 						/*$(".msg_div").html("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"+data.data+"</div>");
@@ -707,7 +707,7 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	$scope.loading = true;
 
 	// Initialize scope variables
-/*	$scope.loading = false;*/
+
 	$scope.otpSent = false;
 	$scope.timerRunning = false;
 	$scope.timeLeft = 0;
@@ -716,64 +716,85 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	
 
 	// Send OTP
-	$scope.sendOtp = function() {
-		
+	$scope.sendOtp = function (type) {
+
 	    if ($scope.timerRunning) return; // prevent multiple clicks
 
 	    $scope.loading = true;
-		
-		let requestData = null;
 
-		  if ($scope.loginshow && $scope.loginform && $scope.loginform.username) {
-		      requestData = $scope.loginform;
-			  console.log("****************from login form************"+requestData);
-		  } 
-		  else if ( $scope.forgotpwd && $scope.forgotpwd.username) {
-		      requestData = $scope.forgotpwd;
-			  console.log("--------------from forgot form------------"+requestData);
-		  } 
-		  else {
-		      showError("Please enter your username first!");
-		      $scope.loading = false;
-		      return;
-		  }
-		
+	    let requestData = null;
+	    let apiUrl = "";
 
-	    var response = $http.post(urlBase + 'genearteOTP', requestData);
-	    response.success(function(data) {
-	        if (data.response === "TRUE") {
-				if (data.modelData && data.modelData.um_mobile) {
-				    const mob = data.modelData.um_mobile;
-				    const masked =
-				        mob.length >= 2
-				            ? "********" + mob.slice(-2)
-				            : "********";
-				    alert("OTP has been sent to your registered mobile number " + masked);
-				} else {
-				    alert("OTP sent successfully!");
-				}
+	    //  pick data source
+	    if ($scope.loginshow && $scope.loginform && $scope.loginform.username) {
+	        requestData = $scope.loginform;
+	        console.log("******** from login form ********", requestData);
+	    }
+	    else if ($scope.forgotpwd && $scope.forgotpwd.username) {
+	        requestData = $scope.forgotpwd;
+	        console.log("-------- from forgot form --------", requestData);
+	    }
+	    else {
+	        showError("Please enter your username first!");
+	        $scope.loading = false;
+	        return;
+	    }
 
-	            if (data.modelData.adv_id != null) {
-	                $scope.register.mobile = data.modelData.mobile;
-	                registraionFormValidateotpform();
-	            } else if ($scope.register.type === 'inperson') {
-	                registraionFormValidateotpform();
+	    //  decide API based on type
+	    if (type === 'login') {
+	        console.log("Calling LOGIN OTP API");
+	        apiUrl = urlBase + 'generateOTP';   //  login API
+	    }
+	    else if (type === 'register') {
+	        console.log("Calling REGISTER OTP API");
+	        apiUrl = urlBase + 'genearteOTP';        // 👈 register API
+	    }
+	    else {
+	        showError("Invalid OTP type!");
+	        $scope.loading = false;
+	        return;
+	    }
+
+	    // call API
+	    $http.post(apiUrl, requestData)
+	        .success(function (data) {
+
+	            if (data.response === "TRUE") {
+
+	                if (data.modelData && data.modelData.um_mobile) {
+	                    const mob = data.modelData.um_mobile;
+	                    const masked = "********" + mob.slice(-2);
+	                    alert("OTP has been sent to your registered mobile number " + masked);
+	                } else {
+	                    alert("OTP sent successfully!");
+	                }
+
+	                if (data.modelData && data.modelData.adv_id != null) {
+	                    $scope.register.mobile = data.modelData.mobile;
+	                    registraionFormValidateotpform();
+	                }
+	                else if ($scope.register && $scope.register.type === 'inperson') {
+	                    registraionFormValidateotpform();
+	                }
+	                else {
+	                    validateotpform();
+	                }
+
+	                // ⏱ start OTP timer (60 sec)
+	                startOTPTimer(600);
+
 	            } else {
-	                validateotpform();
+	                showError(data.data);
 	            }
 
-	            // Start timer for 1 minute (60 seconds)
-	            startOTPTimer(600);
-	        } else {
-	            showError(data.data);
-	        }
-
-	        $scope.loading = false;
-	    }).error(function() {
-	        showError("Oops! Something went wrong.");
-	        $scope.loading = false;
-	    });
+	            $scope.loading = false;
+	        })
+	        .error(function () {
+	            showError("Oops! Something went wrong.");
+	            $scope.loading = false;
+	        });
 	};
+
 
 	// Timer function
 	function startOTPTimer(seconds) {

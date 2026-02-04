@@ -214,6 +214,29 @@ public class AdvocateEfiling {
 	}
 	
 	
+	@Override
+	public String toString() {
+	    return "AdvocateEfiling{" +
+	            "adv_id=" + adv_id +
+	            ", rollNo='" + rollNo + '\'' +
+	            ", rollYear=" + rollYear +
+	            ", title='" + title + '\'' +
+	            ", name='" + name + '\'' +
+	            ", clName='" + clName + '\'' +
+	            ", fhName='" + fhName + '\'' +
+	            ", gender='" + gender + '\'' +
+	            ", enrollCouncil='" + enrollCouncil + '\'' +
+	            ", enrollNo='" + enrollNo + '\'' +
+	            ", enrollYear=" + enrollYear +
+	            ", address1='" + address1 + '\'' +
+	            ", mobile='" + mobile + '\'' +
+	            ", email='" + email + '\'' +
+	            ", location='" + location + '\'' +
+	            ", otp=" + otp +
+	            '}';
+	}
+
+	
 	
 	
 }

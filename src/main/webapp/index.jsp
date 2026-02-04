@@ -33,6 +33,8 @@
 <link
 	href="${pageContext.request.contextPath}/assets/css/animate.min.css"
 	rel="stylesheet" />
+	
+
 <link href="${pageContext.request.contextPath}/assets/css/style.min.css"
 	rel="stylesheet" />
 <link
@@ -212,13 +214,12 @@ canvas {
 		<!-- begin login -->
 		<div class="login login-with-news-feed" ng-if="loginshow">
 			<!-- begin news-feed -->
-			<div class="news-feed">
-				<div class="news-image">
-					<img
-						src="${pageContext.request.contextPath}/assets/img/login-bg/bg-7.jpg"
-						data-id="login-cover-image" alt="" />
-				</div>
-			</div>
+			 <div class="news-feed">
+                    <div class="news-image">
+                        <img src="${pageContext.request.contextPath}/assets/img/login-bg/bg-7.jpg" data-id="login-cover-image" alt="" />
+                    </div>
+                </div>
+
 			<!-- end news-feed -->
 			<!-- begin right-content -->
 			<div class="right-content">
@@ -233,7 +234,7 @@ canvas {
 				<!--   </em>
          </section> -->
 				<!-- begin login-header -->
-
+				<hr />
 				<div class="login-header">
 
 
@@ -245,9 +246,9 @@ canvas {
 
 				<!-- end login-header -->
 				<!-- begin login-content -->
-				<div class="login-content">
+				<div class="login-content ">
 
-					<form class="margin-bottom-0" name="loginFrm" novalidate
+					<form class="margin-bottom-0 shadow" name="loginFrm" novalidate
 						role="form">
 						<span class="msg_div"></span>
 						<div class="form-group"
@@ -278,40 +279,29 @@ canvas {
 							</div>
 						</div>
 
-					<div class="form-group d-flex align-items-center">
-    <!-- Send OTP -->
-   <div class="row">
-    <div class="col-md-12">
-     <button type="button"
-        ng-click="sendOtp()"
-        ng-hide="timerRunning"
-        class="btn btn-primary me-3"
-        style="margin-right: 65px; max-width: 180px;">
-        Send OTP
-    </button>
+						<div class="form-group d-flex align-items-center">
+							<!-- Send OTP -->
+							<div class="row">
+								<div class="col-md-12">
+									<button type="button" ng-click="sendOtp('login')"
+										ng-hide="timerRunning" class="btn btn-primary me-3"
+										style="margin-right: 65px; max-width: 180px;">Send
+										OTP</button>
 
-    <!-- Countdown display -->
-    <span
-        ng-show="timerRunning"
-        class=" me-3"
-        style="margin-right: 65px; max-width: 180px; font-weight:bold;color:red;"
-        >
-        Resend in {{ formatTime(timeLeft) }}
-    </span>
+									<!-- Countdown display -->
+									<span ng-show="timerRunning" class=" me-3"
+										style="margin-right: 65px; max-width: 180px; font-weight: bold; color: red;">
+										Resend in {{ formatTime(timeLeft) }} </span>
 
-    <!-- OTP input -->
-    <input type="text"
-        placeholder="Enter Valid OTP"
-        required
-        ng-model="loginform.um_otp"
-        id="otp"
-        class="form-control w-auto"
-        style="max-width: 173px;"
-        numbers-only />
-    </div>
-   
-   </div>
-</div>
+									<!-- OTP input -->
+									<input type="text" placeholder="Enter Valid OTP" required
+										ng-model="loginform.um_otp" id="otp"
+										class="form-control w-auto" style="max-width: 173px;"
+										numbers-only />
+								</div>
+
+							</div>
+						</div>
 
 
 
@@ -341,11 +331,7 @@ canvas {
 		<div class="login login-with-news-feed" ng-if="forgotshow">
 			<!-- begin news-feed -->
 			<div class="news-feed">
-				<div class="news-image">
-					<img
-						src="${pageContext.request.contextPath}/assets/img/login-bg/bg-7.jpg"
-						data-id="login-cover-image" alt="" />
-				</div>
+				
 			</div>
 			<!-- end news-feed -->
 			<!-- begin right-content -->
@@ -406,8 +392,8 @@ canvas {
 						</div>
 						<div class="login-buttons" ng-show="sendOtp">
 							<button type="submit" ng-disabled="loading==false"
-								ng-click="sendOtp()" class="btn btn-success btn-block btn-lg">Send
-								OTP *</button>
+								ng-click="sendOtp('register')"
+								class="btn btn-success btn-block btn-lg">Send OTP *</button>
 						</div>
 						<div class="login-buttons" ng-show="validateotp">
 							<button type="submit" ng-click="validateOtp()"
@@ -437,11 +423,11 @@ canvas {
 		<!-- end login -->
 		<div class="register register-with-news-feed" ng-if="registershow">
 			<!-- begin news-feed -->
-			<div class="news-feed">
-				<div class="news-image">
-					<img src="assets/img/login-bg/bg-7.jpg" alt="" />
-				</div>
-			</div>
+			 <div class="news-feed">
+                    <div class="news-image">
+                        <img src="${pageContext.request.contextPath}/assets/img/login-bg/bg-7.jpg" data-id="login-cover-image" alt="" />
+                    </div>
+                </div>
 			<!-- end news-feed -->
 			<!-- begin right-content -->
 			<div class="right-content">
@@ -567,8 +553,8 @@ canvas {
 							ng-show="register.type=='aor' && !isadvocate">
 							<label class="col-md-3 control-label">Bar Enroll No/Year</label>
 							<div class="col-md-6">
-								<input  type="text" ng-model="register.enrollNo"
-									id="enrollNo" class="form-control" placeholder="Enroll No" />
+								<input type="text" ng-model="register.enrollNo" id="enrollNo"
+									class="form-control" placeholder="Enroll No" />
 							</div>
 							<div class="col-md-3">
 								<input numbers-only type="text" maxlength="4"
@@ -637,7 +623,7 @@ canvas {
 	<script
 		src="${pageContext.request.contextPath}/js/angularJs/angular.min.js"></script>
 	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=5"></script>
+		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=12"></script>
 	<script>
             $(document).ready(function() {
                 App.init();
