@@ -548,6 +548,26 @@ $scope.nextTab=function(event){
 				$scope.removeFlag = true;
 
 			};
+			
+			
+			/*download application*/
+			
+			$scope.downloadApplication = function () {
+
+			       //  IMPORTANT: freeze editable content before PDF
+			       angular.forEach(document.querySelectorAll("textarea"), function (ta) {
+			           var span = document.createElement("span");
+			           span.innerText = ta.value || ta.placeholder;
+			           span.style.whiteSpace = "pre-wrap";
+			           ta.parentNode.replaceChild(span, ta);
+			       });
+
+			       //  Open PDF download API
+			       $window.open(
+			           contextPath + "/api/petition/download-pdf",
+			           "_blank"
+			       );
+			   };
 
 	
 	 

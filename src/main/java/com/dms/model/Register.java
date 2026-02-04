@@ -11,7 +11,7 @@ public class Register {
 	private String password;
 	private String confirmPassword;
 	private String rollNo;
-	private Long enrollNo;
+	private String enrollNo;
 	private Integer enrollYear;
 	private Long adhar;
 	
@@ -75,10 +75,10 @@ public class Register {
 	public void setRollNo(String rollNo) {
 		this.rollNo = rollNo;
 	}
-	public Long getEnrollNo() {
+	public String getEnrollNo() {
 		return enrollNo;
 	}
-	public void setEnrollNo(Long enrollNo) {
+	public void setEnrollNo(String enrollNo) {
 		this.enrollNo = enrollNo;
 	}
 	public Integer getEnrollYear() {

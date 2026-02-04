@@ -9,7 +9,7 @@
                   <div class="form-group pull-in clearfix">
                   <div class="col-sm-3">
                     <div>
-					 <label class=" control-label" for="file">Upload File<span class="star">*</span></label>
+					 <label class=" control-label" for="file">! Upload File !<span class="star">*</span></label>
                      <input type="file" id="fileCheck" ngf-select ng-model="picFile" name="file"  >
                      <ul>
                         <li ng-repeat="file in files">{{file.name}}</li>

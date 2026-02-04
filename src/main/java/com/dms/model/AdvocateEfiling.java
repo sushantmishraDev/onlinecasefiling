@@ -1,13 +1,10 @@
 package com.dms.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
@@ -45,7 +42,7 @@ public class AdvocateEfiling {
 	private String enrollCouncil;
 	
 	@Column(name="enrollNO")
-	private Long enrollNo;
+	private String enrollNo;
 	
 	@Column(name="enrollyear")
 	private Integer enrollYear;
@@ -67,6 +64,17 @@ public class AdvocateEfiling {
 	
 	@Column(name="otp")
 	private Integer otp;
+	
+	/*
+	 * private LocalDateTime otpGeneratedTime;
+	 * 
+	 * 
+	 * public LocalDateTime getOtpGeneratedTime() { return otpGeneratedTime; }
+	 * 
+	 * public void setOtpGeneratedTime(LocalDateTime otpGeneratedTime) {
+	 * this.otpGeneratedTime = otpGeneratedTime; }
+	 */
+	
 
 	public Integer getOtp() {
 		return otp;
@@ -149,11 +157,11 @@ public class AdvocateEfiling {
 		this.enrollCouncil = enrollCouncil;
 	}
 
-	public Long getEnrollNo() {
+	public String getEnrollNo() {
 		return enrollNo;
 	}
 
-	public void setEnrollNo(Long enrollNo) {
+	public void setEnrollNo(String enrollNo) {
 		this.enrollNo = enrollNo;
 	}
 
@@ -205,6 +213,29 @@ public class AdvocateEfiling {
 		this.location = location;
 	}
 	
+	
+	@Override
+	public String toString() {
+	    return "AdvocateEfiling{" +
+	            "adv_id=" + adv_id +
+	            ", rollNo='" + rollNo + '\'' +
+	            ", rollYear=" + rollYear +
+	            ", title='" + title + '\'' +
+	            ", name='" + name + '\'' +
+	            ", clName='" + clName + '\'' +
+	            ", fhName='" + fhName + '\'' +
+	            ", gender='" + gender + '\'' +
+	            ", enrollCouncil='" + enrollCouncil + '\'' +
+	            ", enrollNo='" + enrollNo + '\'' +
+	            ", enrollYear=" + enrollYear +
+	            ", address1='" + address1 + '\'' +
+	            ", mobile='" + mobile + '\'' +
+	            ", email='" + email + '\'' +
+	            ", location='" + location + '\'' +
+	            ", otp=" + otp +
+	            '}';
+	}
+
 	
 	
 	
