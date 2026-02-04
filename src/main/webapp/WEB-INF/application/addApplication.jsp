@@ -6,7 +6,7 @@
 					<li class="active"><a href="#nav-tab-1" id="1" data-toggle="tab" data-ng-click="ShowId($event)">Application Details</a></li>
 					<li class="">	   <a href="#nav-tab-2" id="2" data-toggle="tab" data-ng-click="ShowId($event)">E-Court Fee </a></li>
 					<li class="">	   <a href="#nav-tab-3" id="3" data-toggle="tab" data-ng-click="ShowId($event)">Upload Application </a></li>
-					<!-- <li class="">	   <a href="#nav-tab-4" id="4" data-toggle="tab" data-ng-click="ShowId($event)">Listing Application </a></li> -->
+					<!-- <li class="">	   <a href="#nav-tab-4" id="4" data-toggle="tab" data-ng-click="ShowId($event)">Listing Application </a></li> --> 
 				</ul>
 				<div class="tab-content">
 				

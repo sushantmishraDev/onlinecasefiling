@@ -153,6 +153,34 @@ public class UserService {
 			return user;
 		}
 	}
+	
+	// validate login with otp
+	@Transactional
+	public User validateLoginWithOtp(String username, int otp) {
+		User user = new User();
+		
+		try {
+			Query query = em
+					.createQuery("SELECT u FROM User u WHERE (username =:username AND um_otp=:otp) and u.um_rec_status=1");
+			query.setParameter("username", username);
+			query.setParameter("otp", otp);
+			user = (User) query.getSingleResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new EntityNotFoundException("Entity does not exist.");
+		} finally {
+			return user;
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public User getByuserid(Long userid) {
 		User u = null;
