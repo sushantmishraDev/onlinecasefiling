@@ -55,7 +55,7 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
   <session-config>
-    <session-timeout>45</session-timeout>
+    <session-timeout>180</session-timeout>
   </session-config>
   <display-name>dms</display-name>
   <welcome-file-list>

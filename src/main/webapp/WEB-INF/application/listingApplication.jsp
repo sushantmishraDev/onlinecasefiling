@@ -1,11 +1,11 @@
-<div id=page style="background-color: white;">
+<%-- <div id=page style="background-color: white;">
 	<h4 class="panel-title" align="center"
 		style="font-weight: bold; font-size: large;">LISTING APPLICATION
 		FORM</h4>
 	<br>
-	<%-- <link
+	<link
 	href="${pageContext.request.contextPath}/assets/listingStyle.css"
-	rel="stylesheet" /> --%>
+	rel="stylesheet" />
 
 	<div id="pdfPrep"
 		style="background: white; width: 210mm; min-height: 297mm; padding: 20mm; margin: auto; font-family: 'Times New Roman', serif;">
@@ -153,4 +153,4 @@
 <button class="btn btn-success" ng-click="saveApplication()">Save
 	Application</button>
 <button class="btn btn-success" ng-click="downloadApplication()">Download
-	Application</button>
+	Application</button> --%>
