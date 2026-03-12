@@ -38,7 +38,7 @@
                                         	<th style="width: 2%;">Sr.<br>No.</th>
                                             <th>Draft No</th>
                                             <th>Diary No</th>
-                                            <th>Registered Date</th>
+                                            <!-- <th>Registered Date</th> -->
                                             <th>First Petitioner</th>
                                             <th>First Respondent</th>
                                             <th>Case Type</th>
@@ -49,14 +49,14 @@
                                     <tbody>
                                         <tr ng-repeat="row in draftList"  class="odd gradeX">
                                         	 <td>{{$index+1}}</td>
-                                             <td>{{row.rcd_draft_no}}</td>
+                                             <td>{{row.rcd_draft_no}}<br/>{{row.rcd_cr_date | date:"dd/MM/yyyy HH:mm:ss"}}</td>
                                              <td>{{row.rcd_diary_no}}</td>
-                                             <td>{{row.rcd_cr_date | date:"dd/MM/yyyy HH:mm:ss"}}</td>
+                                             <!-- <td>{{row.rcd_cr_date | date:"dd/MM/yyyy HH:mm:ss"}}</td> -->
                                              <td>{{row.petitionerDetails.pt_name}}</td>
                                              <td>{{row.respondentDetails.rt_name}}</td>                                          
                                              <td>{{row.caseType.ct_name}}</td>
                                               <td ng-hide ="row.caseStage.lk_longname == 'RETURN_TO_COUNCIL'">{{row.caseStage.lk_longname}}</td>
-                                             <td class="col-md-2" ng-show ="row.caseStage.lk_longname == 'RETURN_TO_COUNCIL'">{{row.scrutionRemark.sr_remrk}}</td>
+                                             <td class="col-md-2" ng-show ="row.caseStage.lk_longname == 'RETURN_TO_COUNCIL'">{{row.caseStage.lk_longname}} Remark :{{row.scrutionRemark.sr_remrk}}</td>
                                              <td>                               
 				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_id==1000041 " ng-click="viewDetails(row.rcd_id)">Edit</button>
 				                                 <button class="btn btn-success" ng-click="previewDetails(row.rcd_id)">Preview</button>

@@ -82,6 +82,10 @@ public class Application {
 	@Column(name = "ap_source")
 	private String ap_source;
 	
+	@OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ap_cr_by",insertable = false, updatable = false)
+	private User userFiled;
+	
 
 	@Column(name = "ap_lstng_desc")
 	private String ap_lstng_desc;
@@ -90,6 +94,16 @@ public class Application {
 	@Column(name = "ap_lstng_prayer")
 	private String ap_lstng_prayer;
 	
+	
+	
+	public User getUserFiled() {
+		return userFiled;
+	}
+
+	public void setUserFiled(User userFiled) {
+		this.userFiled = userFiled;
+	}
+
 	public String getAp_lstng_desc() {
 		return ap_lstng_desc;
 	}

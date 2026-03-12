@@ -61,50 +61,50 @@
 								</div>
 								
 					      <div class="panel-body">
-						<table id="data-table" st-table="displayedCollection"
-							st-safe-src="masterdata"
-							class="table table-striped table-bordered nowrap table-hover" width="100%">
-								<thead>
-								<tr>
-										
-										<th style="text-align: center;" width="15%" st-sort="fd_case_type">Case Type</th>
-										<th style="text-align: center;" width="10%"  st-sort="fd_case_no">Case Number</th>
-										<th style="text-align: center;" width="10%" st-sort="fd_case_year">Case Year</th>
-								    <th style="text-align: center;" width="20%"  st-sort="fd_first_petitioner">First Petitioner </th>
-									<th style="text-align: center;" width="20%"  st-sort="fd_first_respondent">First Respondent</th>
-								<th style="text-align: center;" width="20%">Action</th>
-								</tr>
-								</thead>
-								
-								
-								<tbody>
-									<tr ng-repeat="data in caseFileList" class="odd gradeX">
-										
-									<!-- 	<td align="center">{{data.caseType.ct_name}}<br/><ng-if="data.fd_cr_by==90009">Not E-filed case</ng-if></td> -->
-										<td align="center">{{data.caseType.ct_name}}<br/></td>
-										<td align="center">{{data.fd_case_no}}</td>
-										<td align="center">{{data.fd_case_year}}</td>
-										<td align="center">{{data.fd_first_petitioner}}</td>
-										<td align="center">{{data.fd_first_respondent}}</td>
-										<td align="center">
-										<button id="Submit" type="submit" class="btn btn-success"ng-click="createApplication(data)" >Add Document</button>
-										<!-- <button id="Submit" type="submit" class="btn btn-info" ng-click="viewApplications(data)" >View Documents</button> -->
-										</td>
-										
-									
-									</tr>
-								</tbody>
-								<tfoot>
-									<tr>
-										<td colspan="9" class="text-center">
-											<div st-pagination="" st-items-by-page="10"
-											st-displayed-pages="8">
-											</div>
-										</td>
-									</tr>
-								</tfoot>
-						 </table>
-					</div>
+                            <div class="table-responsive" ng-show="petDoc || draftList.length>0">
+ 						<input type="hidden" class="form-control" value=${fd_id} id="fd_id" name="fd_id">    
+                                <table id="data-table" class="table table-striped table-bordered" >
+                                    <thead>
+                                        <tr>
+                                        	<th>Sr.<br>No</th>
+ 	                                        <!-- <th>Filed By</th> -->
+                                            <th>Document Types</th>
+                                            <th>Number</th>
+                                            <th>Year</th>
+                                            <th>Filed By</th>
+                                            <th>Action</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-show="petDoc!=null">
+                                    <td>1</td>
+                                     <!-- <td>Petitioner</td> -->
+                                     <td>{{petDoc.caseType.ct_name}} </td>
+                                     <td>{{petDoc.rcd_case_no}}</td>
+                                     <td>{{petDoc.rcd_case_year}}</td>
+                                      <td>{{petDoc.userFiled.um_fullname}}({{petDoc.userFiled.username}})</td>
+                                     <td><button  class="btn btn-success" ng-click="showDocument(petDoc)">Preview</button></td>
+                                    </tr>
+                                     </tbody>
+                                </table>
+                                <table id="data-table" class="table table-striped table-bordered" >
+                                        <tr   ng-repeat="row in draftList" class="odd gradeX">
+                                        	<td>{{$index+2}}</td>
+                                        	<!--  <td>{{row.ap_filed_by ==1 ?'Petitioner' : 'Respondent'}}</td> -->
+                                             <td>{{row.applicationType.at_description}}</td> 
+                                             <td>{{row.ap_no}}</td>
+                                             <td>{{row.ap_year}}</td>
+                                             <td>{{row.userFiled.um_fullname}} ({{row.userFiled.username}})</td>
+                                             <td><button  class="btn btn-success" ng-click="showDocuments(row)">Preview</button></td>
+                                          </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div ng-hide="divShow">
+                           <h2 style="color:red;text-align:center;"> You Are Not Authorized To View The Document </h2>
+                            </div>
+                        </div>
 				</div>
 				<!-- end panel -->
 			</div>
@@ -116,7 +116,7 @@
 
 
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/scripts/application_controllers/searchCaseFile.js"></script>
+	src="${pageContext.request.contextPath}/js/scripts/application_controllers/searchCaseFile.js?v=1"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript"

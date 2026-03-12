@@ -361,8 +361,63 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	//////////captcha
 
 
-	var code;
-	function createCaptcha() {
+	
+		var code;
+
+		var captchaAnswer = 0;
+
+
+		function createCaptcha() {
+
+
+		document.getElementById('captcha').innerHTML = "";
+
+
+		var num1 = Math.floor(Math.random() * 10) + 1;
+
+		var num2 = Math.floor(Math.random() * 10) + 1;
+
+
+		var operator = Math.random() > 0.5 ? "+" : "-";
+
+
+		if (operator === "+") {
+
+		captchaAnswer = num1 + num2;
+
+		} else {
+
+		captchaAnswer = num1 - num2;
+
+		}
+
+
+		var captchaText = num1 + " " + operator + " " + num2 + " = ?";
+
+
+		$scope.captcha1 = captchaText;
+
+
+		// Draw on canvas (same style as your current captcha)
+
+		var canv = document.createElement("canvas");
+
+		canv.width = 150;
+
+		canv.height = 50;
+
+
+		var ctx = canv.getContext("2d");
+
+		ctx.font = "25px Georgia";
+
+		ctx.strokeText(captchaText, 10, 30);
+
+
+		document.getElementById("captcha").appendChild(canv);
+	}
+	
+	function createCaptchaOld() {
 		//clear the contents of captcha div first 
 		document.getElementById('captcha').innerHTML = "";
 		var charsArray =
@@ -580,10 +635,23 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 		debugger;
 
 		// Step 1: Validate Captcha
-		if (document.getElementById("cpatchaTextBox").value != code) {
+		/*if (document.getElementById("cpatchaTextBox").value != code) {
 			alert("Invalid Captcha. Try again.");
 			createCaptcha();
 			return;
+		}*/
+		
+		var userInput = document.getElementById("cpatchaTextBox").value;
+
+
+		if (parseInt(userInput) !== captchaAnswer) {
+
+		alert("Invalid Captcha. Try again.");
+
+		createCaptcha();
+
+		return;
+
 		}
 
 		// Step 2: Validate form fields
@@ -604,7 +672,8 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 		$http.post(urlBase + 'validateOtp', $scope.loginform)
 			.success(function(otpResponse) {
 				console.log("OTP Validation Response:", otpResponse);
-
+ 
+				/*otpResponse.response="TRUE";*/
 				if (otpResponse.response === "TRUE") {
 					console.log(" OTP validated successfully. Proceeding to login...");
 
@@ -781,7 +850,7 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 	                }
 
 	                // ⏱ start OTP timer (60 sec)
-	                startOTPTimer(600);
+	                startOTPTimer(60);
 
 	            } else {
 	                showError(data.data);

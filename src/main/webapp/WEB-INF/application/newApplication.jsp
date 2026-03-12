@@ -26,21 +26,21 @@
 
 						</div>
 						
-						<fieldset ng-hide="application.ap_at_mid==9" ng-repeat="subapplication in application.subApplication">
+						<!-- <fieldset ng-hide="application.ap_at_mid==9" ng-repeat="subapplication in application.subApplication">
 						<div class="form-group pull-in clearfix">
 							<div class="col-sm-6">
 								<label> With Application </label>
-								 <!-- <select
+								 <select
 									class="form-control" id="ct_id" name="ct_id"
 									ng-model="application.subApplication.sb_ap_at_mid"
 									 ng-options="applicationType.at_id as applicationType.at_name for applicationType in applicationTypeList | orderBy:'at_name'"
-									 ng-selected="application.subApplication.sb_ap_at_mid == applicationType.at_id"> -->
+									 ng-selected="application.subApplication.sb_ap_at_mid == applicationType.at_id">
 									 <select ng-model="subapplication.sb_ap_at_mid">
                                      <option value="">Select Application Type</option>
                                      <option ng-repeat=" applicationType in applicationTypeList | orderBy:'at_name'" 
                                      ng-selected="subapplication.sb_ap_at_mid == applicationType.at_id" ng-value="{{applicationType.at_id}}">{{applicationType.at_name}} </option>
                                      </select>
-									<!-- <option value="">Select Application Type</option> -->
+									<option value="">Select Application Type</option>
 									
 								</select>
 								
@@ -52,7 +52,7 @@
 							
 
 						</div>
-						</fieldset>
+						</fieldset> -->
 
 					</div>
 				</div>
@@ -62,7 +62,7 @@
 </div>
 
 
-<div  ng-show="application.ap_at_mid==9" class="smooth container w-xxxl w-auto-xs">
+<div  ng-show="application.ap_at_mid==999999" class="smooth container w-xxxl w-auto-xs">
 	<form name="leadStage" class="form-validation">
 		<fieldset class="scheduler-border">
 			<div class="col-sm-10">

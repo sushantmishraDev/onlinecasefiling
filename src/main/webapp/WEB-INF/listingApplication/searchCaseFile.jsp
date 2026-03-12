@@ -1,3 +1,5 @@
+ <!--    listing application     -->
+
 <jsp:include page="../content/header2.jsp"></jsp:include>
 	<div id="content" class="content" ng-controller="searchCaseFileController">
 		<div class="row">
@@ -33,7 +35,7 @@
 										
 										
 										<th>
-											<select ng-options="caseType.ct_id as (caseType.ct_label+'-'+caseType.ct_name+'') for caseType in caseTypeList  | orderBy:'ct_label'"
+											<select ng-options="caseType.ct_ccms_id as (caseType.ct_label+'-'+caseType.ct_name+'') for caseType in caseTypeList  | orderBy:'ct_label'"
 											class="form-control" id="caseTypeData" 
 											name="fd_case_type" ng-model="model.fd_case_type" required>
 											<option value="">Select Case Type</option>
@@ -50,7 +52,7 @@
  										<th>
 										
 										<button id="search" type="submit" class="btn btn-primary btn-sm pull-left"
-												ng-click="searchAlreadyCaseFile()" data-toggle="modal" style="size: 2px">
+												ng-click="searchCaseFileNew()" data-toggle="modal" style="size: 2px">
 										<span class="glyphicon glyphicon-plus-sign"></span>Search</button>
 										</th>
 									</tr>
@@ -61,7 +63,7 @@
 								</div>
 								
 					      <div class="panel-body">
-						<table id="data-table" st-table="displayedCollection"
+						<table ng-show="isListingAllow==='TRUE'" id="data-table" st-table="displayedCollection"
 							st-safe-src="masterdata"
 							class="table table-striped table-bordered nowrap table-hover" width="100%">
 								<thead>
@@ -78,17 +80,22 @@
 								
 								
 								<tbody>
-									<tr ng-repeat="data in caseFileList" class="odd gradeX">
+									<!-- <tr ng-repeat="data in caseFileList" class="odd gradeX"> -->
 										
-									<!-- 	<td align="center">{{data.caseType.ct_name}}<br/><ng-if="data.fd_cr_by==90009">Not E-filed case</ng-if></td> -->
-										<td align="center">{{data.caseType.ct_name}}<br/></td>
+										<!-- <td align="center">{{data.caseType.ct_name}}<br/><ng-if="data.fd_case_no==90009">Not E-filed case</ng-if></td>
 										<td align="center">{{data.fd_case_no}}</td>
 										<td align="center">{{data.fd_case_year}}</td>
 										<td align="center">{{data.fd_first_petitioner}}</td>
 										<td align="center">{{data.fd_first_respondent}}</td>
+										<td align="center"> -->
+										<td align="center">{{caseFileList.caseType}}<br/></td>
+										<td align="center">{{caseFileList.caseNo}}</td>
+										<td align="center">{{caseFileList.caseYear}}</td>
+										<td align="center">{{caseFileList.petitioner}}</td>
+										<td align="center">{{caseFileList.respondent}}</td>
 										<td align="center">
-										<button id="Submit" type="submit" class="btn btn-success"ng-click="createApplication(data)" >Add Document</button>
-										<!-- <button id="Submit" type="submit" class="btn btn-info" ng-click="viewApplications(data)" >View Documents</button> -->
+										<button  id="Submit" ng-show="caseFileList.caseId" type="submit" class="btn btn-success"ng-click="applicationListing(caseFileList.caseId)" >Create Listing Application</button>
+										
 										</td>
 										
 									
@@ -104,6 +111,7 @@
 									</tr>
 								</tfoot>
 						 </table>
+						 <span ng-show="isListingAllow==='FALSE'"><h3 style="color:blue">You are not authorized to file Listing application in this Case. Listing application only be filed by advocate available in case.</h3></span>
 					</div>
 				</div>
 				<!-- end panel -->

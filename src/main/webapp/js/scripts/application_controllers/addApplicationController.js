@@ -159,6 +159,7 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 				getUploadedDocuments($scope.draftId);
 				}
 			}
+			$scope.petDoc={};
 
 				function getCourtFee(id){
 				    $http.get(urlBase+ 'application/getCourtFee', {
@@ -176,7 +177,63 @@ EDMSApp.controller('addApplicationController',['$scope','$http','Upload',functio
 				}
 
 				
-				  
+				 $scope.getDocList=function(){
+					//getPetDoc($scope.fd_id);
+			  		$http.get(urlBase+'application/getDocList/'+$scope.fd_id).success(function (data) {
+			    	$scope.count=data.data;
+			      	$scope.draftList=data.modelList;
+			      	
+			      	console.log("pet",$scope.petDoc);
+			      }).
+			      error(function(data, status, headers, config) {
+			      	console.log("Error in getting tree data");
+			      });
+				};
+				
+				/*function getPetDoc(){*/
+				
+					$scope.getPetDoc=function(){
+					
+			  		$http.get(urlBase+'application/getPetDoc/'+$scope.fd_id).success(function (data) {
+				    	//$scope.count=data.data;
+				      	$scope.petDoc=data.modelData;
+				      	
+				      //	getDocList();
+				      	
+				    	  
+				      }).
+				      error(function(data, status, headers, config) {
+				      	console.log("Error in getting tree data");
+				      });
+					};
+					
+					$scope.showDocument=function(selectedfile){
+						var response = $http.get(urlBase+'scrutiny/copyFile',{params: {'pu_document_name': selectedfile.rcd_draft_no+".pdf"}});
+						response.success(function(data, status, headers, config) {		
+							console.log(data);
+							if(data.data != null)
+							{
+								window.open(urlBase+"/uploads/"+data.data,'_blank');
+							}
+						});
+						response.error(function(data, status, headers, config) {
+							bootbox.alert("Error");
+						});
+					};
+					
+					$scope.showDocuments=function(selectedfile){
+						var response = $http.get(urlBase+'application/copyApplicationFile',{params: {'au_document_name': selectedfile.ap_draft_no+".pdf"}});
+						response.success(function(data, status, headers, config) {		
+							console.log(data);
+							if(data.data != null)
+							{
+								window.open(urlBase+"/uploads/"+data.data,'_blank');
+							}
+						});
+						response.error(function(data, status, headers, config) {
+							bootbox.alert("Error");
+						});
+					};
 		
 	
 	$scope.addApplication=function(application,otherApp){
@@ -302,9 +359,9 @@ function getCaseDetails(){
 	    	
 	    		
 	    		
-	    		console.log("dataaaaaaaaaaaaaaaaa",$scope.caseDetailsCIS[0]);
-	    		getPet();
-	    		  getRes();
+	    	//	console.log("dataaaaaaaaaaaaaaaaa",$scope.caseDetailsCIS[0]);
+	    		//getPet();
+	    		  //getRes();
 	    	
 	      }).
 	      error(function(data, status, headers, config) {

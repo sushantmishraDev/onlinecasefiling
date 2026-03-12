@@ -35,6 +35,8 @@ String scrutinyapplication="";
 String olreport="";
 String amendmenthistory="";
 String defectRemoveByOrder="";
+String listingapplication="";
+String alreadyFiledDoc="";
 String uri=(String) request.getAttribute("javax.servlet.forward.request_uri");
 if(uri.equals("/onlinecasefiling/ecourt/ecourtHome"))
 	home="active";
@@ -44,6 +46,8 @@ if(uri.equals("/onlinecasefiling/ecourt/addCaveat"))
 	newcaveat="active";
 if(uri.equals("/onlinecasefiling/searchcasefile/search"))
 	newapplication="active";
+if(uri.equals("/onlinecasefiling/searchcasefile/searchDocs"))
+	alreadyFiledDoc="active";
 if(uri.equals("/onlinecasefiling/scrutiny/cases"))
 	scrutinycase="active";
 if(uri.equals("/onlinecasefiling/scrutiny/caveats"))
@@ -120,7 +124,7 @@ if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
 					<li class="has-sub <%=newcaveat %>">
 						<a href="${pageContext.request.contextPath}/ecourt/addCaveat">
 						<i class="fa fa-file-o"></i>
-							<span>Caveat</span>
+							<span>Fresh Caveat</span>
 							</a>
 					</li>
 					<%-- <li class="has-sub <%=newapplication %>">
@@ -132,9 +136,21 @@ if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
 					<li class="has-sub <%=newapplication %>">
 						<a href="${pageContext.request.contextPath}/searchcasefile/search">
 						<i class="fa fa-file-o"></i>
-							<span>Application/Document</span>
+							<span>Fresh Application/Document</span>
 							</a>
 					</li>
+					<li class="has-sub <%=alreadyFiledDoc %>">
+						<a href="${pageContext.request.contextPath}/searchcasefile/searchDocs">
+						<i class="fa fa-file-o"></i>
+							<span>Filed Cases/Applications</span>
+							</a>
+					</li>
+					<%-- <li class="has-sub <%=listingapplication%>">
+						<a href="${pageContext.request.contextPath}/searchcasefile/listingApplication">
+						<i class="fa fa-file-o"></i>
+							<span>Template For Listing Application</span>
+							</a>
+					</li> --%>
 					<li class="has-sub <%=amendmenthistory %>">
 						<a href="${pageContext.request.contextPath}/amendmenthistory/manage">
 						<i class="fa fa-file-o"></i>

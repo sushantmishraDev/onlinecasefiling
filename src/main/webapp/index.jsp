@@ -331,7 +331,7 @@ canvas {
 		<div class="login login-with-news-feed" ng-if="forgotshow">
 			<!-- begin news-feed -->
 			<div class="news-feed">
-				
+				<img src="${pageContext.request.contextPath}/assets/img/login-bg/bg-7.jpg" data-id="login-cover-image" alt="" />
 			</div>
 			<!-- end news-feed -->
 			<!-- begin right-content -->
@@ -623,7 +623,7 @@ canvas {
 	<script
 		src="${pageContext.request.contextPath}/js/angularJs/angular.min.js"></script>
 	<script type="text/javascript"
-		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=12"></script>
+		src="${pageContext.request.contextPath}/js/scripts/controllers/loginController.js?v=14"></script>
 	<script>
             $(document).ready(function() {
                 App.init();

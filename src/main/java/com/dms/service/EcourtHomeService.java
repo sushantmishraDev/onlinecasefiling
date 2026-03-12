@@ -424,7 +424,8 @@ public List<StNoDetails> getSessionTrack(Long id) {
 		// TODO Auto-generated method stub
 		List<CaseCheckListMapping> result=null;
 		Query query=null;
-		query = em.createQuery("SELECT c from CaseCheckListMapping c where c.cm_rec_status=1 and c.cm_rcd_mid=:id").setParameter("id", doc);
+		/*query = em.createQuery("SELECT c from CaseCheckListMapping c where c.cm_rec_status=1 and c.cm_rcd_mid=:id").setParameter("id", doc);*/
+		query = em.createQuery("SELECT c from CaseCheckListMapping c where  c.cm_rcd_mid=:id").setParameter("id", doc);
 		result=query.getResultList();
 		return result;
 	}

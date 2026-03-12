@@ -25,8 +25,11 @@ import com.dms.model.ApplicationUploaded;
 import com.dms.model.BSApplicationCheckListMapping;
 import com.dms.model.CaseCheckListMapping;
 import com.dms.model.CaseFileDetail;
+import com.dms.model.CaseType;
 import com.dms.model.OtherAppNo;
+import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.SubApplication;
+import com.dms.model.User;
 
 
 
@@ -105,6 +108,26 @@ public class ApplicationService
 		CaseFileDetail result=null;
 	    String query=" SELECT cfd from CaseFileDetail cfd where cfd.fd_id="+fdId;
 		result= (CaseFileDetail) em.createQuery(query).getSingleResult();
+		
+		return result;
+	}
+	
+	
+	@Transactional
+	public CaseFileDetail getCaseFileOld(CaseFileDetail fd) {
+		CaseFileDetail result=null;
+	    String query=" SELECT cfd from CaseFileDetail cfd where cfd.fd_case_type="+fd.getFd_old_case_type()+" and cfd.fd_case_no='"+fd.getFd_old_case_no()
+	    		+ "' and cfd.fd_case_year="+fd.getFd_old_case_year();
+		result= (CaseFileDetail) em.createQuery(query).getSingleResult();
+		
+		return result;
+	}
+	
+	@Transactional
+	public CaseType getCaseType(Integer ccmsId) {
+		CaseType result=null;
+	    String query=" SELECT cfd from CaseType cfd where cfd.ct_ccms_id="+ccmsId;
+		result= (CaseType) em.createQuery(query).getSingleResult();
 		
 		return result;
 	}
@@ -202,6 +225,22 @@ public class ApplicationService
     }
 	
 	
+	@Transactional
+    public CaseFileDetail save(CaseFileDetail c) {
+    
+		CaseFileDetail cfd = null;
+		CaseFileDetail cfd1 = null;
+    	try 
+    	{	
+    		cfd= em.merge(c);	
+    		cfd1=em.find(CaseFileDetail.class, cfd.getFd_id());
+	    }catch (Exception e) {		
+	    	e.printStackTrace();
+		}
+    	return cfd1;
+    }
+	
+	
 	
 	
 	@Transactional
@@ -267,6 +306,121 @@ public class ApplicationService
 			Query query=null;
 			query = em.createQuery(" SELECT cf from ApplicationCourtFee cf where cf.acf_rec_status=1 and cf.acf_ap_mid=:id").setParameter("id", id);
 			result=query.getResultList();
+			return result;
+		}
+	 
+	 
+	 @Transactional
+		public List<Application> getDocList(Long id) {
+			
+			List<Application> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT cf from Application cf where cf.ap_stage_lid=1000049 and cf.ap_fd_mid=:id order by ap_no ASC").setParameter("id", id);
+			result=query.getResultList();
+			return result;
+		}
+	 
+	 @Transactional
+		public List<Application> getOldCaseDocList(Long id) {
+			
+			List<Application> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT cf from Application cf where cf.ap_stage_lid=1000049 and cf.ap_fd_mid=:id order by ap_no ASC").setParameter("id", id);
+			result=query.getResultList();
+			return result;
+		}
+	 
+	 @Transactional
+		public List<Long> getDocUsers(Long id) {
+			
+			List<Long> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT distinct ap_cr_by from Application cf where cf.ap_stage_lid=1000049 and cf.ap_fd_mid=:id").setParameter("id", id);
+			
+			try{
+				result=query.getResultList();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+		}
+	 
+	 @Transactional
+		public List<Long> getOldCaseDocUsers(Long id) {
+			
+			List<Long> result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT distinct ap_cr_by from Application cf where cf.ap_stage_lid=1000049 and cf.ap_fd_mid=:id").setParameter("id", id);
+			try{
+				result=query.getResultList();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+		}
+	 
+	 
+	 
+	 @Transactional
+		public RegisteredCaseDetails getPetFile(CaseFileDetail fd) {
+			
+		 RegisteredCaseDetails result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT rcd from RegisteredCaseDetails rcd where "
+					+ " rcd.rcd_ct_id=:fd_case_type and rcd.rcd_case_no=:fd_case_no and rcd.rcd_case_year =:fd_case_year").
+					setParameter("fd_case_type", fd.getFd_case_type()).setParameter("fd_case_no", Integer.parseInt(fd.getFd_case_no())).
+					setParameter("fd_case_year", fd.getFd_case_year());
+			
+			try{
+				result=(RegisteredCaseDetails) query.getSingleResult();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			
+			if(result==null) {
+				query = em.createQuery(" SELECT rcd from RegisteredCaseDetails rcd where "
+						+ " rcd.rcd_ct_id=:fd_case_type and rcd.rcd_case_no=:fd_case_no and rcd.rcd_case_year =:fd_case_year").
+						setParameter("fd_case_type", fd.getFd_old_case_type()).setParameter("fd_case_no", Integer.parseInt(fd.getFd_old_case_no())).
+						setParameter("fd_case_year", fd.getFd_old_case_year());
+				try{
+					result=(RegisteredCaseDetails) query.getSingleResult();
+				}catch(Exception e)	{
+					e.printStackTrace();
+				}
+				
+			}
+			return result;
+		}
+	 
+	 @Transactional
+		public Long getPetUser(CaseFileDetail fd) {
+			
+		 Long result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT rcd.rcd_cr_by from RegisteredCaseDetails rcd where "
+					+ " rcd.rcd_ct_id=:fd_case_type and rcd.rcd_case_no=:fd_case_no and rcd.rcd_case_year =:fd_case_year ").
+					setParameter("fd_case_type", fd.getFd_case_type()).setParameter("fd_case_no", Integer.parseInt(fd.getFd_case_no())).
+					setParameter("fd_case_year", fd.getFd_case_year());
+			
+			
+			try{
+				result=(Long) query.getSingleResult();
+			}catch(Exception e)	{
+				e.printStackTrace();
+			}
+			return result;
+		}
+	 
+	 @Transactional
+		public Long getPetUserOldCase(CaseFileDetail fd) {
+			
+		 Long result=null;
+			Query query=null;
+			query = em.createQuery(" SELECT rcd.rcd_cr_by from RegisteredCaseDetails rcd where "
+					+ " rcd.rcd_ct_id=:fd_case_type and rcd.rcd_case_no=:fd_case_no and rcd.rcd_case_year =:fd_case_year ").
+					setParameter("fd_case_type", fd.getFd_old_case_type()).setParameter("fd_case_no", Integer.parseInt(fd.getFd_old_case_no())).
+					setParameter("fd_case_year", fd.getFd_old_case_year());
+			result=(Long) query.getSingleResult();
 			return result;
 		}
 	 

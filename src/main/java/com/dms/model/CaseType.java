@@ -36,6 +36,10 @@ public class CaseType {
 	
 	@Column(name="ct_flag")
 	private String ct_flag;
+	
+	@Column(name="ct_ccms_id")
+	private Integer ct_ccms_id;
+
 
     /* @OneToOne
 	@JoinColumn(name="ct_id")
@@ -47,6 +51,14 @@ public class CaseType {
 	
 	public String getCt_type() {
 		return ct_type;
+	}
+
+	public Integer getCt_ccms_id() {
+		return ct_ccms_id;
+	}
+
+	public void setCt_ccms_id(Integer ct_ccms_id) {
+		this.ct_ccms_id = ct_ccms_id;
 	}
 
 	public String getCt_flag() {

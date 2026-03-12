@@ -54,10 +54,10 @@
 	
 	 <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSourceCIS"
 		destroy-method="close">
-		<property name="driverClassName" value="org.postgresql.Driver" />
-		<property name="url" value="jdbc:postgresql://192.168.0.36:5433/cisdb_16012018?charSet=LATIN1"/> 
-      	<property name="username" value="ahccisdata"/> 
-        <property name="password" value="aldhc@321"/>
+		<property name="driverClassName" value="org.postgresql.Driver"/>
+      	<property name="url" value="jdbc:postgresql://10.111.7.53:5432/cishclko?charSet=LATIN1"/> 
+      	<property name="username" value="postgres"/> 
+        <property name="password" value="postgres"/>
 	</bean>    
 	
 	

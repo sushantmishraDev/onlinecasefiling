@@ -343,6 +343,7 @@
                                                                         <th>Defect</th>
                                                                          <th>Remark</th>
                                                                          <th>Defect Date</th>
+                                                                         <th>Status</th>
                                                                         
                                                                   </tr>
                                                             </thead>
@@ -352,6 +353,7 @@
                                                                                         <td>{{row.checklist.name}}</td>
                                                                                         <td style="white-space: pre-line;" >{{row.cm_remark}}</td>  
                                                                                          <td>{{row.cm_cr_date|date:"dd/MM/yyyy"}}</td> 
+                                                                                         <td>{{row.cm_rec_status ==2 ? 'Defect Removed' : 'Pending'}}</td>
                                                                                           
                                                                   </tr>
                                                             </tbody>

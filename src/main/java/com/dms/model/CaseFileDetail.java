@@ -46,6 +46,77 @@ public class CaseFileDetail {
 	@Column(name="fd_cr_by")
 	private Long fd_cr_by;
 	
+	@Column(name="fd_cino")
+	private String fd_cino;
+	
+	@Column(name="fd_id_old")
+	private Long fd_id_old;
+	
+	@Column(name="fd_old_case_no")
+	private String fd_old_case_no="";
+	
+	@Column(name="fd_old_case_year")
+	private Integer fd_old_case_year;	
+	
+	@Column(name="fd_old_case_type")
+	private Long fd_old_case_type;
+	
+	
+	@Column(name="fd_ccms_case_id")
+	private Long fd_ccms_case_id;
+	
+	
+	
+	
+	
+	public Long getFd_ccms_case_id() {
+		return fd_ccms_case_id;
+	}
+
+	public void setFd_ccms_case_id(Long fd_ccms_case_id) {
+		this.fd_ccms_case_id = fd_ccms_case_id;
+	}
+
+	public Long getFd_id_old() {
+		return fd_id_old;
+	}
+
+	public void setFd_id_old(Long fd_id_old) {
+		this.fd_id_old = fd_id_old;
+	}
+
+	public String getFd_old_case_no() {
+		return fd_old_case_no;
+	}
+
+	public void setFd_old_case_no(String fd_old_case_no) {
+		this.fd_old_case_no = fd_old_case_no;
+	}
+
+	public Integer getFd_old_case_year() {
+		return fd_old_case_year;
+	}
+
+	public void setFd_old_case_year(Integer fd_old_case_year) {
+		this.fd_old_case_year = fd_old_case_year;
+	}
+
+	public Long getFd_old_case_type() {
+		return fd_old_case_type;
+	}
+
+	public void setFd_old_case_type(Long fd_old_case_type) {
+		this.fd_old_case_type = fd_old_case_type;
+	}
+
+	public String getFd_cino() {
+		return fd_cino;
+	}
+
+	public void setFd_cino(String fd_cino) {
+		this.fd_cino = fd_cino;
+	}
+
 	public Long getFd_cr_by() {
 		return fd_cr_by;
 	}

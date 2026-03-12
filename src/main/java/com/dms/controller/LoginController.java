@@ -603,8 +603,24 @@ public class LoginController extends HttpServlet {
 		com.dms.model.AdvocateEfiling adv = userService.getAdvocateByRollNo(user1.getUsername());
 		Advocate adv1 = advocateService.getAdvocateByRollNo(user1.getUsername());
 		
+          if(adv.getAdv_id()==null) {
+			
+			if(adv1 !=null) {
+			adv.setAdv_id(adv1.getAdv_id());
+			adv.setRollNo(adv1.getRollNo());
+			adv.setRollYear(adv.getRollYear());
+			adv.setAddress1(adv1.getAddress1());
+			adv.setFhName(adv1.getFhName());
+			adv.setEmail(adv1.getEmail());
+			adv.setEnrollCouncil(adv1.getEnrollCouncil());
+			adv.setEnrollNo(adv1.getEnrollNo());
+			adv.setEnrollYear(adv1.getEnrollYear());
+			adv.setMobile(adv1.getMobile());
+			adv=userService.saveAdvocate(adv);
+			}
+		}
 		
-		if(adv1!=null && !adv1.getMobile().equals(adv.getMobile())){
+		if(adv1!=null && adv.getAdv_id() !=null && !adv1.getMobile().equals(adv.getMobile()) ){
 			
 			adv.setMobile(adv1.getMobile());
 			

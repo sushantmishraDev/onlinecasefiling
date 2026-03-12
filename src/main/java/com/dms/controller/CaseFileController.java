@@ -7,10 +7,17 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 
 import com.dms.model.ActDetails;
 import com.dms.model.ActionResponse;
@@ -97,6 +104,48 @@ public class CaseFileController {
 		}
 		return jsonData;
 
+	}
+	
+	
+	@RequestMapping(value = "/searchCaseFileList", method = RequestMethod.GET)
+	public @ResponseBody String searchCaseFileList(HttpServletRequest request) {
+
+	    // 1. Validate and parse parameters
+	    String caseTypeParam = request.getParameter("case_type");
+	    String caseNo = request.getParameter("case_no");
+	    String caseYearParam = request.getParameter("case_year");
+
+	    if (caseTypeParam == null || caseNo == null || caseYearParam == null) {
+	        return "Missing required parameters";
+	    }
+	    RestTemplate restTemplate = new RestTemplate();
+	    Integer casetype = Integer.valueOf(caseTypeParam);
+	    Integer caseYear = Integer.valueOf(caseYearParam);
+
+	    // 2. Prepare API request
+	    String externalApi = "http://192.168.0.114/testapi/API/CaseStatus/BriefCaseDetailsByTypeNoYear";
+
+	    MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+	    formData.add("CaseType", casetype.toString());
+	    formData.add("CaseNumber", caseNo);
+	    formData.add("CaseYear", caseYear.toString());
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+	    HttpEntity<MultiValueMap<String, String>> entity =
+	            new HttpEntity<>(formData, headers);
+
+	    // 3. Call external API
+	    ResponseEntity<String> externalResponse =
+	            restTemplate.postForEntity(externalApi, entity, String.class);
+	    
+	    System.out.println("externalResponse====="+externalResponse);
+
+	    // 4. Return body directly
+	    return externalResponse.getBody();
+	    
+        
 	}
 
 	@RequestMapping(value = "/getRespondent", method = RequestMethod.GET)

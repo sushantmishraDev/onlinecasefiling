@@ -11,29 +11,45 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.ccms.model.CaseDetailsCcms;
+import com.ccms.model.CcmsAdvoates;
 import com.dms.model.ActionResponse;
 import com.dms.model.AllowEfiling;
 import com.dms.model.Application;
@@ -44,10 +60,14 @@ import com.dms.model.ApplicationTypes;
 import com.dms.model.ApplicationUploaded;
 import com.dms.model.BSApplicationCheckListMapping;
 import com.dms.model.BindedEntity;
+import com.dms.model.CaseConversionCCmc;
 import com.dms.model.CaseFileDetail;
+import com.dms.model.CaseType;
+import com.dms.model.CcmsCaseDetails;
 import com.dms.model.IndexField;
 import com.dms.model.Lookup;
 import com.dms.model.PetitionerDetails;
+import com.dms.model.RegisteredCaseDetails;
 import com.dms.model.SmsLog;
 import com.dms.model.SubApplication;
 import com.dms.model.User;
@@ -60,6 +80,8 @@ import com.dms.service.ScrutinyService;
 import com.dms.service.UserRoleService;
 import com.dms.service.UserService;
 import com.dms.utility.GlobalFunction;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -112,6 +134,16 @@ public class ApplicationController
 		model.addAttribute("fd_id", fd_id);	
 
 		return "/application/addApplication";
+	}
+	
+	
+	@RequestMapping(value = "/viewDocs", method = RequestMethod.GET)
+	public String viewDocs(Model model,HttpServletRequest request) 
+	{
+		String fd_id=request.getParameter("fd_id");
+		model.addAttribute("fd_id", fd_id);	
+
+		return "/application/viewDocuments";
 	}
 	
 	@RequestMapping(value = "/applicationDraftForm", method = RequestMethod.GET)
@@ -176,6 +208,416 @@ public class ApplicationController
 
 		return viewname;
 
+	}
+	
+	@RequestMapping(value = "/getDocList/{id}", method = RequestMethod.GET)
+	public @ResponseBody String getDocList(@PathVariable("id") Long docId,HttpSession session) 
+	{
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<Application> response = new ActionResponse<Application>();
+		CaseFileDetail fd=applicationService.getCaseFile(docId);
+		String jsonData = "";
+		/*Object[] types = noticeService.getCaseDetails("WRIC", 1, 2022);*/
+		
+		List<Application> apDocs=new ArrayList<>();
+		
+		List<Long> u=applicationService.getDocUsers(docId);
+		
+		List<Long> uOldCase=applicationService.getOldCaseDocUsers(fd.getFd_id_old());
+		u.addAll(uOldCase);
+		
+		Long petU=applicationService.getPetUser(fd);
+		if(petU != null && fd.getFd_id_old()!=null) {
+			petU=applicationService.getPetUserOldCase(fd);
+		}
+		u.add(petU);
+		
+		 RestTemplate restTemplate1 = new RestTemplate();
+		  
+		  ObjectMapper mapper = new ObjectMapper();
+
+		     // Option 1: ignore unknown fields
+		     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	        
+
+
+	        HttpHeaders headers1 = new HttpHeaders();
+	        headers1.setContentType(MediaType.APPLICATION_JSON);
+	        
+	        Map<String, Object> requestBody = new HashMap<>();
+	        requestBody.put("Caseid", String.valueOf(fd.getFd_ccms_case_id())); // send as string if API expects string
+	        
+	        HttpEntity<Map<String, Object>> entity1 = new HttpEntity<>(requestBody, headers1);
+		
+		String externalApi="http://192.168.0.114/testapi/API/CaseStatus/AdvocateDetailsByCaseId";
+	     
+		ResponseEntity<Object> response2 = restTemplate1.postForEntity(
+	             externalApi,
+	             entity1,
+	             Object.class
+	             
+	     );     
+	     
+	     Object t= response2.getBody();
+	     
+	     CcmsAdvoates cAdv=mapper.convertValue(t, CcmsAdvoates.class);
+	     Object[] oPet=cAdv.getPetAdvocate().split(",");
+	     Object[] oRes=cAdv.getResAdvocate().split(",");
+	     String advParty=null;
+	     
+	     String  yourValue=user.getUm_fullname()+"("+user.getUsername()+" )";
+	     
+	     boolean containsAdv=Arrays.asList(oPet).contains(yourValue);
+	     if(!containsAdv) {
+	    	 containsAdv=Arrays.asList(oRes).contains(yourValue);
+	    	 advParty="Res";
+	     }
+	     else {
+	    	 advParty="Pet";
+	     }
+	     
+	     if(containsAdv) {
+	    	 
+	    	 apDocs= applicationService.getDocList(docId);
+				apDocs.addAll(applicationService.getOldCaseDocList(fd.getFd_id_old()));
+				response.setData("TRUE");
+				//response.setModelData(types);
+				response.setModelList(apDocs);
+	     }
+	     else {
+	    			if(u.contains(user.getUm_id())) {
+	    				apDocs= applicationService.getDocList(docId);
+	    				apDocs.addAll(applicationService.getOldCaseDocList(fd.getFd_id_old()));
+	    				response.setData("TRUE");
+	    				//response.setModelData(types);
+	    				response.setModelList(apDocs);
+	    				
+	    			}
+	    			else {
+	    				response.setData("false");
+	    				//response.setModelData(types);
+	    				//response.setModelList(apDocs);
+	    			}
+	    			
+				//response.setData("false");
+				//response.setModelData(types);
+				//response.setModelList(apDocs);
+			}
+
+		
+		
+		
+		/*List<Object> jgNmae = noticeService.getJudgeName(types[8].toString());*/
+		
+		
+		
+		
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+	
+	@RequestMapping(value = "/getCheckListingAdv/{Caseid}", method = RequestMethod.GET)
+	public @ResponseBody String getCheckListingAdv(@PathVariable("Caseid") Integer CaseId,HttpSession session) 
+	{
+		User user = (User) session.getAttribute("USER");
+		
+		ActionResponse<CcmsAdvoates> response1 = new ActionResponse<CcmsAdvoates>();
+		
+		  RestTemplate restTemplate = new RestTemplate();
+		  
+		  ObjectMapper mapper = new ObjectMapper();
+
+		     // Option 1: ignore unknown fields
+		     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	        
+
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        
+	        Map<String, Object> requestBody = new HashMap<>();
+	        requestBody.put("Caseid", String.valueOf(CaseId)); // send as string if API expects string
+	        
+	        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+		
+		String externalApi="http://192.168.0.114/testapi/API/CaseStatus/AdvocateDetailsByCaseId";
+	     
+		ResponseEntity<Object> response = restTemplate.postForEntity(
+	             externalApi,
+	             entity,
+	             Object.class
+	             
+	     );     
+	     
+	     Object t= response.getBody();
+	     
+	     CcmsAdvoates cAdv=mapper.convertValue(t, CcmsAdvoates.class);
+	     Object[] oPet=cAdv.getPetAdvocate().split(",");
+	     Object[] oRes=cAdv.getResAdvocate().split(",");
+	     String advParty=null;
+	     
+	     String  yourValue=user.getUm_fullname()+"("+user.getUsername()+" )";
+	     
+	     boolean containsAdv=Arrays.asList(oPet).contains(yourValue);
+	     if(!containsAdv) {
+	    	 containsAdv=Arrays.asList(oRes).contains(yourValue);
+	    	 advParty="Res";
+	     }
+	     else {
+	    	 advParty="Pet";
+	     }
+	     if(containsAdv) {
+	    	 response1.setResponse("TRUE");
+	    	 response1.setData(advParty);
+	    	 response1.setModelData(cAdv);	    	 
+	    	 
+	     }
+	     else {
+	    	 response1.setResponse("FALSE");
+	     }
+	     
+	     String jsonData = cm.convert_to_json(response1);
+			return jsonData;
+		
+	}
+	
+	@RequestMapping(
+		    value = "/listingApplication/{Caseid}",
+		    method = RequestMethod.GET
+		)
+		public String listingApplication(
+		        @PathVariable("Caseid") Integer CaseId,
+		        HttpServletRequest request,HttpSession session) {
+		User user = (User) session.getAttribute("USER");
+		System.out.println("User==========" +user.getUm_fullname());
+		/*request.setAttribute("user", user.getUm_fullname());
+		request.setAttribute("role", user.getUsername());*/
+		
+
+        RestTemplate restTemplate = new RestTemplate();
+        
+
+        String externalApi =
+            "http://192.168.0.114/testapi/API/CaseStatus/CaseDetailsByCaseId";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("Caseid", String.valueOf(CaseId)); // send as string if API expects string
+        
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+        
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                externalApi,
+                entity,
+                String.class
+                
+        );       
+        
+        ObjectMapper mapper = new ObjectMapper();
+
+     // Option 1: ignore unknown fields
+     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+     	
+     	CaseDetailsCcms caseDetails = null;
+     try {
+    	 String json = response.getBody();
+		caseDetails = mapper.readValue(json, CaseDetailsCcms.class);
+	
+	} catch (JsonProcessingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+     	
+        // 5. Print response for debugging
+        System.out.println("API Response: " + caseDetails);  
+        String caseSplit[] = caseDetails.getDisplayCaseno().split("/");      
+               
+        request.setAttribute("caseData", caseDetails);
+        request.setAttribute("caseSplit", caseSplit);
+       // model.addAttribute("caseData", caseDetails);
+
+        return "/listingApplication/listingApplication";
+    }
+
+	
+	
+	@RequestMapping(value = "/getPetDoc/{id}", method = RequestMethod.GET)
+	public @ResponseBody String getPetDoc(@PathVariable("id") Long docId,HttpSession session) 
+	{
+		User user = (User) session.getAttribute("USER");
+		ActionResponse<RegisteredCaseDetails> response = new ActionResponse<RegisteredCaseDetails>();
+		CaseFileDetail fd=applicationService.getCaseFile(docId);
+		String jsonData = "";
+		/*Object[] types = noticeService.getCaseDetails("WRIC", 1, 2022);*/
+		
+		
+		RestTemplate restTemplate = new RestTemplate();
+		 HttpHeaders headers = new HttpHeaders();
+		 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		 MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+		 
+		 map.add("CaseType",fd.getCaseType().getCt_ccms_id().toString());
+		 map.add("CaseNumber", fd.getFd_case_no());
+		 map.add("CaseYear",fd.getFd_case_year().toString());
+		 
+		 HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(map, headers);
+		 
+			
+
+		 
+		 HttpEntity<Object> response1 =
+		     restTemplate.exchange("http://192.168.0.114/testapi/API/CaseStatus/BriefCaseDetailsByTypeNoYear",
+		                           HttpMethod.POST,
+		                           entity,
+		                           Object.class);
+		 
+		 Object caseIntial=(Object) response1.getBody();
+			
+		 ObjectMapper m = new ObjectMapper();
+		 m.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		 CcmsCaseDetails props = m.convertValue(caseIntial, CcmsCaseDetails.class);
+		 
+		 if(props.getCase_id()!="" && fd.getFd_first_petitioner()!="") {
+			 String[] parties = props.getParty_Name().split("\\s+VS");
+			 fd.setFd_first_petitioner(parties[0]);
+			 fd.setFd_first_respondent(parties[1]);
+			 fd.setFd_cino(props.getCINO().trim());
+			 fd.setFd_ccms_case_id(Long.parseLong(props.getCase_id().trim()));
+			 fd =applicationService.save(fd);
+		 }
+		 
+		 /*if(props.getIsCaseConverted().trim().equals("Y")) {*/
+		 if(true) {
+			 HttpHeaders headers2 = new HttpHeaders();
+			 headers2.setContentType(MediaType.APPLICATION_JSON);
+			 
+			 String reqString="{\"Cino\":\""+props.getCINO().trim()+"\"}";
+			 HttpEntity<String> reqEntity =new HttpEntity<>(reqString,headers2);
+			 ResponseEntity<Object> response2 =
+				     restTemplate.exchange("http://192.168.0.114/ccmsapi/api/DisplayBoard/GetCaseConversionDetail",
+				                           HttpMethod.POST,
+				                           reqEntity,
+				                           Object.class);
+			 /*if(response2.getStatusCode()) {
+				 
+			 }*/
+			 
+			 List<Object> caseConv=(List<Object>)response2.getBody();
+				
+			 ObjectMapper m2 = new ObjectMapper();
+			 m2.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+			 if(caseConv.size()!=0) {
+			 CaseConversionCCmc props2 = m2.convertValue(caseConv.get(0), CaseConversionCCmc.class);
+			 CaseType ct=applicationService.getCaseType(Integer.parseInt(props2.getOldregcase_type()));
+			 fd.setFd_old_case_type(ct.getCt_id());
+			 fd.setFd_old_case_no(props2.getOldreg_no());
+			 fd.setFd_old_case_year(Integer.parseInt(props2.getOldreg_year()));
+			 
+			 
+			 CaseFileDetail fdOld=applicationService.getCaseFileOld(fd);
+			 
+			 if(fdOld!=null) {
+				 fd.setFd_id_old(fdOld.getFd_id());
+			 }
+			 
+			 fd=applicationService.save(fd);
+			 }
+			 
+			 
+		 }
+		
+		RegisteredCaseDetails rcd=new RegisteredCaseDetails();
+		
+		
+		 RestTemplate restTemplate1 = new RestTemplate();
+		  
+		  ObjectMapper mapper = new ObjectMapper();
+
+		     // Option 1: ignore unknown fields
+		     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	        
+
+
+	        HttpHeaders headers1 = new HttpHeaders();
+	        headers1.setContentType(MediaType.APPLICATION_JSON);
+	        
+	        Map<String, Object> requestBody = new HashMap<>();
+	        requestBody.put("Caseid", String.valueOf(fd.getFd_ccms_case_id())); // send as string if API expects string
+	        
+	        HttpEntity<Map<String, Object>> entity1 = new HttpEntity<>(requestBody, headers1);
+		
+		String externalApi="http://192.168.0.114/testapi/API/CaseStatus/AdvocateDetailsByCaseId";
+	     
+		ResponseEntity<Object> response2 = restTemplate1.postForEntity(
+	             externalApi,
+	             entity1,
+	             Object.class
+	             
+	     );     
+	     
+	     Object t= response2.getBody();
+	     
+	     CcmsAdvoates cAdv=mapper.convertValue(t, CcmsAdvoates.class);
+	     Object[] oPet=cAdv.getPetAdvocate().split(",");
+	     Object[] oRes=cAdv.getResAdvocate().split(",");
+	     String advParty=null;
+	     
+	     String  yourValue=user.getUm_fullname()+"("+user.getUsername()+" )";
+	     
+	     boolean containsAdv=Arrays.asList(oPet).contains(yourValue);
+	     if(!containsAdv) {
+	    	 containsAdv=Arrays.asList(oRes).contains(yourValue);
+	    	 advParty="Res";
+	     }
+	     else {
+	    	 advParty="Pet";
+	     }
+	     if(containsAdv) {
+	    	 rcd=applicationService.getPetFile(fd);
+				response.setData("TRUE");
+				response.setModelData(rcd);
+	     }
+	     else {
+				response.setData("False");
+				//response.setModelData(rcd);
+			}
+
+		
+		
+
+		/*List<Long> u=applicationService.getDocUsers(docId);
+		u.addAll(applicationService.getOldCaseDocUsers(fd.getFd_id_old()));
+		
+		Long petU=applicationService.getPetUser(fd);
+		if(petU==null) {
+			petU=applicationService.getPetUserOldCase(fd);
+		}
+		u.add(petU);
+		
+		if(u.contains(user.getUm_id())) {
+			rcd=applicationService.getPetFile(fd);
+			response.setData("TRUE");
+			response.setModelData(rcd);
+		}
+		else {
+			response.setData("False");
+			//response.setModelData(rcd);
+		}
+		 */
+		
+		/*List<Object> jgNmae = noticeService.getJudgeName(types[8].toString());*/
+		
+		
+		//response.setModelList(apDocs);
+		
+		
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
 	}
 	
 	
