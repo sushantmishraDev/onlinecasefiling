@@ -145,12 +145,12 @@ if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
 							<span>Filed Cases/Applications</span>
 							</a>
 					</li>
-					<%-- <li class="has-sub <%=listingapplication%>">
+					<li class="has-sub <%=listingapplication%>">
 						<a href="${pageContext.request.contextPath}/searchcasefile/listingApplication">
 						<i class="fa fa-file-o"></i>
 							<span>Template For Listing Application</span>
 							</a>
-					</li> --%>
+					</li>
 					<li class="has-sub <%=amendmenthistory %>">
 						<a href="${pageContext.request.contextPath}/amendmenthistory/manage">
 						<i class="fa fa-file-o"></i>
