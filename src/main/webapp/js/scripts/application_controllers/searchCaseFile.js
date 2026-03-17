@@ -347,6 +347,7 @@ $scope.generatePDF = function() {
 
 //  }, 300); // ⬅ wait for Angular DOM
 };
+
 $scope.generateODT1 = function()
 {
 
@@ -369,34 +370,171 @@ $scope.generateODT1 = function()
 	
 }
 
-$scope.generateODT = function(){
-    var element = document.getElementById('pdfPrep');
-    var nodes = element.children; // Only direct children
-    var paragraphs = [];
 
-    angular.forEach(nodes, function(node) {
-        var text = node.innerText || node.value || "";
-        text = text.trim();
-        if (text) {
-            // Escape XML special chars
-            text = text.replace(/&/g,"&amp;")
-                       .replace(/</g,"&lt;")
-                       .replace(/>/g,"&gt;");
-            // Wrap each text in <text:p>
-            paragraphs.push(text);
-        }
+$scope.generateODT = function () {
+
+    var element = document.getElementById("pdfPrep").cloneNode(true);
+
+    /* -------- REMOVE ANGULAR COMMENT NODES -------- */
+    var walker = document.createTreeWalker(
+        element,
+        NodeFilter.SHOW_COMMENT,
+        null,
+        false
+    );
+
+    var node;
+    var comments = [];
+
+    while (node = walker.nextNode()) {
+        comments.push(node);
+    }
+
+    comments.forEach(function(comment) {
+        comment.parentNode.removeChild(comment);
     });
 
-    var odtContent = 			        
-        paragraphs.join("\n"); 
+    /* -------- REMOVE ANGULAR ATTRIBUTES -------- */
+    var allElements = element.querySelectorAll("*");
 
-    var blob = new Blob([odtContent], { type: "application/vnd.oasis.opendocument.text" });
+    angular.forEach(allElements, function(el){
+
+        [].slice.call(el.attributes).forEach(function(attr){
+
+            if(attr.name.startsWith("ng-") ||
+               attr.name.startsWith("data-ng-") ||
+               attr.name.startsWith("x-ng-")){
+                el.removeAttribute(attr.name);
+            }
+
+        });
+
+        /* Remove Angular classes */
+        el.classList.remove("ng-scope","ng-binding","ng-isolate-scope");
+
+    });
+
+	/* -------- CONVERT TEXTAREA TO TEXT -------- */
+	var textareas = element.querySelectorAll("textarea");
+
+	angular.forEach(textareas, function (ta) {
+
+	    var div = document.createElement("div");
+
+	    var text = ta.value || ta.placeholder;
+
+	    div.innerText = text;
+
+	    div.style.whiteSpace = "pre-wrap";
+	    div.style.fontFamily = "Arial,Times New Roman, serif";
+	    div.style.fontSize = "14pt";
+	    div.style.lineHeight = "1.5";
+	    div.style.textAlign = "left";
+	    div.style.display = "block";
+	    div.style.letterSpacing = "1pt";
+
+	    /* Align with party name text */
+	  //  div.style.paddingLeft = "200px"; 
+		
+		  // adjust slightly if needed
+
+	    ta.parentNode.replaceChild(div, ta);
+
+	});
+
+    /* -------- REMOVE CONTENTEDITABLE -------- */
+    element.querySelectorAll("[contenteditable]").forEach(function(e){
+        e.removeAttribute("contenteditable");
+    });
+
+    /* -------- CLEAN INVISIBLE CHARACTERS -------- */
+    function cleanText(node){
+
+        node.innerHTML = node.innerHTML
+            .replace(/&nbsp;/g," ")
+            .replace(/\u00A0/g," ")
+            .replace(/\t/g," ")
+            .replace(/\u200B/g,"")
+            .replace(/\uFEFF/g,"");
+
+    }
+
+    cleanText(element);
+
+    /* -------- CREATE HTML FOR ODT -------- */
+    var html =
+        "<html><head><meta charset='utf-8'>" +
+        "<style>" +
+        "body{font-family:'Arial,Times New Roman',serif;font-size:14pt;line-height:1.5;letter-spacing: 1pt;}" +
+        "p{margin-bottom:10pt;margin-left:10pt;text-align:justify;}" +
+        ".center{text-align:center;}" +
+        ".right{text-align:right;}" +
+        ".page{page-break-before:always;}" +
+        ".no-break{page-break-inside:avoid;}" +
+        "</style>" +
+        "</head><body>" +
+        element.innerHTML +
+        "</body></html>";
+
+    /* -------- DOWNLOAD FILE -------- */
+    var blob = new Blob([html], {
+        type: "application/vnd.oasis.opendocument.text"
+    });
+
+    var link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+    link.download = "Listing_Application.odt";
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+};
+
+
+
+
+/*$scope.generateODT = function () {
+
+    var element = document.getElementById("pdfPrep").cloneNode(true);
+
+    // Convert textarea to paragraph
+    element.querySelectorAll("textarea").forEach(function(t){
+        var p = document.createElement("p");
+        p.innerHTML = (t.value || t.placeholder).replace(/\n/g,"<br>");
+        t.parentNode.replaceChild(p, t);
+    });
+
+    // Remove contenteditable
+    element.querySelectorAll("[contenteditable]").forEach(function(e){
+        e.removeAttribute("contenteditable");
+    });
+
+    // Wrap everything in a div that forces font
+    var content =
+        "<div style=\"font-family:Arial,'Times New Roman',serif;font-size:14pt;\">" +
+        element.innerHTML +
+        "</div>";
+
+    var html =
+        "<html><head><meta charset='utf-8'></head><body>" +
+        content +
+        "</body></html>";
+
+		var blob = new Blob([html], {
+		    type: "application/msword"
+		});
+
+		link.download = "Listing_Application.doc";
+
     var link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "Listing_Application.odt";
+    document.body.appendChild(link);
     link.click();
-};
-
+    document.body.removeChild(link);
+};*/
 		
 	 
 	 
