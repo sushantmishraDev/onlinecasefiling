@@ -21,7 +21,7 @@ EDMSApp.directive('loading', ['$http', function ($http) {
 
 
 
-EDMSApp.controller('draftViewController',['$scope','$http',function ($scope, $http) {
+EDMSApp.controller('draftViewController',      ['$scope','$http',function ($scope, $http) {
  
  
   var urlBase="/onlinecasefiling/"
@@ -42,6 +42,8 @@ EDMSApp.controller('draftViewController',['$scope','$http',function ($scope, $ht
   $scope.impugnedDataList=[];
   $scope.draftList=[];
   $scope.actDataList=[];
+  
+ 
  
  
   $scope.caseId= $('#caseId').val();
@@ -134,6 +136,86 @@ EDMSApp.controller('draftViewController',['$scope','$http',function ($scope, $ht
     	  }
       }
   
+	  /*=================================== Vijay  chaurasiya ==========================*/
+	  
+	  $scope.fd_id=0
+	
+	  $scope.caseType=0;
+	  $scope.caseNo=null;  $scope.caseYear=0;
+	  
+	  
+	  $scope.view = function(ct_id, case_no, case_year) {
+
+	      $http.get(urlBase + 'searchcasefile/searchCaseFile', {
+	          params: {
+	              case_year: case_year,
+	              case_type: ct_id,
+	              case_no: case_no
+	          }
+	      })
+	      .success(function (data) {
+
+	          if (data.response == "TRUE") {
+
+	              var fd_id = data.modelList[0].fd_id;
+
+	              console.log("FD_ID (before open):", fd_id);
+
+	              //  STORE
+	              sessionStorage.setItem("fd_id", fd_id);
+
+				 
+	              var url = urlBase + "ecourt/viewCasePage";
+	              window.open(url, "_blank");
+
+	          } else {
+	              alert("This Case is not Efiled");
+	          }
+	      });
+	  };
+	   
+	  
+	
+
+	
+	  
+	/*  function CopyDocument(document_name){ 
+		
+		
+		if(document_name!=null){
+			console.log("**************************document naem printed from copydocument"+document_name)
+			
+			
+		}
+		
+		var response = $http.get(urlBase+'scrutiny/copyFile',{params: {'pu_document_name': document_name+".pdf"}});
+				response.success(function(data, status, headers, config) {		
+					console.log(data);
+					if(data.data != null)
+					{
+						console.log("Your document pdf is copied successfully"+data.data)
+						var url = urlBase + 'uploads//' +data.data;
+							  
+							 
+							                PDFViewerApplication.open({
+							                    url: url
+							                });
+					}
+				});
+				response.error(function(data, status, headers, config) {
+					bootbox.alert("Error");
+				});
+		
+		
+	  }
+	  
+	  
+	  
+	  
+	  
+	  */
+	  
+	  
   function getDraftDetails(){
 	  	$http.get(urlBase+'ecourt/getDraftDetails').
       success(function (data) {
@@ -203,29 +285,6 @@ $http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
 });
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -349,8 +408,8 @@ $http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
 	
 
 
-
-
+	
+	
 
 
 
@@ -401,17 +460,12 @@ $http.get(urlBase+ 'ecourt_add_case/getRegisterCase', {
 	});
 
 }
-	
-	
-	
-	
-  
+	  
   
   */
   
-  
-  
-  
+
+
   
   
   

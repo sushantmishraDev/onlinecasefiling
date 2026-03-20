@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.dms.model.ActDetails;
@@ -134,6 +135,16 @@ public class EcourtHomeController {
 
 		return "/ecourt/caveatDraftForm";
 	}
+	
+	
+//	===================================
+	
+	@RequestMapping(value = "/viewCasePage", method = RequestMethod.GET)
+	public String viewCasePage() {
+
+	    return "/ecourt/viewCasePage";
+	}
+	
 
 	@RequestMapping(value = "/previewList/{id}", method = RequestMethod.GET)
 	public String draftView(Model model, @PathVariable Integer id) {

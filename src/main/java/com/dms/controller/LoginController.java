@@ -877,12 +877,9 @@ public class LoginController extends HttpServlet {
 	        String smsText = "Your OTP is " + otp +
 	                " for eFiling password change. Don't disclose to anyone";
 
-//	        String r1 = cm.sendSMS(smsUrl, mobile, smsText, otpTmpId);
-//	        String r2 = cm.sendBSNLSMS(smsUrl, mobile,
-	//                smsText + " - Allahabad High Court", otpTmpId);
-	        String r1="1";
-	        String r2="1";
-
+	        String r1 = cm.sendSMS(smsUrl, mobile, smsText, otpTmpId);
+	        String r2 = cm.sendBSNLSMS(smsUrl, mobile,smsText + " - Allahabad High Court", otpTmpId);
+	      
 	        if ("1".equals(r1) || "1".equals(r2)) {
 
 	            advResponse.setResponse("TRUE");

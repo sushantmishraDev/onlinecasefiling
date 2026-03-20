@@ -60,6 +60,7 @@
                                              <td>                               
 				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT' || row.caseStage.lk_id==1000041 " ng-click="viewDetails(row.rcd_id)">Edit</button>
 				                                 <button class="btn btn-success" ng-click="previewDetails(row.rcd_id)">Preview</button>
+				                                  <button class="btn btn-success" ng-click="view(row.caseType.ct_id,row.rcd_case_no,row.rcd_case_year)">View</button>
 				                                 <button class="btn btn-success" ng-if="row.caseStage.lk_longname=='DRAFT'|| row.caseStage.lk_id==1000041" ng-click="submitForm(row)">Submit</button>
                                         	 </td>
                                           </tr>

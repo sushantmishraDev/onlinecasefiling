@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
-encoding//src/main/webapp/WEB-INF/casefile/viewer.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/ecourt/notice.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/ecourt/viewCasePage.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/ecourt/viewer.jsp=UTF-8
 encoding//src/main/webapp/index.jsp=UTF-8

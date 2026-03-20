@@ -287,6 +287,80 @@ public class ScrutinyController
 		jsonData = cm.convert_to_json(response);
 		return jsonData;
 	}
+	
+	
+	
+	
+	
+	@RequestMapping(value="/copyApplicationFileNew",method=RequestMethod.GET)
+	@ResponseBody
+	public String copyApplicationFileNew(HttpServletRequest request) throws ParseException
+	{
+		String jsonData = null;
+		
+		String doc_name=request.getParameter("au_document_name");
+		
+		ActionResponse<IndexField> response= new ActionResponse<IndexField>();
+		
+		ApplicationUploaded au=scrutinyService.getApplicationUploaded(doc_name);
+	
+		/*Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		String draft_path=lookUp.getLk_longname();
+
+		File source = new File(draft_path+File.separator+doc_name);	*/
+		String uploadPath = context.getRealPath("");
+		/* doc_name="appl_"+doc_nam e; */
+		
+		
+		Lookup lookUp=lookupService.getLookUpObject("APPLICATION_PATH");	
+		String draft_path=lookUp.getLk_longname();	
+		
+		Lookup lookUpBck=lookupService.getLookUpObject("APPLICATION_BCKUP_PATH");	
+		
+		String draft_path_bck=lookUpBck.getLk_longname();
+
+		File source =null;
+		
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		//	 String bef=sdf.format("2020-01-01 00:00:00");
+		        
+		        Date dateBef = sdf.parse("2020-07-01 00:00:00");
+			
+			if(au.getAu_uploaded_date().before(dateBef)) {
+				source = new File(draft_path_bck+File.separator+doc_name);	
+			}
+			else {
+				source = new File(draft_path+File.separator+doc_name);	
+			}
+		
+		
+		File dest = new File(uploadPath+"/uploads/"+doc_name);
+
+		try {
+			    FileUtils.copyFile(source, dest);
+			    response.setResponse("TRUE");
+			    response.setData(doc_name);
+			} 
+			catch (IOException e) {
+			    e.printStackTrace();
+			    response.setResponse("FALSE");
+			}
+		jsonData = cm.convert_to_json(response);
+		return jsonData;
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@RequestMapping(value = "/getCheckList", method = RequestMethod.GET)
 	@ResponseBody

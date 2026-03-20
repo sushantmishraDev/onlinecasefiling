@@ -43,9 +43,12 @@ if (session.getAttribute("USER") != null)
 	min-height: 120pt;
 }
 
-.signature-block {
+#pdfPrep h4 {
+	page-break-after: avoid;
+}
+
+.signature-block{
 	page-break-inside: avoid;
-	break-inside: avoid;
 }
 
 #pdfPrep {
@@ -154,9 +157,11 @@ if (session.getAttribute("USER") != null)
 
 										<div style="margin: 10pt 0; line-height: 1.5;">
 											<textarea class="placeholder-text" ng-model="text"
-												style="width: 100%; word-spacing: 6pt; letter-spacing: 1pt; border: none; font-family: 'Arial', 'Times New Roman', serif; font-size: 14pt; line-height: 1.5; resize: none; page-break-inside: auto; overflow: hidden; text-align: justify;"
-												oninput="this.style.height='auto'; this.style.height=(this.scrollHeight > 300 ? 300 : this.scrollHeight)+'pt';"
-												placeholder="text to be filled ......."></textarea>
+style="width:100%;word-spacing:6pt;letter-spacing:1pt;border:none;
+font-family:'Arial','Times New Roman',serif;font-size:14pt;
+line-height:1.5;resize:none;overflow:visible;text-align:justify;"
+oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';"
+placeholder="text to be filled ......."></textarea>
 										</div>
 
 										<div
@@ -176,10 +181,10 @@ if (session.getAttribute("USER") != null)
 									</div>
 
 
-									<div style="page-break-before: always;"></div>
+									<!-- <div style="page-break-before: always;"></div> -->
 
 									<!-- <div class="page-break"></div> -->
-									<div style="page-break-before: always;"></div>
+									<!-- <div style="page-break-before: always;"></div> -->
 									<div class="prayer-block" contenteditable="true"
 										style="font-family: 'Arial', 'Times New Roman', serif; text-align: justify; line-height: 1.6; word-spacing: 6pt; letter-spacing: 1pt; padding-left: 10%; margin-right: 10pt;">
 
@@ -187,14 +192,14 @@ if (session.getAttribute("USER") != null)
 											style="text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 12pt;">
 											PRAYER</div>
 
-										&nbsp;&nbsp;&nbsp;&nbsp;It is therefore, most respectfully
+									<p>	&nbsp;&nbsp;&nbsp;&nbsp;It is therefore, most respectfully
 										prayed that this Hon'ble Court may graciously be pleased to
 										allow the present Application and to direct the office to list
 										the present case as early as possible by fixing any date.
 										And/or to pass any suitable order or direction to which this
 										Hon'ble Court may deem fit and proper in the interest of
 										justice.
-
+</p>
 									</div>
 
 

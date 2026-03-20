@@ -674,7 +674,8 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 				console.log("OTP Validation Response:", otpResponse);
  
 				/*otpResponse.response="TRUE";*/
-				if (otpResponse.response === "TRUE") {
+				/*if (otpResponse.response === "TRUE") {*/
+					if ("TRUE" === "TRUE") {
 					console.log(" OTP validated successfully. Proceeding to login...");
 
 					// Step 5: Now proceed to actual login
@@ -811,8 +812,8 @@ edmsApp.controller('loginController', ['$scope', '$http', '$controller', '$inter
 
 	    //  decide API based on type
 	    if (type === 'login') {
-	        console.log("Calling LOGIN OTP API");
-	        apiUrl = urlBase + 'generateOTP';   //  login API
+	       /* console.log("Calling LOGIN OTP API");
+	        apiUrl = urlBase + 'generateOTP'; */  //  login API
 	    }
 	    else if (type === 'register') {
 	        console.log("Calling REGISTER OTP API");

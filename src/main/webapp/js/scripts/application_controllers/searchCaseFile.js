@@ -292,61 +292,64 @@ EDMSApp.controller('searchCaseFileController',['$scope','$http','$q',function ($
 		}
 
 
-$scope.generatePDF = function() {
-	//  $timeout(function () {
+		$scope.generatePDF = function() {
+			//  $timeout(function () {
 
-    var element = document.getElementById('pdfPrep');
+		    var element = document.getElementById('pdfPrep');
 
-    var textareas = element.querySelectorAll("textarea");
-    var backup = [];
+		    var textareas = element.querySelectorAll("textarea");
+		    var backup = [];
 
-    angular.forEach(textareas, function (ta) {
-        var div = document.createElement("div");
-        div.innerText = ta.value || ta.placeholder;
-        div.style.whiteSpace = "pre-wrap";
-        div.style.fontFamily = "Arial,Times New Roman, serif";
-        div.style.wordSpacing = "6pt";
-        div.style.letterSpacing="1pt";
-        div.style.fontSize = "14pt";
-        div.style.lineHeight = "1.5";
-        div.style.pageBreakInside = "avoid";
-        div.style.display = "block";
-        div.style.textAlign= "justify";
-      //  div.style.pageBreakInside = "auto";
+		    angular.forEach(textareas, function (ta) {
+		        var div = document.createElement("div");
+		        div.innerText = ta.value || ta.placeholder;
+		        div.style.whiteSpace = "pre-wrap";
+		        div.style.fontFamily = "Arial,Times New Roman, serif";
+		        div.style.wordSpacing = "6pt";
+		        div.style.letterSpacing="1pt";
+		        div.style.fontSize = "14pt";
+		        div.style.lineHeight = "1.5";
+		        div.style.pageBreakInside = "avoid";
+		        div.style.display = "block";
+		        div.style.textAlign= "justify";
+		      //  div.style.pageBreakInside = "auto";
 
-        backup.push({ parent: ta.parentNode, ta: ta, div: div });
-        ta.parentNode.replaceChild(div, ta);
-    });
+		        backup.push({ parent: ta.parentNode, ta: ta, div: div });
+		        ta.parentNode.replaceChild(div, ta);
+		    });
 
-    var opt = {
-        margin: 10,
-        filename: 'Listing_Application.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: {
-            scale: 3,
-            useCORS: true,
-            scrollY: 0
-        },
-        jsPDF: {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait'
-        },
-        pagebreak: { mode: ['css', 'legacy'] }
-    };
+			var opt = {
+			    margin: [15,15,15,15],
+			    filename: 'Listing_Application.pdf',
+			    image: { type: 'jpeg', quality: 1 },
+			    html2canvas: {
+			        scale: 2,
+			        useCORS: true,
+			        scrollY: 0
+			    },
+			    jsPDF: {
+			        unit: 'mm',
+			        format: 'a4',
+			        orientation: 'portrait'
+			    },
+			    pagebreak: {
+			        mode: ['css']
+			    }
+			};
+		    html2pdf()
+		        .set(opt)
+		        .from(element)
+		        .save()
+		        .then(function () {
+		            angular.forEach(backup, function (b) {
+		                b.parent.replaceChild(b.ta, b.div);
+		            });
+		        });
 
-    html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(function () {
-            angular.forEach(backup, function (b) {
-                b.parent.replaceChild(b.ta, b.div);
-            });
-        });
-
-//  }, 300); // ⬅ wait for Angular DOM
-};
+		//  }, 300); // ⬅ wait for Angular DOM
+		};
+		
+		
 $scope.generateODT1 = function()
 {
 
@@ -407,48 +410,61 @@ $scope.generateODT = function () {
 
         });
 
-        /* Remove Angular classes */
         el.classList.remove("ng-scope","ng-binding","ng-isolate-scope");
 
     });
 
-	/* -------- CONVERT TEXTAREA TO TEXT -------- */
-	var textareas = element.querySelectorAll("textarea");
+    /* -------- CONVERT TEXTAREA TO TEXT -------- */
+    var textareas = element.querySelectorAll("textarea");
 
-	angular.forEach(textareas, function (ta) {
+    angular.forEach(textareas, function (ta) {
 
-	    var div = document.createElement("div");
+        var div = document.createElement("div");
 
-	    var text = ta.value || ta.placeholder;
+        div.className = "odt-text";
 
-	    div.innerText = text;
+        div.innerText = ta.value || ta.placeholder;
 
-	    div.style.whiteSpace = "pre-wrap";
-	    div.style.fontFamily = "Times New Roman, serif";
-	    div.style.fontSize = "14pt";
-	    div.style.lineHeight = "1.5";
-	    div.style.textAlign = "left";
-	    div.style.display = "block";
+        div.style.whiteSpace = "pre-wrap";
+        div.style.display = "block";
 
-	    /* Align with party name text */
-	    div.style.paddingLeft = "200px"; 
-		div.style.marginRight="50px";
-		  // adjust slightly if needed
+        div.style.fontFamily = "'Times New Roman', serif";
+        div.style.fontSize = "14pt";
+        div.style.lineHeight = "1.6";
+        div.style.wordSpacing = "4pt";
+        div.style.letterSpacing = "1pt";
+        div.style.textAlign = "justify";
 
-	    ta.parentNode.replaceChild(div, ta);
+        ta.parentNode.replaceChild(div, ta);
 
-	});
+    });
 
     /* -------- REMOVE CONTENTEDITABLE -------- */
     element.querySelectorAll("[contenteditable]").forEach(function(e){
         e.removeAttribute("contenteditable");
     });
+	
+	
+	/* -------- FIX INDENTATION FOR ODT -------- */
+	var paragraphs = element.querySelectorAll("p");
+
+	paragraphs.forEach(function(p){
+
+	    var text = p.innerHTML;
+
+	    if(text.startsWith("&nbsp;&nbsp;&nbsp;&nbsp;") || text.startsWith("    ")){
+	        p.style.marginLeft = "10pt";
+	        p.innerHTML = text.replace(/^(&nbsp;|\s)+/, "");
+	    }
+
+	});
+	
 
     /* -------- CLEAN INVISIBLE CHARACTERS -------- */
     function cleanText(node){
 
         node.innerHTML = node.innerHTML
-            .replace(/&nbsp;/g," ")
+             .replace(/&nbsp;/g," ")
             .replace(/\u00A0/g," ")
             .replace(/\t/g," ")
             .replace(/\u200B/g,"")
@@ -460,18 +476,39 @@ $scope.generateODT = function () {
 
     /* -------- CREATE HTML FOR ODT -------- */
     var html =
-        "<html><head><meta charset='utf-8'>" +
-        "<style>" +
-        "body{font-family:'Times New Roman',serif;font-size:14pt;line-height:1.5;}" +
-        "p{margin-bottom:10pt;margin-left:8pt;text-align:justify;}" +
-        ".center{text-align:center;}" +
-        ".right{text-align:right;}" +
-        ".page{page-break-before:always;}" +
-        ".no-break{page-break-inside:avoid;}" +
-        "</style>" +
-        "</head><body>" +
-        element.innerHTML +
-        "</body></html>";
+    "<html><head><meta charset='utf-8'>" +
+    "<style>" +
+
+    "body{" +
+    "font-family:'Times New Roman',serif;" +
+    "font-size:14pt;" +
+    "line-height:1.6;" +
+    "text-align:justify;" +
+    "}" +
+
+    ".odt-text{" +
+    "font-family:'Times New Roman',serif;" +
+    "font-size:14pt;" +
+    "line-height:1.6;" +
+    "word-spacing:4pt;" +
+    "letter-spacing:1pt;" +
+    "text-align:justify;" +
+    "margin-top:10pt;" +
+    "white-space:pre-wrap;" +
+    "}" +
+
+    "p{" +
+    "margin-bottom:10pt;" +
+    "word-spacing:4pt;" +
+    "letter-spacing:1pt;" +
+    "text-align:justify;" +
+    "}" +
+
+    "ol{margin-left:20pt;}" +
+
+    "</style></head><body>" +
+    element.innerHTML +
+    "</body></html>";
 
     /* -------- DOWNLOAD FILE -------- */
     var blob = new Blob([html], {
@@ -486,9 +523,7 @@ $scope.generateODT = function () {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
 };
-
 $scope.searchCaseFile = function () {
 
     $http.get(urlBase + 'searchcasefile/searchCaseFile', {
