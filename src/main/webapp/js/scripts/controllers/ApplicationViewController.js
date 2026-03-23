@@ -67,6 +67,10 @@ function ($scope, $http, $timeout) {
             var data = response.data;
 
             $scope.List = data.modelList || [];
+			
+			$scope.List.sort(function (a, b) {
+			    return a.ap_cr_date - b.ap_cr_date; // ascending
+			});
 
             // Copy in background (no open)
             angular.forEach($scope.List, function (item) {
