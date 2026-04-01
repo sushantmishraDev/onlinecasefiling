@@ -13,6 +13,28 @@
 <link rel='stylesheet' href='${pageContext.request.contextPath}/css/editor.css'>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Allahabad High Court e-Filing</title>
+<style>
+
+
+#outlineView {
+    padding: 8px;
+    font-size: 13px;
+}
+
+#outlineView a {
+    display: block;
+    padding: 4px 8px;
+    color: #fff;
+    text-decoration: none;
+}
+
+#outlineView a:hover {
+    background-color: #444;
+    border-left: 3px solid #00bfff;
+}
+</style>
+
+
 
  <%@ include file="style.jsp"%>
 <%@ include file="script.jsp"%>
@@ -95,7 +117,7 @@ if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
 		<!-- end #header -->
 		
 		<!-- begin #sidebar -->
-		<div id="sidebar" class="sidebar">
+		<div id="sidebar" class="sidebar" style="width: 210px;">
 			<!-- begin sidebar scrollbar -->
 			<div data-scrollbar="true" data-height="100%">
 				
@@ -199,9 +221,72 @@ if(uri.equals("/onlinecasefiling/defectRemovalByOrder/manage"))
 			<!-- end sidebar scrollbar -->
 		</div>
 		
+		<div id="sidebarContent" style=" margin-top: 19px; position:fixed; background-color:black;" >
+		
+		 <div id="outlineView" class="hidden" width ="105px" style="text-decoration-none;"></div>
+		
+		
 		<!-- end #sidebar -->
 		
 		<!-- begin #content -->
-			
+		</div>
+		</div>
+		</body>
+		</html>	
 	<!-- ================== END PAGE LEVEL JS ================== -->
+<script>
+	function right() {
+		document.getElementById("sidebar").style.width = 0 + "px";
+		document.getElementById("content").style.marginLeft = "0px";
+		document.getElementById("content").style.marginRight = "220px";
+		document.getElementById("sidebarContent").style.right = "0";
+		document.getElementById("sidebar").style.left = null;
+		document.getElementById("sidebar").style.right = "0";
+		document.getElementById("sidebar").style.width = 220 + "px";
+		$('#myDiv').each(function () {
+		    if (!$(this).text().match(/^\s*$/)) {
+		        $(this).insertBefore($(this).prev('#metaDataPanel'));
+		    }
+		});
+	}
 
+	function left() {
+		document.getElementById('sidebar').style.width = "0px";
+		document.getElementById('sidebar').style.right = null;
+		document.getElementById("sidebar").style.left = "0";
+		document.getElementById('sidebarContent').style.right = null;
+		document.getElementById('content').style.marginLeft = "220px";
+		document.getElementById('content').style.marginRight = "0px";
+		document.getElementById('sidebar').style.width =210 + "px";
+		$('#metaDataPanel').each(function () {
+		    if (!$(this).text().match(/^\s*$/)) {
+		        $(this).insertBefore($(this).prev('#myDiv'));
+		    }
+		});
+	}
+	
+	
+	function slide(){
+		console.log(document.getElementById('slide').checked);
+		const lf=document.getElementById('slide').checked==true;
+		if(lf==true){
+			right()
+			setCookie('slide', 1, 365);
+		}
+		else{
+			left()
+			setCookie('slide', 2, 365);
+		}
+	}
+	
+	window.addEventListener('load', function () {
+		// show()
+		})
+	
+	
+		
+		
+	
+</script>
+	
+	

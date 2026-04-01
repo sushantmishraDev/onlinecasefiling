@@ -251,7 +251,7 @@ EDMSApp.controller('draftViewController',      ['$scope','$http',function ($scop
 
 
 $scope.previewDetails=function(id){
-window.open(urlBase+"ecourt/previewList/"+id,'_self');
+window.open(urlBase+"ecourt/previewList/"+id,'_blank');
 }
 
 

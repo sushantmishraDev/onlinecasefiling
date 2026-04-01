@@ -1,149 +1,219 @@
 var EDMSApp = angular.module('EDMSApp', ['ui.bootstrap']);
 
 EDMSApp.controller('ApplicationViewController', ['$scope', '$http', '$timeout',
-function ($scope, $http, $timeout) {
+	function($scope, $http, $timeout) {
 
-    var urlBase = "/onlinecasefiling/";
+		var urlBase = "/onlinecasefiling/";
 
-    // ================= INIT =================
-    $scope.List = [];
-    $scope.Petition = null;
-    $scope.fd_id = null;
+		// ================= INIT =================
+		$scope.List = [];
+		$scope.Petition = null;
+		$scope.fd_id = null;
 
-    // ================= INIT PAGE =================
-    $scope.initViewPage = function () {
 
-        var fd_id = sessionStorage.getItem("fd_id");
+		var bookMarkToggle = false;
+		var count = 0;
 
-        if (!fd_id) {
-            console.log("No fd_id found");
-            return;
-        }
+		var myVar1 = setInterval(booMarkShowFunction, 600);
 
-        $scope.fd_id = fd_id;
+		function booMarkShowFunction() {
+			count++;
 
-        // Load data
-        $scope.getPetDoc();
-        $scope.getDocList();
-    };
+			var outlineView = document.getElementById('outlineView');
 
-    // ================= GET PETITION =================
-    $scope.getPetDoc = function () {
+			console.log("===========================outlineView", outlineView);
 
-        $http.get(urlBase + 'application/getPetDoc/' + $scope.fd_id)
-        .then(function (response) {
+			if (outlineView.hasChildNodes()) {
 
-            var data = response.data;
 
-            if (!data.modelData) return;
+				document.getElementById("sidebarContent").hidden = true;
 
-            var draftNo = data.modelData.rcd_draft_no;
+				if (document.getElementById("sidebarContent").hidden == true) {
 
-            if (draftNo) {
+					document.getElementById("sidebarContent").hidden = false;
+					document.getElementById("sidebar").hidden = true;
+					outlineView.classList.remove('hidden');
+					bookMarkToggle = true;
+					clearInterval(myVar1);
 
-                $scope.Petition = draftNo;
+				}
+				else {
 
-                //  Wait for copy → then open PDF
-                copyDocument(draftNo).then(function () {
+					document.getElementById("sidebarContent").hidden = true;
+					document.getElementById("sidebar").hidden = false;
 
-                    $timeout(function () {
-                        openPDF("case_" + draftNo + ".pdf");
-                    }, 300); // small delay for safety
 
-                });
-            }
 
-        }).catch(function () {
-            console.log("Error fetching petition");
-        });
-    };
+				}
 
-    // ================= GET APPLICATION LIST =================
-    $scope.getDocList = function () {
 
-        $http.get(urlBase + 'application/getDocList/' + $scope.fd_id)
-        .then(function (response) {
 
-            var data = response.data;
+			}
+			else if (bookMarkToggle) {
 
-            $scope.List = data.modelList || [];
-			
-			$scope.List.sort(function (a, b) {
-			    return a.ap_cr_date - b.ap_cr_date; // ascending
+				document.getElementById("sidebar").hidden = false;
+				document.getElementById("sidebarContent").hidden = true;
+				outlineView.classList.add('hidden');
+				bookMarkToggle = false;
+				clearInterval(myVar1);
+			}
+			else if (count > 10) {
+				console.log("counttttttttttttttttttttttt", count);
+				document.getElementById("sidebar").hidden = false;
+				document.getElementById("sidebarContent").hidden = true;
+				outlineView.classList.add('hidden');
+				count = 0;
+				clearInterval(myVar1);
+
+			}
+			/*else if(!bookMarkToggle) {
+				console.log("do nothinggggggggggggg");
+				document.getElementById("sidebar").hidden=false;
+				document.getElementById("sidebarContent").hidden=true;
+				outlineView.classList.add('hidden');
+				clearInterval(myVar1);
+				
+			}*/
+
+
+		}
+
+
+
+		// ================= INIT PAGE =================
+		$scope.initViewPage = function() {
+
+			var fd_id = sessionStorage.getItem("fd_id");
+
+			if (!fd_id) {
+				console.log("No fd_id found");
+				return;
+			}
+
+			$scope.fd_id = fd_id;
+
+			// Load data
+			$scope.getPetDoc();
+			$scope.getDocList();
+		};
+
+		// ================= GET PETITION =================
+		$scope.getPetDoc = function() {
+
+			$http.get(urlBase + 'application/getPetDoc/' + $scope.fd_id)
+				.then(function(response) {
+
+					var data = response.data;
+
+					if (!data.modelData) return;
+
+					var draftNo = data.modelData.rcd_draft_no;
+
+					if (draftNo) {
+
+						$scope.Petition = draftNo;
+
+						//  Wait for copy → then open PDF
+						copyDocument(draftNo).then(function() {
+
+							$timeout(function() {
+								openPDF("case_" + draftNo + ".pdf");
+							}, 300); // small delay for safety
+
+						});
+					}
+
+				}).catch(function() {
+					console.log("Error fetching petition");
+				});
+		};
+
+		// ================= GET APPLICATION LIST =================
+		$scope.getDocList = function() {
+
+			$http.get(urlBase + 'application/getDocList/' + $scope.fd_id)
+				.then(function(response) {
+
+					var data = response.data;
+
+					$scope.List = data.modelList || [];
+
+					$scope.List.sort(function(a, b) {
+						return a.ap_cr_date - b.ap_cr_date; // ascending
+					});
+
+					// Copy in background (no open)
+					angular.forEach($scope.List, function(item) {
+						if (item.ap_draft_no) {
+							copyApplicationFile(item.ap_draft_no + ".pdf");
+						}
+					});
+
+				}).catch(function() {
+					console.log("Error fetching doc list");
+				});
+		};
+
+		// ================= CLICK TO OPEN =================
+		$scope.showSubDocument = function(fileName) {
+
+			if (!fileName) {
+				console.log("No file selected");
+				return;
+			}
+
+			// Remove .pdf if already added
+			if (!fileName.endsWith(".pdf")) {
+				fileName = fileName + ".pdf";
+			}
+
+			openPDF(fileName);
+		};
+
+		// ================= COPY PETITION =================
+		function copyDocument(fileName) {
+
+			return $http.get(urlBase + 'scrutiny/copyFile', {
+				params: { pu_document_name: fileName + ".pdf" }
+			})
+				.then(function(res) {
+					console.log("Petition Copied:", res.data);
+				})
+				.catch(function() {
+					console.log("Copy failed:", fileName);
+				});
+		}
+
+		// ================= COPY APPLICATION =================
+		function copyApplicationFile(fileName) {
+
+			return $http.get(urlBase + 'scrutiny/copyApplicationFileNew', {
+				params: { au_document_name: fileName }
+			})
+				.then(function(res) {
+					console.log("Application Copied:", res.data);
+				})
+				.catch(function() {
+					console.log("Copy failed:", fileName);
+				});
+		}
+
+		// ================= OPEN PDF =================
+		function openPDF(file) {
+
+			var url = urlBase + 'uploads/' + file;
+
+			pdfjsLib.GlobalWorkerOptions.workerSrc =
+				window.location.origin + '/onlinecasefiling/js/pdfjs-3.4.120/build/pdf.worker.js';
+
+			console.log("Opening PDF:", url);
+
+			PDFViewerApplication.open({
+				url: url
 			});
+		}
 
-            // Copy in background (no open)
-            angular.forEach($scope.List, function (item) {
-                if (item.ap_draft_no) {
-                    copyApplicationFile(item.ap_draft_no + ".pdf");
-                }
-            });
+		// ================= INIT CALL =================
+		$scope.initViewPage();
 
-        }).catch(function () {
-            console.log("Error fetching doc list");
-        });
-    };
-
-    // ================= CLICK TO OPEN =================
-    $scope.showSubDocument = function (fileName) {
-
-        if (!fileName) {
-            console.log("No file selected");
-            return;
-        }
-
-        // Remove .pdf if already added
-        if (!fileName.endsWith(".pdf")) {
-            fileName = fileName + ".pdf";
-        }
-
-        openPDF(fileName);
-    };
-
-    // ================= COPY PETITION =================
-    function copyDocument(fileName) {
-
-        return $http.get(urlBase + 'scrutiny/copyFile', {
-            params: { pu_document_name: fileName + ".pdf" }
-        })
-        .then(function (res) {
-            console.log("Petition Copied:", res.data);
-        })
-        .catch(function () {
-            console.log("Copy failed:", fileName);
-        });
-    }
-
-    // ================= COPY APPLICATION =================
-    function copyApplicationFile(fileName) {
-
-        return $http.get(urlBase + 'scrutiny/copyApplicationFileNew', {
-            params: { au_document_name: fileName }
-        })
-        .then(function (res) {
-            console.log("Application Copied:", res.data);
-        })
-        .catch(function () {
-            console.log("Copy failed:", fileName);
-        });
-    }
-
-    // ================= OPEN PDF =================
-    function openPDF(file) {
-
-        var url = urlBase + 'uploads/' + file;
-
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            window.location.origin + '/onlinecasefiling/js/pdfjs-3.4.120/build/pdf.worker.js';
-
-        console.log("Opening PDF:", url);
-
-        PDFViewerApplication.open({
-            url: url
-        });
-    }
-
-    // ================= INIT CALL =================
-    $scope.initViewPage();
-
-}]);
+	}]);

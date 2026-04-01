@@ -21,12 +21,50 @@
 	src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/web/viewer.js?v=3"></script>
 
 
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/scripts/controllers/ApplicationViewController.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/apps.min.js"></script>
+
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>
+
+<style>
+.no-padding {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+
+/* ------------------------------ */
+</style>
+
+
+
+<script>
+	$(document).ready(function() {
+		var a = 10006;
+		$(document.body).on('mousedown', '.modal-header', function() {
+			$(".modal-content").resizable().find('.close').click(function(e) {
+				$(this).parent().parent().remove();
+			});
+		});
+
+	});
+	//,stack: ".myform div"
+</script>
+
+
+<!--========================================== VIJAY CHAURASIYA  =========================== -->
+
 <div ng-app="EDMSApp" ng-controller="ApplicationViewController">
 
 	<div class="row">
-         
-         <div class="col-md-2"></div>
-		<div class="col-md-3">
+
+		<div class="col-md-2 no-padding"">
+			<!-- PDF Bookmarks will appear here -->
+			<div id="" style="margin-top: 10px;"></div>
+		</div>
+
+		<div class="col-md-3 no-padding"">
 			<div class="panel-group" id="accordion">
 				<div class="panel panel-inverse overflow-hidden">
 					<div class="panel-heading">
@@ -86,9 +124,11 @@
 				</div>
 				<!-- ============================== Misc Application============================== -->
 
-				<div class="panel panel-inverse overflow-hidden">
-					<div class="panel-heading">
-						<h3 class="panel-title">
+				<div ng-show="List.length > 0"
+					class="panel panel-inverse overflow-hidden">
+
+					<div class="panel-heading" style="padding: 6px 10px;">
+						<h3 class="panel-title" style="font-size: 14px; margin: 0;">
 							<a class="accordion-toggle accordion-toggle-styled"
 								data-toggle="collapse" data-parent="#accordion"
 								href="#collapseThree"> <i
@@ -96,52 +136,84 @@
 							</a>
 						</h3>
 					</div>
+
 					<div id="collapseThree" class="panel-collapse collapse in">
 						<div class="panel-body"
-							style="padding: 2px; max-height: 450px; overflow: auto;">
-							<div class="table-responsive">
-								<table class="table table-bordered">
+							style="padding: 2px; max-height: 450px; overflow: auto; font-size: 12px;">
 
-									<thead>
+							<div class="table-responsive">
+
+								<table class="table table-bordered table-condensed"
+									style="margin-bottom: 0;">
+
+									<thead style="font-size: 12px;">
 										<tr>
-											<th>Sr No</th>
-											<th>Type</th>
-											<th>Name</th>
-											<th>Counsel</th>
+											<th style="width: 5%; padding: 4px;">Sr.</th>
+											<th style="padding: 4px;">Type</th>
+											<th style="padding: 4px;">Name</th>
+											<th style="padding: 4px;">Counsel</th>
 										</tr>
 									</thead>
 
 									<tbody>
-										<tr ng-repeat="data in List">
+										<tr ng-repeat="data in List"
+											ng-style="data.checked==true ? personColour : ''"
+											style="line-height: 1.2;">
 
-											<td>{{$index+1}}</td>
+											<!-- Sr No -->
+											<td style="padding: 3px;">{{$index + 1}}</td>
 
-											<td><span ng-click="showSubDocument('appl_' + data.ap_draft_no)"
-												style="text-decoration: underline; cursor: pointer;">
-													<b>{{data.applicationType.at_name}} <br />
-
+											<!-- Type -->
+											<td style="padding: 3px; width: 35%;"><span
+												ng-click="showSubDocument(data.ap_draft_no)"
+												style="text-decoration: underline; cursor: pointer; font-size: 12px;">
+													<b> {{data.applicationType.at_name}}<br />
+														{{data.ap_draft_no}}
 												</b>
-											</span></td>
+											</span> <!-- Sub apps -->
+												<div ng-repeat="sb in data.subApplications"
+													style="font-size: 11px; line-height: 1.1;"
+													ng-click="showSubDocument(data.ap_draft_no)">
+													{{sb.applicationType.at_name}}<br />
+													{{sb.sb_ap_no}}/{{sb.sb_ap_year}}
+												</div> <!-- Icons -->
+												<div style="margin-top: 2px;">
+													<span ng-if="data.ap_draft_no"
+														class="glyphicon glyphicon-folder-open"
+														style="cursor: pointer; font-size: 12px;"
+														ng-click="showdemo(data)"> </span> <span
+														ng-if="data.ap_draft_no"
+														class="glyphicon glyphicon-new-window"
+														style="cursor: pointer; float: right; font-size: 12px;"
+														ng-click="caseTab(data.ap_draft_no, $index, List)">
+													</span> <span style="float: right; margin-right: 6px;"> <input
+														type="checkbox" ng-model="data.checkBoxValue"
+														ng-click="checkHighlight(data)">
+													</span>
+												</div></td>
 
-											<td>{{data.ap_applicant_name}}</td>
+											<!-- Name -->
+											<td style="padding: 3px; font-size: 12px;">
+												{{data.ap_applicant_name}}</td>
 
-											<td>{{data.userFiled.um_fullname}}</td>
+											<!-- Counsel -->
+											<td style="padding: 3px; font-size: 12px;">
+												{{data.userFiled.um_fullname}}</td>
 
 										</tr>
-
 									</tbody>
 
 								</table>
+
 							</div>
 						</div>
 					</div>
 				</div>
-
 			</div>
 
 		</div>
 
-		<div class="col-md-7">
+		<div class="col-md-7 no-padding"">
 
 
 			<jsp:include page="viewer2.jsp"></jsp:include>
@@ -158,7 +230,7 @@
 
 
 
-
+<!--========================================== VIJAY CHAURASIYA  =========================== -->
 
 </body>
 <link rel='stylesheet'
@@ -166,88 +238,16 @@
 
 
 
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/scripts/controllers/ApplicationViewController.js"></script>
+
 
 <script src="${pageContext.request.contextPath}/assets/js/apps.min.js"></script>
 
 
-<script
-	src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/build/pdf.js"></script>
-<script
-	src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/web/viewer.js"></script>
 
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/Smart-Table-master/dist/smart-table.js"></script>
 
-<style>
-.st-sort-ascent:before {
-	content: '\25B2';
-}
 
-.st-sort-descent:before {
-	content: '\25BC';
-}
-/* 
-/* 	     */
-.sidenav {
-	height: 100%;
-	width: 100%;
-	position: fixed;
-}
-
-textarea {
-	height: 100%;
-	width: 100%;
-	font-size: 28px;
-	border-style: none;
-	border-color: Transparent;
-}
-
-.ui-widget.sidenav-dialog {
-	font-family: Verdana, Arial, sans-serif;
-	font-size: 1em;
-}
-
-.ui-widget-content.sidenav-dialog {
-	background: #F9F9F9;
-	border: 1px solid #90d93f;
-	color: #222222;
-}
-
-.ui-dialog.sidenav-dialog {
-	left: 0;
-	outline: 0 none;
-	padding: 0 !important;
-	position: absolute;
-	top: 0;
-}
-
-.ui-dialog.sidenav-dialog .ui-dialog-content {
-	background: none repeat scroll 0 0 transparent;
-	border: 0 none;
-	overflow: auto;
-	position: relative;
-	padding: 0 !important;
-	margin: 0;
-}
-
-.ui-dialog.sidenav-dialog .ui-widget-header {
-	background: #b0de78;
-	border: 0;
-	color: #fff;
-	font-weight: normal;
-}
-
-.ui-dialog.sidenav-dialog .ui-dialog-titlebar {
-	padding: 0.1em .5em;
-	position: relative;
-	font-size: 1em;
-	color: #191919 !important;
-}
-/*Sushant  */
-/* ------------------------------ */
-</style>
 
 <script>
 	$(document).ready(function() {
@@ -257,16 +257,16 @@ textarea {
 
 	$(function() {
 		$("#mySidenav").dialog({
-		    autoOpen: false, //  IMPORTANT
-		    height: 200,
-		    width: 350,
-		    resizable: true,
-		    position: {
-		        my: "left top",
-		        at: "right bottom"
-		    },
-		    dialogClass: 'no-close sidenav-dialog'
-		});
+			autoOpen : false,
+			height : 200,
+			width : 350,
+			resizable : true,
+			position : {
+				my : "left top",
+				at : "right bottom"
+			},
+			dialogClass : 'no-close sidenav-dialog'
+		})
 		/* 
 					.parent().draggable({
 		             containment: '#content'
@@ -319,18 +319,6 @@ textarea {
 </script>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/scripts/controllers/ApplicationViewController.js"></script>
 <script type="text/javascript"
@@ -340,6 +328,11 @@ textarea {
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/angularJs/angular-tree-control.js"></script>
 
+
+
+<script>
+	
+</script>
 
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/assets/js/apps.min.js"></script>
