@@ -134,15 +134,17 @@ public class ScrutinyController
 		
 		Lookup lookUpBck=lookupService.getLookUpObject("DRAFT_PATH_BCKUP");	
 		
-		/*
-		 * String draft_path=lookUp.getLk_longname();
-		 * 
-		 * String draft_path_bck=lookUpBck.getLk_longname();
-		 */
 		
-		String draft_path = "D:/test/files";
-		String draft_path_bck = "D:/test/files_bck";
-
+		  String draft_path=lookUp.getLk_longname();
+		  
+		  String draft_path_bck=lookUpBck.getLk_longname();
+		 
+			/* Local path for testing */
+		
+			/*
+			 * String draft_path = "D:/test/files"; String draft_path_bck =
+			 * "D:/test/files_bck";
+			 */
 		File source =null;
 		
         PetitionUploaded pu=scrutinyService.getPetitionUploaded(doc_name);
