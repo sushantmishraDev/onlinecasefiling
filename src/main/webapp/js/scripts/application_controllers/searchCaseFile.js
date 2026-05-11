@@ -372,7 +372,7 @@ $scope.generateODT1 = function()
 	
 }
 
-$scope.generateODT = function () {
+$scope.generateODTWorking = function () {
 
     var element = document.getElementById("pdfPrep").cloneNode(true);
 
@@ -548,6 +548,196 @@ $scope.searchCaseFile = function () {
     });
 
 };
+
+
+$scope.filingDate = "";
+$scope.hearingDate = "";
+
+/*$scope.updateField = function(event, field) {
+    var text = event.target.innerText.trim();
+
+    $scope.$applyAsync(function () {
+        if (!text || text === ".....") {
+            $scope[field] = "";
+            event.target.innerText = ".....";
+            event.target.style.color = "blue";
+        } else {
+            $scope[field] = text;
+            event.target.style.color = "black";
+        }
+    });
+};*/
+
+
+
+
+/*$scope.setHearingDate = function(event){
+    var text = event.target.innerText.trim();
+
+    if (text === "" || text === ".....") {
+        $scope.hearingDate = "";
+        event.target.innerText = ".....";
+        event.target.style.color = "blue";
+    } else {
+        $scope.hearingDate = text;
+        event.target.style.color = "black";
+    }
+};*/
+/* 🔹 REMOVE placeholder immediately when typing */
+
+$scope.onFocusText = function ($event) {
+	if ($scope.onBehalfOf === "" &&
+	        event.target.innerText.trim() === "Enter text") {
+	        event.target.innerText = "";
+			event.target.style.color = "black";
+	    }
+};
+
+
+$scope.onBehalfOf = "";
+
+/* 🔹 REMOVE placeholder immediately when typing */
+/*$scope.onBehalfTyping = function(event){
+    if ($scope.onBehalfOf === "" &&
+        event.target.innerText.trim() === "Enter text") {
+        event.target.innerText = "";
+    }
+};
+*/
+/* 🔹 SAVE value */
+$scope.updateOnBehalf = function(event){
+    var text = event.target.innerText.trim();
+
+    if (text === "" || text === "Enter text") {
+        $scope.onBehalfOf = "";
+        event.target.innerText = "Enter text";
+        event.target.style.color = "blue";
+    } else {
+        $scope.onBehalfOf = text;
+        event.target.style.color = "black";
+    }
+};
+
+
+
+$scope.generateODT = function () {
+
+    console.log("................Generating ODT...");
+
+    var form = document.createElement("form");
+    form.method = "POST";
+
+    //  FIX 1: Correct URL (VERY IMPORTANT)
+    form.action = urlBase+"searchcasefile/generateOdt";
+    form.target = "_self";
+
+    function add(name, value){
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value || "";
+        form.appendChild(input);
+    }
+
+    // SAFE FETCH FUNCTIONS
+    function getText(selector){
+        var el = document.querySelector(selector);
+        return el ? el.innerText : "";
+    }
+
+    function getValue(selector){
+        var el = document.querySelector(selector);
+        return el ? el.value : "";
+    }
+
+    // -------- COLLECT DATA --------
+    add("applicationNo", "123");
+    add("year", "2026");
+
+   
+
+    add("petitionerAddress",
+        getText("#page3 div[contenteditable]"));
+
+    add("respondentAddress",
+        getText("#page4 p[contenteditable]"));
+
+    add("mainContent",
+        getValue("textarea"));
+		
+		/*var mainContent = getValue("textarea");
+		add("mainContent", mainContent);
+		
+		console.log("mainContent===",getValue("textarea"));
+		console.log(mainContent);*/
+
+    var dateText = getText("h4[contenteditable]");
+    add("date", dateText.replace("Dated:", "").trim());
+	
+	
+	$scope.caseData = {
+	    caseType: document.getElementById("caseType").value,
+	    district: document.getElementById("district").value
+	};
+
+	$scope.caseSplit = [
+	    "",
+	    document.getElementById("caseNo").value,
+	    document.getElementById("caseYear").value
+	];
+
+	$scope.categoryText = document.getElementById("categoryText").value;
+	
+    //  FIX 2: Prevent undefined crash
+    add("caseType", $scope.caseData ? $scope.caseData.caseType : "");
+    add("caseNumber", $scope.caseSplit ? $scope.caseSplit[1] : "");
+    add("caseYear", $scope.caseSplit ? $scope.caseSplit[2] : "");
+    add("district", $scope.caseData ? $scope.caseData.district : "");
+	add("category", $scope.categoryText);
+	add("onBehalfOf", $scope.onBehalfOf);
+	add("filingDate", $scope.filingDate);
+	add("hearingDate", $scope.hearingDate);
+	console.log("=================================",$scope.filingDate,$scope.hearingDate);
+	
+	console.log($scope.onBehalfOf,$scope.categoryText)
+
+    add("petitionerList",
+        ($scope.firstPrint || []).join("\n"));
+
+    add("respondentList",
+        ($scope.secondPrint || []).join("\n"));
+
+    add("advocateName", document.getElementById("advocateName").value);
+    add("rollNo", document.getElementById("rollNo").value);
+
+    document.body.appendChild(form);
+
+    // ✅ FIX 3: Ensure submit works in Angular
+    setTimeout(function () {
+        form.submit();
+    }, 0);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	 
 	 $scope.searchAlreadyCaseFile=function(){
 		 $http.get(urlBase+'searchcasefile/searchCaseFile', {params : {'case_year' :$scope.model.fd_case_year,'case_type' :$scope.model.fd_case_type,'case_no' :$scope.model.fd_case_no}}).

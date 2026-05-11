@@ -1,9 +1,14 @@
 package com.dms.controller;
 
+import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -283,6 +288,129 @@ private GlobalFunction cm;
 		return jsonData;
 
 	}
+	
+	
+	
+	  @RequestMapping(value = "/generateOdt", method = RequestMethod.POST)
+	    public void generateOdt(HttpServletRequest request,
+	                            HttpServletResponse response) {
+
+	        try {
+
+	            Map<String, String> data = new HashMap<>();
+
+	            data.put("applicationNo", get(request,"applicationNo"));
+	            data.put("year", get(request,"year"));
+
+	            data.put("onBehalfOf", get(request,"onBehalfOf"));
+	            data.put("petitionerAddress", get(request,"petitionerAddress"));
+	            data.put("respondentAddress", get(request,"respondentAddress"));
+	         //   data.put("mainContent", get(request,"mainContent"));
+	            String mainContent = get(request, "mainContent");				
+	            data.put("mainContent", mainContent);
+	            
+	            data.put("date", get(request,"date"));
+
+	            data.put("caseType", get(request,"caseType"));
+	            data.put("caseNumber", get(request,"caseNumber"));
+	            data.put("caseYear", get(request,"caseYear"));
+	            data.put("district", get(request,"district"));
+	            data.put("category", get(request,"category"));
+	            data.put("filingDate", get(request,"filingDate"));
+	            data.put("hearingDate", get(request,"hearingDate"));
+	            
+
+	            data.put("advocateName", get(request,"advocateName"));
+	            data.put("rollNo", get(request,"rollNo"));
+
+
+	            
+	            
+	            String petitionerRaw = get(request, "petitionerList");
+
+	            StringBuilder petitionerFormatted = new StringBuilder();
+
+	            if (petitionerRaw != null && !petitionerRaw.isEmpty()) {
+
+	                String[] petitioners = petitionerRaw.split("\\r?\\n");
+
+	                for (int i = 0; i < petitioners.length; i++) {
+
+	                    String name = petitioners[i].trim();
+
+	                    if (!name.isEmpty()) {
+
+	                        petitionerFormatted.append(i + 1)
+	                                           .append(". ")
+	                                           .append(name);
+
+if (i < petitioners.length - 1) {
+    petitionerFormatted.append("\r\n\r\n");
+}
+	                    }
+	                }
+	            }
+
+	            data.put("petitionerList", petitionerFormatted.toString());
+	                      
+	            
+	            String respondentRaw = get(request, "respondentList");
+
+	            StringBuilder respondentFormatted = new StringBuilder();
+
+	            if (respondentRaw != null && !respondentRaw.isEmpty()) {
+
+	                String[] respondents = respondentRaw.split("\\r?\\n");
+
+	                for (int i = 0; i < respondents.length; i++) {
+
+	                    String name = respondents[i].trim();
+
+	                    if (!name.isEmpty()) {
+
+	                        respondentFormatted.append(i + 1)
+	                                           .append(". ")
+	                                           .append(name);
+
+if (i < respondents.length - 1) {
+    petitionerFormatted.append("\r\n\r\n");
+}
+	                    }
+	                }
+	            }
+
+	            data.put("respondentList", respondentFormatted.toString());
+	            
+	           System.out.println("Petitioner List*******************"+get(request,"petitionerList"));
+
+	            byte[] file = searchFileService.generate(data);
+
+	            response.setContentType("application/vnd.oasis.opendocument.text");
+	            response.setHeader("Content-Disposition", "attachment; filename=Application.odt");
+	            response.setContentLength(file.length);
+
+	            OutputStream os = response.getOutputStream();
+	            os.write(file);
+	            os.flush();
+	            os.close();
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    private String get(HttpServletRequest req, String key) {
+	        String val = req.getParameter(key);
+	        return val == null ? "" : val;
+	    }
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 }

@@ -4,8 +4,10 @@ EDMSApp.controller('ApplicationViewController', ['$scope', '$http', '$timeout',
 	function($scope, $http, $timeout) {
 
 		var urlBase = "/onlinecasefiling/";
-
-		// ================= INIT =================
+        // =============================================================================
+		// ================= Java Fullstaack Vijay Chaurasiya 2026  =================
+		// ==============================================================================
+		
 		$scope.List = [];
 		$scope.Petition = null;
 		$scope.fd_id = null;
@@ -217,3 +219,13 @@ EDMSApp.controller('ApplicationViewController', ['$scope', '$http', '$timeout',
 		$scope.initViewPage();
 
 	}]);
+	
+	// =============================================================================
+		// ================= Java Fullstaack Vijay Chaurasiya 2026  =================
+		// ==============================================================================
+	
+	
+	
+	
+	
+	

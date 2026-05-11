@@ -2937,6 +2937,13 @@ class ProgressBar {
     this.#classList.remove("hidden");
   }
 }
+
+
+
+
+
+
+
 exports.ProgressBar = ProgressBar;
 function getActiveOrFocusedElement() {
   let curRoot = document;

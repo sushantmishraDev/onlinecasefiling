@@ -36,8 +36,7 @@
 
 /* ------------------------------ */
 </style>
-
-
+ 
 
 <script>
 	$(document).ready(function() {
@@ -63,6 +62,7 @@
 			<!-- PDF Bookmarks will appear here -->
 			<div id="" style="margin-top: 10px;"></div>
 		</div>
+
 
 		<div class="col-md-3 no-padding"">
 			<div class="panel-group" id="accordion">
@@ -164,7 +164,7 @@
 											<td style="padding: 3px;">{{$index + 1}}</td>
 
 											<!-- Type -->
-											<td style="padding: 3px; width: 35%;"><span
+											<td style="padding: 7px; width: 35%;"><span
 												ng-click="showSubDocument(data.ap_draft_no)"
 												style="text-decoration: underline; cursor: pointer; font-size: 12px;">
 													<b> {{data.applicationType.at_name}}<br />
@@ -177,7 +177,7 @@
 													{{sb.applicationType.at_name}}<br />
 													{{sb.sb_ap_no}}/{{sb.sb_ap_year}}
 												</div> <!-- Icons -->
-												<div style="margin-top: 2px;">
+												<!-- <div style="margin-top: 2px;">
 													<span ng-if="data.ap_draft_no"
 														class="glyphicon glyphicon-folder-open"
 														style="cursor: pointer; font-size: 12px;"
@@ -190,7 +190,8 @@
 														type="checkbox" ng-model="data.checkBoxValue"
 														ng-click="checkHighlight(data)">
 													</span>
-												</div></td>
+												</div> -->
+												</td>
 
 											<!-- Name -->
 											<td style="padding: 3px; font-size: 12px;">
@@ -318,7 +319,6 @@
 	});
 </script>
 
-
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/scripts/controllers/ApplicationViewController.js"></script>
 <script type="text/javascript"
@@ -327,8 +327,6 @@
 	src="${pageContext.request.contextPath}/js/bootstrap/ui-bootstrap-tpls.0.11.2.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/angularJs/angular-tree-control.js"></script>
-
-
 
 <script>
 	

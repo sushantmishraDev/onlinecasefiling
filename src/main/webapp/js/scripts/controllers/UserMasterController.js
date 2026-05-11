@@ -123,19 +123,6 @@ edmsApp.controller("UserMasterCtrl",['$scope','$http', function($scope,$http) {
     	
     	$scope.masterentity=masterentity;
     	
-//    	if($scope.masterentity){
-//    		angular.forEach($scope.masterdata,function(value,index){	    			
-//    			if(value.username==$scope.masterentity.username){
-//    				if($scope.masterentity.um_id){
-//    					if($scope.masterentity.um_id!=value.um_id){
-//    						$scope.error=true;
-//    					}
-//    				}else{
-//    					$scope.error=true;
-//    				}
-//    			}
-//            });
-//    	}
     	
     		var response = $http.post(urlBase+'user/create',$scope.masterentity);		 
 				response.success(function(data, status, headers, config) {					

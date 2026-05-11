@@ -63,6 +63,19 @@ if (session.getAttribute("USER") != null)
 	<div id="content" class="content">
 		<div class="container-fluid" ng-controller="searchCaseFileController"
 			oncontextmenu="return false;" ng-init="listingParty()">
+			
+			
+			
+			<input type="hidden" id="advocateName" value="<%=user.getUm_fullname()%>">
+            <input type="hidden" id="rollNo" value="<%=user.getUsername()%>">
+            <input type="hidden" id="caseType" value="${caseData.caseType}">
+<input type="hidden" id="caseNo" value="${caseSplit[1]}">
+<input type="hidden" id="caseYear" value="${caseSplit[2]}">
+<input type="hidden" id="district" value="${caseData.district}">
+<input type="hidden" id="categoryText"
+       value="${fn:split(caseData.category, '(')[0]}">
+            
+            
 
 			<!-- <input type="hidden" class="form-control" value=${doc_id} id="doc_id" name="doc_id">   ---- caseDetalby ccms data in ${caseData} ${caseSplit} -->
 			<h3>
@@ -92,12 +105,18 @@ if (session.getAttribute("USER") != null)
 									<div id=page2 style="text-align: center">
 										<h4>LISTING APPLICATION NO. --------- OF 2026</h4>
 										<!-- <h4>(Under order XXII Rule 1 Of High Court Rules)</h4> -->
-										<p style="line-height: 0pt;" contenteditable="true"
-											onfocus="if(this.innerText.includes('Enter text')){this.innerHTML='On behalf of.....';}"
-											onblur="if(this.innerText.trim()=='On behalf of'){this.innerHTML='On behalf of<i style=\'color:blue;\'>
-											Enter text</i>';}" > On behalf of.....<i style="color: blue;">Enter
-												text</i>
-										</p>
+										<p style="line-height:1.5;">
+    On behalf of
+    <span contenteditable="true"
+    	ng-focus="onFocusText()"
+          ng-keyup="onBehalfTyping($event)"
+          ng-blur="updateOnBehalf($event)"
+          style="min-width:150px;
+                 display:inline-block;
+                 color:{{!onBehalfOf ? 'blue' : 'black'}};">
+        {{ onBehalfOf || 'Enter text' }}
+    </span>
+</p>
 										<h4 align="center">IN</h4>
 										<h4>${caseData.caseType}NO.${caseSplit[1]}OF
 											${caseSplit[2]}</h4>
@@ -155,7 +174,7 @@ if (session.getAttribute("USER") != null)
 											respectfully showeth as under:</p>
 
 
-										<div style="margin: 10pt 0; line-height: 1.5;">
+										<div style="margin: 10pt 0; line-height: 1.5;page-break-inside: auto;">
 											<textarea class="placeholder-text" ng-model="text"
 style="width:100%;word-spacing:6pt;letter-spacing:1pt;border:none;
 font-family:'Arial','Times New Roman',serif;font-size:14pt;
@@ -171,12 +190,27 @@ placeholder="text to be filled ......."></textarea>
 
 
 
-										<div
-											style="text-align: justify; letter-spacing: 1pt; line-height: 1.5; margin: 10pt 0; break-inside: avoid;">
-											5.That this application is being filed on <span
-												style="white-space: nowrap;">.....</span> and it is to be
-											taken up on <span style="white-space: nowrap;">.....</span>.
-										</div>
+<div style="text-align: justify; letter-spacing: 1pt; line-height: 1.5; margin: 10pt 0;">
+    5. That this application is being filed on 
+
+   <!--  <span contenteditable="true"
+          ng-init="filingDate=''"
+          ng-blur="updateField($event, 'filingDate')"
+          style="border-bottom:1px dotted black; min-width:80px; display:inline-block; color:blue;">
+        .....
+    </span>  -->
+    <input type="text" ng-model="filingDate" placeholder="....................." style="border:none; width:100px;font-family:'Arial','Times New Roman',serif;font-size:12pt;">
+
+    and it is to be taken up on 
+
+    <!-- <span contenteditable="true"
+          ng-init="hearingDate=''"
+          ng-blur="updateField($event, 'hearingDate')"
+          style="border-bottom:1px dotted black; min-width:80px; display:inline-block; color:blue;">
+        .....
+    </span> -->
+    <input type="text" ng-model="hearingDate" placeholder="....................." style="border:none; width:100px;font-family:'Arial','Times New Roman',serif;font-size:12pt;">
+</div>
 
 									</div>
 
@@ -277,7 +311,7 @@ placeholder="text to be filled ......."></textarea>
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/odf.js/0.9.0/odf.min.js"></script>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/js/scripts/application_controllers/searchCaseFile.js?v=2"></script>
+	src="${pageContext.request.contextPath}/js/scripts/application_controllers/searchCaseFile.js?v=4"></script>
 
 <%-- <script type="text/javascript"
 	src="${pageContext.request.contextPath}/js/bootstrap/angular-datepicker.js"></script> --%>
@@ -299,6 +333,7 @@ placeholder="text to be filled ......."></textarea>
 
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+	
+	
 
 </html>

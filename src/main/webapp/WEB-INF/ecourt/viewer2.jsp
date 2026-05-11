@@ -9,10 +9,13 @@
 <link rel="resource" type="application/l10n"
 	href="${pageContext.request.contextPath}/js/pdfjs-3.4.120/web/locale/locale.properties" />
 <script src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/build/pdf.js"></script>
-<script
-	src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/web/debugger.js"></script>
+
 <script
 	src="${pageContext.request.contextPath}/js/pdfjs-3.4.120/web/viewer.js?v=3"></script>
+	
+	
+	
+	
 
 <div tabindex="1" class="viewOnLoad" style="height: 450px; ">
     <div id="outerContainer">
@@ -58,7 +61,7 @@
       <div id="mainContainer">
         <div class="findbar hidden doorHanger" id="findbar">
           <div id="findbarInputContainer">
-            <input id="findInput" class="toolbarField" title="Find" placeholder="Find in document…" tabindex="91" data-l10n-id="find_input" aria-invalid="false">
+            <input id="findInput" class="toolbarField" title="Find" placeholder="Find in documentâ?¦" tabindex="91" data-l10n-id="find_input" aria-invalid="false">
             <div class="splitToolbarButton">
               <button id="findPrevious" class="toolbarButton" title="Find the previous occurrence of the phrase" tabindex="92" data-l10n-id="find_previous">
                 <span data-l10n-id="find_previous_label">Previous</span>
@@ -205,8 +208,8 @@
 
             <div class="horizontalToolbarSeparator"></div>
 
-            <button id="documentProperties" class="secondaryToolbarButton" title="Document Properties…" tabindex="69" data-l10n-id="document_properties" aria-controls="documentPropertiesDialog">
-              <span data-l10n-id="document_properties_label">Document Properties…</span>
+            <button id="documentProperties" class="secondaryToolbarButton" title="Document Propertiesâ?¦" tabindex="69" data-l10n-id="document_properties" aria-controls="documentPropertiesDialog">
+              <span data-l10n-id="document_properties_label">Document Propertiesâ?¦</span>
             </button>
           </div>
         </div>  <!-- secondaryToolbar -->
@@ -231,8 +234,12 @@
                     <span data-l10n-id="next_label">Next</span>
                   </button>
                 </div>
-                <input type="number" id="pageNumber" class="toolbarField" title="Page" value="1" min="1" tabindex="15" data-l10n-id="page" autocomplete="off">
-                <span id="numPages" class="toolbarLabel"></span>
+              <!--    <input type="number" id="pageNumber" class="toolbarField" title="Page" value="1" min="1" tabindex="15" data-l10n-id="page" autocomplete="off">
+                <span id="numPages" class="toolbarLabel"></span>  -->
+                 <input type="number" id="pageNumber" style="display:none;">
+               <select id="pageSelect" class="toolbarField" style="height:28px;font-size:13px;" ></select>
+              <span id="numPages" class="toolbarLabel"></span>
+              
               </div>
               <div id="toolbarViewerRight" >
                 <button id="openFile" class="toolbarButton hiddenLargeView" title="Open File" tabindex="31" data-l10n-id="open_file" hidden="true">
@@ -386,7 +393,7 @@
         </dialog>
         <dialog id="printServiceDialog" style="min-width: 200px;">
           <div class="row">
-            <span data-l10n-id="print_progress_message">Preparing document for printing…</span>
+            <span data-l10n-id="print_progress_message">Preparing document for printingâ?¦</span>
           </div>
           <div class="row">
             <progress value="0" max="100"></progress>
@@ -403,3 +410,127 @@
 
     <input type="file" id="fileInput" class="hidden">
   </div>
+  
+  
+  <!--====================================== VIJAY CHAURASIYA ==============================  -->
+  <!-- ====================================== THIS SCRIPT FOR PAGE DROPDOWN ==============  -->
+<script>
+console.log("FINAL STABLE FIX LOADED");
+document.addEventListener("DOMContentLoaded", function () {
+
+    const waitForViewer = setInterval(function () {
+
+        if (
+            typeof PDFViewerApplication !== "undefined" &&
+            PDFViewerApplication.initialized &&
+            PDFViewerApplication.eventBus
+        ) {
+            clearInterval(waitForViewer);
+
+            console.log("PDF SYSTEM READY");
+
+            const eventBus = PDFViewerApplication.eventBus;
+            const select = document.getElementById("pageSelect");
+
+            if (!select) return;
+
+            //  Rebuild dropdown EVERY TIME new PDF loads
+            eventBus.on("pagesinit", function () {
+
+                const pdf = PDFViewerApplication.pdfDocument;
+                const totalPages = pdf._pdfInfo.numPages;
+
+                console.log("New PDF Loaded. Pages:", totalPages);
+
+                // Clear old values
+                select.innerHTML = "";
+
+                // Fill new pages
+                for (let i = 1; i <= totalPages; i++) {
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.text = i;
+                    select.appendChild(option);
+                }
+
+                // Set current page
+                select.value = 1;
+
+                //  Remove old event (important to avoid duplicate binding)
+                select.onchange = null;
+
+                // Dropdown  PDF
+                select.addEventListener("change", function () {
+                    PDFViewerApplication.page = parseInt(this.value);
+                });
+
+            });
+
+            //  Sync dropdown when page changes (bookmark, scroll, buttons)
+            eventBus.on("pagechanging", function (e) {
+                select.value = e.pageNumber;
+            });
+
+        }
+
+    }, 300);
+
+});</script>
+       <!--====================================== VIJAY CHAURASIYA ==============================  -->
+
+ <!-- =============================This scripts overrides automatic page zoom of the pdf  -->
+<script>
+console.log("AUTO ZOOM FIX LOADED");
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const waitForViewer = setInterval(function () {
+
+        if (
+            typeof PDFViewerApplication !== "undefined" &&
+            PDFViewerApplication.initialized &&
+            PDFViewerApplication.eventBus
+        ) {
+            clearInterval(waitForViewer);
+
+            const eventBus = PDFViewerApplication.eventBus;
+
+            console.log("FINAL FIX ACTIVE");
+
+            //  Initial load
+            eventBus.on("pagesinit", function () {
+                PDFViewerApplication.pdfViewer.currentScaleValue = "auto";
+            });
+
+            //  Sync dropdown
+            eventBus.on("pagechanging", function (e) {
+                const select = document.getElementById("pageSelect");
+                if (select) {
+                    select.value = e.pageNumber;
+                }
+            });
+
+            //  FINAL FIX (bookmark zoom issue)
+            let isAutoZoomApplied = false;
+
+            eventBus.on("updateviewarea", function () {
+
+                if (isAutoZoomApplied) return;
+
+                isAutoZoomApplied = true;
+
+                setTimeout(() => {
+                    if (PDFViewerApplication.pdfViewer.currentScaleValue !== "auto") {
+                        console.log("Fixing zoom after bookmark");
+                        PDFViewerApplication.pdfViewer.currentScaleValue = "auto";
+                    }
+                    isAutoZoomApplied = false;
+                }, 100);
+            });
+
+        }
+
+    }, 300);
+
+});
+</script>
